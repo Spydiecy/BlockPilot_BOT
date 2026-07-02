@@ -101,103 +101,7 @@ function HeroContent() {
   );
 }
 
-function Navbar() {
-  return (
-    <nav className="fixed top-0 left-0 right-0 z-20" style={{ backgroundColor: 'rgba(13, 13, 24, 0.3)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
-      <div className="container mx-auto px-4 py-4 md:px-6 lg:px-8 flex items-center justify-between">
-        <div className="flex items-center space-x-8 lg:space-x-12">
-          <a 
-            href="#" 
-            onClick={(e) => {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }} 
-            className="text-white group"
-          >
-            <div className="relative">
-              {/* Glow Effect */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg blur opacity-20 group-hover:opacity-40 transition duration-300" />
-              
-              {/* Logo Container */}
-              <div className="relative flex items-center bg-black border border-neutral-800 group-hover:border-blue-500/50 px-4 py-2 rounded-lg transition duration-300">
-                {/* Lightning Bolt */}
-                <div className="mr-2 text-blue-400 group-hover:text-blue-300 transition-colors duration-300">
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                  </svg>
-                </div>
-                
-                {/* Text */}
-                <span className="text-xl font-mono font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-300 group-hover:from-blue-400 group-hover:to-white transition duration-300">
-                  AuditFi
-                </span>
-              </div>
-            </div>
-          </a>
 
-          <div className="hidden md:flex items-center space-x-8">
-            <a 
-              href="#" 
-              onClick={(e) => {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="text-gray-300 hover:text-white text-sm transition duration-150"
-            >
-              Home
-            </a>
-            <a 
-              href="#features" 
-              onClick={(e) => {
-                e.preventDefault();
-                smoothScrollTo('features');
-              }}
-              className="text-gray-300 hover:text-white text-sm transition duration-150"
-            >
-              Features
-            </a>
-            <a 
-              href="#how-it-works" 
-              onClick={(e) => {
-                e.preventDefault();
-                smoothScrollTo('how-it-works');
-              }}
-              className="text-gray-300 hover:text-white text-sm transition duration-150"
-            >
-              How it Works
-            </a>
-            <a 
-              href="#chains" 
-              onClick={(e) => {
-                e.preventDefault();
-                smoothScrollTo('chains');
-              }}
-              className="text-gray-300 hover:text-white text-sm transition duration-150"
-            >
-              Chains Supported
-            </a>
-            <a 
-              href="#audits" 
-              onClick={(e) => {
-                e.preventDefault();
-                smoothScrollTo('audits');
-              }}
-              className="text-gray-300 hover:text-white text-sm transition duration-150"
-            >
-              Audits
-            </a>
-          </div>
-        </div>
-
-        <div className="flex items-center">
-          <a href="/dashboard" className="bg-black border border-gray-800 text-white px-6 py-2 rounded-full text-sm hover:bg-gray-900 transition duration-300">
-            Launch App
-          </a>
-        </div>
-      </div>
-    </nav>
-  );
-}
 
 const HeroSection = () => {
   const screenshotRef = useRef<HTMLDivElement>(null);
@@ -227,8 +131,6 @@ const HeroSection = () => {
 
   return (
     <div className="relative">
-      <Navbar />
-
       <div className="relative min-h-screen">
         <div className="absolute inset-0 z-0 pointer-events-auto">
           <HeroSplineBackground />
