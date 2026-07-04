@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FiHome, FiFileText, FiShield, FiSettings, FiUser, FiZap } from 'react-icons/fi';
+import { FiHome, FiFileText, FiShield, FiUser, FiZap, FiCreditCard } from 'react-icons/fi';
 
 interface NavItem {
   name: string;
@@ -24,7 +24,7 @@ export function AnimatedNavbar() {
     { name: 'Test Cases', path: '/test-cases', icon: <FiFileText /> },
     { name: 'Reports', path: '/reports', icon: <FiFileText /> },
     { name: 'Profile', path: '/profile', icon: <FiUser /> },
-    { name: 'Settings', path: '/settings', icon: <FiSettings /> },
+    { name: 'Wallet', path: '/wallet', icon: <FiCreditCard /> },
   ];
 
   // Handle scroll events
