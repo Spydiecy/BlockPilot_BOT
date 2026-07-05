@@ -44,17 +44,17 @@ declare global {
 }
 
 export const CHAIN_CONFIG: Record<string, ChainConfig> = {
-  pharosDevnet: {
-    chainId: '0xC352', // 50002 in hex
-    chainName: 'Pharos Devnet',
+  blockdagTestnet: {
+    chainId: '0x413', // 1043 in hex
+    chainName: 'BlockDAG Testnet',
     nativeCurrency: {
-      name: 'Pharos',
-      symbol: 'PTT',
+      name: 'BlockDAG Testnet',
+      symbol: 'BDAG',
       decimals: 18
     },
-    rpcUrls: ['https://devnet.dplabs-internal.com'],
-    blockExplorerUrls: ['https://pharosscan.xyz'],
-    iconPath: '/chains/pharos.png'
+    rpcUrls: ['https://rpc.primordial.bdagscan.com'],
+    blockExplorerUrls: ['https://primordial.bdagscan.com'],
+    iconPath: '/chains/blockdag.png'
   }
 } as const;
 

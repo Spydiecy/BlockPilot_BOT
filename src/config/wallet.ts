@@ -1,3 +1,5 @@
+import { ethers } from 'ethers';
+
 // Define chain interface
 export interface Chain {
   id: number;
@@ -10,6 +12,14 @@ export interface Chain {
 
 // Supported chains configuration
 export const SUPPORTED_CHAINS = {
+  blockdagTestnet: {
+    id: 1043,
+    name: 'BlockDAG Testnet',
+    rpcUrl: 'https://rpc.primordial.bdagscan.com',
+    explorerUrl: 'https://primordial.bdagscan.com',
+    currency: 'BDAG',
+    testnet: true,
+  },
   ethereum: {
     id: 1,
     name: 'Ethereum',
@@ -48,7 +58,7 @@ export type ChainId = keyof typeof SUPPORTED_CHAINS;
 export type SupportedChain = typeof SUPPORTED_CHAINS[ChainId];
 
 // Default chain to use
-const DEFAULT_CHAIN: ChainId = 'ethereum';
+const DEFAULT_CHAIN: ChainId = 'blockdagTestnet';
 
 // Helper to get chain by ID
 export const getChainById = (chainId: number): SupportedChain | undefined => {
@@ -69,15 +79,23 @@ export const formatAddress = (address: string, length = 6): string => {
 };
 
 // Format balance with appropriate decimals
-export const formatBalance = (balance: string | number, decimals = 4): string => {
-  const num = typeof balance === 'string' ? parseFloat(balance) : balance;
-  if (isNaN(num)) return '0';
-  
-  // Convert from wei to ETH if the number is very large
-  const displayValue = num > 1e18 ? num / 1e18 : num;
-  
-  // Format with fixed decimals, then remove trailing zeros
-  return displayValue.toFixed(decimals).replace(/\.?0+$/, '');
+export const formatBalance = (balance: string | number | undefined, decimals = 4): string => {
+  if (balance === undefined || balance === null) return '0.0000';
+
+  try {
+    // ethers.formatEther can handle BigInt, hex strings, and numbers representing wei
+    const formatted = ethers.formatEther(balance);
+    const num = parseFloat(formatted);
+    return num.toFixed(decimals);
+  } catch (error) {
+    // If formatEther fails, it's likely because the value is already a decimal string like "79.9694"
+    const balanceAsNumber = parseFloat(balance.toString());
+    if (!isNaN(balanceAsNumber)) {
+      return balanceAsNumber.toFixed(decimals);
+    }
+    console.error('Could not format balance:', balance, error);
+    return '0.0000';
+  }
 };
 
 // Get default chain configuration

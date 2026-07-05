@@ -19,7 +19,7 @@ import {
   Lightning,
   Shield
 } from 'phosphor-react';
-import { connectWallet } from '@/utils/web3';
+import { connectWallet, switchNetwork } from '@/utils/web3';
 import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI } from '@/utils/contracts';
 import { CHAIN_CONFIG } from '@/utils/web3';
 
@@ -194,22 +194,17 @@ export default function AuditPage() {
       );
 
       // Get current chain ID
-      const network = await provider.getNetwork();
-      const chainId = '0x' + network.chainId.toString(16);
+      const currentChainId = '0x' + (await provider.getNetwork()).chainId.toString(16);
       
-      // Check if we're on Pharos Devnet
-      const detectedChain = await detectCurrentNetwork();
-      
-      if (!detectedChain) {
-        throw new Error('Please switch to Pharos Devnet to register audits');
-      }
-      
-      if (detectedChain !== 'pharosDevnet') {
-        throw new Error('Please switch to Pharos Devnet to register audits');
+      // Check if we're on BlockDAG Testnet
+      if (currentChainId !== CHAIN_CONFIG.blockdagTestnet.chainId) {
+        await switchNetwork('blockdagTestnet');
+        // Throw an error to stop execution and prompt user to re-initiate the action
+        throw new Error('Please switch to BlockDAG Testnet and try again.');
       }
       
       // Get the proper contract address based on the current network
-      const contractAddress = CONTRACT_ADDRESSES[detectedChain];
+      const contractAddress = CONTRACT_ADDRESSES.blockdagTestnet;
       
       const contract = new ethers.Contract(
         contractAddress,
@@ -357,7 +352,7 @@ export default function AuditPage() {
             <span className="text-blue-400 text-sm font-semibold">AI Security Analysis</span>
           </div>
           <h1 className="text-3xl font-mono font-bold text-blue-400 mb-4">Smart Contract Audit</h1>
-          <p className="text-gray-400">Get instant AI-powered security analysis for your smart contracts on Pharos Devnet</p>
+          <p className="text-gray-400">Get instant AI-powered security analysis for your smart contracts on BlockDAG Testnet</p>
           <AnimatePresence>
             {error && (
               <motion.div
@@ -590,7 +585,7 @@ export default function AuditPage() {
                       
                       {!currentChain && (
                         <div className="mt-4 text-yellow-400 text-sm">
-                          Please connect to Pharos Devnet
+                          Please connect to BlockDAG Testnet
                         </div>
                       )}
                     </div>

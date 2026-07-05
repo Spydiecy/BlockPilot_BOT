@@ -55,7 +55,7 @@ export default function ReportsPage() {
       const allAudits: AuditReport[] = [];
       
       try {
-        console.log('Fetching audit reports from Pharos Devnet...');
+        console.log('Fetching audit reports from BlockDAG Testnet...');
         
         // First get the total number of contracts
         const totalResponse = await fetch('/api/blockchain', {
@@ -75,7 +75,7 @@ export default function ReportsPage() {
         
         const totalData = await totalResponse.json();
         const totalContracts = totalData.result;
-        console.log(`Found ${totalContracts} contracts on Pharos Devnet`);
+        console.log(`Found ${totalContracts} contracts on BlockDAG Testnet`);
         
         // Fetch in batches to respect rate limits
         const BATCH_SIZE = 10; 
@@ -112,7 +112,7 @@ export default function ReportsPage() {
                 summary: audit.summary,
                 auditor: audit.auditor,
                 timestamp: audit.timestamp,
-                chain: 'pharosDevnet' // Since we're only using Pharos Devnet
+                chain: 'blockdagTestnet' // Since we're only using BlockDAG Testnet
               });
             }
             

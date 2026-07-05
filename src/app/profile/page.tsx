@@ -64,7 +64,7 @@ export default function ProfilePage() {
       let totalStars = 0;
       
       try {
-        console.log('Fetching user history from Pharos Devnet...');
+        console.log('Fetching user history from BlockDAG Testnet...');
         
         // First, get all contract hashes audited by this user
         const historyResponse = await fetch('/api/blockchain', {

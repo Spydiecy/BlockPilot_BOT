@@ -1,6 +1,6 @@
 // constants/contracts.ts
 export const CONTRACT_ADDRESSES = {
-  pharosDevnet: '0xCa36dD890F987EDcE1D6D7C74Fb9df627c216BF6',
+  blockdagTestnet: '0x16f16b1742ECA434faf9442a9f9d933A766acfCA',
 } as const;
 
 export const AUDIT_REGISTRY_ABI = [

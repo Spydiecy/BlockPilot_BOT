@@ -207,12 +207,23 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setIsAuthenticated(true);
         setWalletConnected(true); // Set cookie on connect
         
-        // Get current chain ID
-        const chainId = await ethereum.request({ method: 'eth_chainId' }) as string;
-        handleChainChanged(chainId);
-        
-        // Update balance
-        await updateBalance(account);
+        // Check and switch network if necessary
+        const defaultChain = getDefaultChain();
+        const currentChainId = parseInt(await ethereum.request({ method: 'eth_chainId' }) as string, 16);
+
+        if (currentChainId !== defaultChain.id) {
+          const switched = await switchChain(defaultChain.id);
+          if (switched) {
+            // After switching, the 'chainChanged' event will update the state
+            await updateBalance(account);
+          } else {
+            // Handle case where user rejects the switch
+            throw new Error('User rejected network switch.');
+          }
+        } else {
+          handleChainChanged(`0x${currentChainId.toString(16)}`);
+          await updateBalance(account);
+        }
         
         // Redirect if needed
         if (redirect !== '/') {

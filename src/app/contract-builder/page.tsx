@@ -247,13 +247,12 @@ export default function ContractBuilder() {
       const { provider, signer } = await connectWallet();
       const detectedChain = await detectCurrentNetwork();
       
-      // Validate we're on Pharos Devnet
-      if (!detectedChain) {
-        throw new Error('Please switch to Pharos Devnet to deploy contracts');
-      }
-      
-      if (detectedChain !== 'pharosDevnet') {
-        throw new Error('Please switch to Pharos Devnet to deploy contracts');
+      // Validate we're on BlockDAG Testnet
+      const network = await provider.getNetwork();
+      const currentChainId = '0x' + network.chainId.toString(16);
+
+      if (currentChainId !== CHAIN_CONFIG.blockdagTestnet.chainId) {
+        throw new Error('Please switch to BlockDAG Testnet to deploy contracts');
       }
 
       // Compile contract
@@ -347,7 +346,7 @@ export default function ContractBuilder() {
             <span className="text-blue-400 text-sm font-semibold">Smart Contract Development</span>
           </div>
           <h1 className="text-3xl font-mono font-bold mb-4 text-blue-400">Smart Contract Builder</h1>
-          <p className="text-gray-400">Generate and deploy secure smart contracts on Pharos Devnet</p>
+          <p className="text-gray-400">Generate and deploy secure smart contracts on BlockDAG Testnet</p>
           
           <AnimatePresence>
             {error && (
@@ -558,7 +557,7 @@ export default function ContractBuilder() {
                       </div>
                     ) : (
                       <div className="text-sm text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-3 py-2">
-                        Please connect to Pharos Devnet to deploy
+                        Please connect to BlockDAG Testnet to deploy
                       </div>
                     )}
 
