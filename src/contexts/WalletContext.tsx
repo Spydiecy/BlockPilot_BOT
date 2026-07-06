@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, ReactNode, useCallback, useState } from 'react';
+import { ethers } from 'ethers';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { formatBalance, getChain, getDefaultChain, getSupportedChains, type SupportedChain } from '@/config/wallet';
 import type { EthereumProvider } from '@/types/ethereum';
@@ -27,13 +28,15 @@ const getEthereum = (): EthereumProvider | undefined => {
 interface WalletContextType {
   isConnected: boolean;
   isConnecting: boolean;
-  address: string | undefined;
-  chainId: number | undefined;
+  address: string | null;
+  chainId: number | null;
   currentChain: SupportedChain | undefined;
-  balance: string | undefined;
+  balance: string | null;
+  provider: ethers.BrowserProvider | null;
+  signer: ethers.Signer | null;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
-  switchChain: (chainId: number) => Promise<boolean>;
+  switchChain: (chainId: number) => Promise<void>;
   isAuthenticated: boolean;
 }
 
@@ -42,9 +45,11 @@ const WalletContext = createContext<WalletContextType | undefined>(undefined);
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [address, setAddress] = useState<string | undefined>();
-  const [chainId, setChainId] = useState<number | undefined>();
-  const [balance, setBalance] = useState<string>();
+  const [address, setAddress] = useState<string | null>(null);
+  const [chainId, setChainId] = useState<number | null>(null);
+  const [balance, setBalance] = useState<string | null>(null);
+  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
+  const [signer, setSigner] = useState<ethers.Signer | null>(null);
   const [currentChain, setCurrentChain] = useState<SupportedChain | undefined>();
   
   const router = useRouter();
@@ -111,14 +116,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         ethereum.removeListener('chainChanged', handleChainChangedEvent);
       }
     };
-
-    // Cleanup
-    return () => {
-      if (window.ethereum) {
-        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
-        window.ethereum.removeListener('chainChanged', handleChainChanged);
-      }
-    };
   }, []);
 
   // Handle account changes
@@ -129,8 +126,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       
     if (validAccounts.length === 0) {
       // Disconnected
-      setAddress(undefined);
-      setBalance(undefined);
+      setAddress(null);
+      setBalance(null);
       setIsAuthenticated(false);
       setCurrentChain(undefined);
       setWalletConnected(false); // clear cookie on disconnect
@@ -165,28 +162,20 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       console.warn('Unsupported chain ID:', chainId);
       setCurrentChain(undefined);
     }
-    
-    // Optionally, update state here if needed, but do NOT reload the page
-    // window.location.reload();
   }, []);
 
   // Update balance for an account
   const updateBalance = useCallback(async (account: string) => {
-    const ethereum = getEthereum();
-    if (!ethereum) return;
+    if (!provider) return;
     
     try {
-      const balance = await ethereum.request({
-        method: 'eth_getBalance',
-        params: [account, 'latest']
-      }) as string;
-      
-      setBalance(formatBalance(balance));
+      const balance = await provider.getBalance(account);
+      setBalance(formatBalance(balance.toString()));
     } catch (error) {
       console.error('Error fetching balance:', error);
-      setBalance(undefined);
+      setBalance(null);
     }
-  }, []);
+  }, [provider]);
 
   // Connect wallet
   const connect = async () => {
@@ -211,24 +200,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         const defaultChain = getDefaultChain();
         const currentChainId = parseInt(await ethereum.request({ method: 'eth_chainId' }) as string, 16);
 
-        if (currentChainId !== defaultChain.id) {
-          const switched = await switchChain(defaultChain.id);
-          if (switched) {
-            // After switching, the 'chainChanged' event will update the state
-            await updateBalance(account);
-          } else {
-            // Handle case where user rejects the switch
-            throw new Error('User rejected network switch.');
-          }
-        } else {
-          handleChainChanged(`0x${currentChainId.toString(16)}`);
-          await updateBalance(account);
+        if (currentChain?.id !== defaultChain.id) {
+          await switchChain(defaultChain.id);
+          // After the switch attempt, the chainChanged event will trigger a state update.
+          // We don't need to check the return value here.
         }
-        
-        // Redirect if needed
-        if (redirect !== '/') {
-          router.push(redirect);
-        }
+        await updateBalance(account);
       }
     } catch (error) {
       console.error('Error connecting wallet:', error);
@@ -241,17 +218,17 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   // Disconnect wallet
   const disconnect = async () => {
     // Note: Most wallets don't have a disconnect method, we just clear the state
-    setAddress(undefined);
-    setBalance(undefined);
-    setChainId(undefined);
+    setAddress(null);
+    setBalance(null);
+    setChainId(null);
     setCurrentChain(undefined);
     setIsAuthenticated(false);
     setWalletConnected(false); // Clear cookie on disconnect
-    router.push('/');
+    router.push('/wallet');
   };
 
   // Switch to a different chain
-  const switchChain = async (targetChainId: number): Promise<boolean> => {
+  const switchChain = async (targetChainId: number): Promise<void> => {
     if (typeof window === 'undefined' || !window.ethereum) {
       throw new Error('No Ethereum provider found');
     }
@@ -261,7 +238,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: `0x${targetChainId.toString(16)}` }],
       });
-      return true;
     } catch (switchError: any) {
       // This error code indicates that the chain has not been added to MetaMask
       if (switchError.code === 4902) {
@@ -283,10 +259,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
               blockExplorerUrls: [chain.explorerUrl],
             }],
           });
-          return true;
         } catch (addError) {
-          console.error('Error adding chain:', addError);
-          throw addError;
+          console.error('Target chain configuration not found');
+          return;
         }
       } else {
         console.error('Error switching chain:', switchError);
@@ -295,22 +270,39 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  useEffect(() => {
+    const ethereum = getEthereum();
+    if (ethereum) {
+      const web3Provider = new ethers.BrowserProvider(ethereum as any);
+      setProvider(web3Provider);
+      if (address) {
+        const getSigner = async () => {
+          const web3Signer = await web3Provider.getSigner();
+          setSigner(web3Signer);
+        }
+        getSigner();
+      }
+    }
+  }, [address]);
+
   // Expose the wallet context
+  const value = {
+    isConnected: isAuthenticated,
+    isConnecting,
+    address,
+    chainId,
+    currentChain,
+    balance,
+    provider,
+    signer,
+    connect,
+    disconnect,
+    switchChain,
+    isAuthenticated,
+  };
+
   return (
-    <WalletContext.Provider
-      value={{
-        isConnected: isAuthenticated,
-        isConnecting,
-        address,
-        chainId,
-        currentChain,
-        balance,
-        connect,
-        disconnect,
-        switchChain,
-        isAuthenticated,
-      }}
-    >
+    <WalletContext.Provider value={value}>
       {children}
     </WalletContext.Provider>
   );
