@@ -125,7 +125,7 @@ export default function AuditPage() {
       const tx = await contract.registerAudit(
         contractHash,
         result.stars,
-        `https://ipfs.io/ipfs/YOUR_IPFS_HASH` // Placeholder for IPFS hash
+        result.summary
       );
 
       const receipt = await tx.wait();

@@ -3,10 +3,12 @@ import { ethers } from 'ethers';
 // Define chain interface
 export interface Chain {
   id: number;
+  key: ChainId;
   name: string;
   rpcUrl: string;
   explorerUrl: string;
   currency: string;
+  iconPath: string;
   testnet?: boolean;
 }
 
@@ -14,42 +16,52 @@ export interface Chain {
 export const SUPPORTED_CHAINS = {
   blockdagTestnet: {
     id: 1043,
+    key: 'blockdagTestnet',
     name: 'BlockDAG Testnet',
     rpcUrl: 'https://rpc.primordial.bdagscan.com',
     explorerUrl: 'https://primordial.bdagscan.com',
     currency: 'BDAG',
+    iconPath: '/chains/blockdag.png',
     testnet: true,
   },
   ethereum: {
     id: 1,
+    key: 'ethereum',
     name: 'Ethereum',
     rpcUrl: 'https://eth.llamarpc.com',
     explorerUrl: 'https://etherscan.io',
     currency: 'ETH',
+    iconPath: '/chains/ethereum.svg',
     testnet: false,
   },
   polygon: {
     id: 137,
+    key: 'polygon',
     name: 'Polygon',
     rpcUrl: 'https://polygon-rpc.com',
     explorerUrl: 'https://polygonscan.com',
     currency: 'MATIC',
+    iconPath: '/chains/polygon.svg',
     testnet: false,
   },
   optimism: {
     id: 10,
+    key: 'optimism',
     name: 'Optimism',
     rpcUrl: 'https://mainnet.optimism.io',
     explorerUrl: 'https://optimistic.etherscan.io',
     currency: 'ETH',
+    iconPath: '/chains/optimism.svg',
     testnet: false,
   },
   arbitrum: {
     id: 42161,
+    key: 'arbitrum',
     name: 'Arbitrum',
     rpcUrl: 'https://arb1.arbitrum.io/rpc',
     explorerUrl: 'https://arbiscan.io',
     currency: 'ETH',
+    iconPath: '/chains/arbitrum.svg',
     testnet: false,
   },
 } as const;
