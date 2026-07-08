@@ -9,6 +9,8 @@ import {
   MagnifyingGlass, 
   Wallet, 
   User, 
+  TestTube, 
+  BookOpen, 
   IconProps 
 } from 'phosphor-react';
 
@@ -21,6 +23,8 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: '/', label: 'Home', icon: House },
   { path: '/audit', label: 'Audit', icon: MagnifyingGlass },
+  { path: '/testcase-generator', label: 'Test Cases', icon: TestTube },
+  { path: '/documentor', label: 'Documentation', icon: BookOpen },
   { path: '/wallet', label: 'Wallet', icon: Wallet },
   { path: '/profile', label: 'Profile', icon: User },
 ];

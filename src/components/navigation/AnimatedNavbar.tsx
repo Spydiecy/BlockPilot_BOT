@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FiHome, FiFileText, FiShield, FiUser, FiZap, FiCreditCard } from 'react-icons/fi';
+import { FiHome, FiFileText, FiShield, FiUser, FiZap, FiCreditCard, FiBookOpen } from 'react-icons/fi';
 
 interface NavItem {
   name: string;
@@ -21,7 +21,8 @@ export function AnimatedNavbar() {
   const navItems: NavItem[] = [
     { name: 'Home', path: '/', icon: <FiHome /> },
     { name: 'Audit', path: '/audit', icon: <FiShield /> },
-    { name: 'Test Cases', path: '/test-cases', icon: <FiFileText /> },
+    { name: 'Test Cases', path: '/testcase-generator', icon: <FiZap /> },
+    { name: 'Documentator', path: '/documentor', icon: <FiBookOpen /> },
     { name: 'Reports', path: '/reports', icon: <FiFileText /> },
     { name: 'Profile', path: '/profile', icon: <FiUser /> },
     { name: 'Wallet', path: '/wallet', icon: <FiCreditCard /> },
