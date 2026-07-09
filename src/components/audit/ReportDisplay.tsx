@@ -82,7 +82,7 @@ export function ReportDisplay({
   defaultChain 
 }: ReportDisplayProps) {
   return (
-    <div className="h-full bg-gray-900/50 rounded-lg border border-gray-800 p-6 overflow-y-auto custom-scrollbar relative">
+    <div className="h-full bg-black/50 rounded-2xl border border-blue-900/50 p-6 overflow-y-auto custom-scrollbar relative">
       {txState.hash && (
         <a 
           href={`${defaultChain.explorerUrl}/tx/${txState.hash}`}
@@ -113,12 +113,12 @@ export function ReportDisplay({
           <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">Vulnerabilities Detected</h3>
           {Object.entries(result.vulnerabilities).map(([severity, issues]) => (
             issues.length > 0 && (
-              <div key={severity} className={`p-4 rounded-lg ${SEVERITY_CONFIGS[severity].bgColor} border ${SEVERITY_CONFIGS[severity].borderColor}`}>
+              <div key={severity} className={`p-4 rounded-2xl ${SEVERITY_CONFIGS[severity].bgColor} border ${SEVERITY_CONFIGS[severity].borderColor}`}>
                 <div className="flex items-center gap-3 mb-2">
                   {SEVERITY_CONFIGS[severity].icon}
                   <h4 className={`text-md font-bold ${SEVERITY_CONFIGS[severity].color}`}>{SEVERITY_CONFIGS[severity].label}</h4>
                 </div>
-                <ul className="list-disc list-inside text-gray-300 text-sm space-y-1">
+                <ul className="list-disc list-inside text-white text-sm space-y-1">
                   {issues.map((issue, index) => <li key={index}>{issue}</li>)}
                 </ul>
               </div>
@@ -130,7 +130,7 @@ export function ReportDisplay({
             <CheckCircle size={20} weight="fill" className="text-green-400" />
             Recommendations
           </h3>
-          <ul className="list-disc list-inside text-gray-300 text-sm space-y-2 mt-3">
+          <ul className="list-disc list-inside text-white text-sm space-y-2 mt-3">
             {result.recommendations.map((rec, index) => <li key={index}>{rec}</li>)}
           </ul>
         </div>
@@ -139,14 +139,14 @@ export function ReportDisplay({
             <Lightning size={20} weight="fill" className="text-purple-400" />
             Gas Optimizations
           </h3>
-          <ul className="list-disc list-inside text-gray-300 text-sm space-y-2 mt-3">
+          <ul className="list-disc list-inside text-white text-sm space-y-2 mt-3">
             {result.gasOptimizations.map((opt, index) => <li key={index}>{opt}</li>)}
           </ul>
         </div>
       </div>
 
       {isReviewBlurred && (
-        <div className="absolute inset-0 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center text-center p-8 rounded-lg">
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center text-center p-8 rounded-2xl">
           <h3 className="text-2xl font-bold text-white mb-4">Unlock Full Report</h3>
           <p className="text-gray-400 mb-6 max-w-sm">
             Register this audit on the BlockDAG Testnet to permanently store the results and receive a verifiable proof-of-audit.
@@ -155,7 +155,7 @@ export function ReportDisplay({
             <button 
               onClick={registerAuditOnChain}
               disabled={txState.isProcessing || !isConnected}
-              className="w-full px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 disabled:bg-gray-700 transition-colors flex items-center justify-center gap-2"
+              className="w-full px-6 py-3 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 disabled:bg-gray-700 transition-colors flex items-center justify-center gap-2"
             >
               {txState.isProcessing ? (
                 <>
@@ -180,7 +180,7 @@ export function ReportDisplay({
       )}
 
       {txState.error && (
-        <div className="absolute bottom-4 left-4 right-4 bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-2 rounded-lg">
+        <div className="absolute bottom-4 left-4 right-4 bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-2 rounded-2xl">
           {txState.error}
         </div>
       )}
