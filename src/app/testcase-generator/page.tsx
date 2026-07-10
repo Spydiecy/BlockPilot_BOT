@@ -190,16 +190,11 @@ Return a structured list of testing steps without any extra text.`
   };
 
   return (
-    <div className="min-h-screen py-12 bg-black text-white flex items-center justify-center">
-      <div className="w-full max-w-5xl mx-auto px-4">
-        <div className="bg-black/50 rounded-2xl shadow-lg shadow-blue-500/20 border border-blue-900/50 p-8 mb-8">
-          <header className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-blue-500/20 border border-blue-500/20 rounded-full flex items-center justify-center">
-              <TestTube size={24} className="text-blue-400" weight="fill" />
-            </div>
-            <h1 className="text-2xl font-bold text-white tracking-tighter">Test Case Generator</h1>
-          </header>
-          <p className="text-blue-400 mb-2">Generate comprehensive test cases for your smart contracts using different testing frameworks</p>
+    <div className="min-h-screen py-12 bg-black text-white">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="mb-8">
+          <h1 className="text-3xl font-mono font-bold mb-4 text-blue-400">Test Case Generator</h1>
+          <p className="text-blue-400">Generate comprehensive test cases for your smart contracts using different testing frameworks</p>
           <AnimatePresence>
             {error && (
               <motion.div
