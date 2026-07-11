@@ -190,125 +190,138 @@ Return a structured list of testing steps without any extra text.`
   };
 
   return (
-    <div className="min-h-screen py-12 bg-black text-white">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-mono font-bold mb-4 text-blue-400">Test Case Generator</h1>
-          <p className="text-blue-400">Generate comprehensive test cases for your smart contracts using different testing frameworks</p>
-          <AnimatePresence>
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mt-4 bg-gray-900/10 border border-blue-900/30/20 text-blue-300 px-4 py-2 rounded-2xl"
+    <div className="min-h-screen w-full bg-black text-white relative overflow-hidden">
+      <div
+        className="absolute inset-0 h-full w-full bg-black bg-[linear-gradient(to_right,#161616_1px,transparent_1px),linear-gradient(to_bottom,#161616_1px,transparent_1px)] bg-[size:4rem_4rem]"
+      ></div>
+      <div className="absolute inset-0 h-full w-full bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+      <div className="relative z-10 p-4 sm:p-6 lg:p-8">
+        <header className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-500/10 border border-blue-500/20 rounded-full flex items-center justify-center">
+              <TestTube size={24} className="text-blue-400" weight="fill" />
+            </div>
+            <h1 className="text-2xl font-bold text-white tracking-tighter">Test Case Generator</h1>
+          </div>
+        </header>
+        
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="mb-6 bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-2 rounded-2xl"
+            >
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Framework Selection */}
+        <div className="mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {TESTING_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                onClick={() => setSelectedFramework(option.id)}
+                className={`p-4 rounded-2xl border transition-all duration-200 text-left h-full hover:shadow-md
+                  ${selectedFramework === option.id
+                    ? 'border-blue-500 bg-blue-500/20 text-white shadow-blue-500/5'
+                    : 'border-blue-900/50 hover:border-blue-500/50 bg-black/20'
+                  }`}
               >
-                {error}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="text-blue-400">
+                    {option.icon}
+                  </div>
+                  <span className="font-semibold text-white">{option.name}</span>
+                </div>
+                <p className="text-xs text-blue-400 mb-2">{option.description}</p>
+                <div className="flex flex-wrap gap-1">
+                  {option.features.map((feature) => (
+                    <span
+                      key={feature}
+                      className="text-xs px-2 py-1 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="flex flex-col space-y-4">
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              {TESTING_OPTIONS.map((option) => (
-                <button
-                  key={option.id}
-                  onClick={() => setSelectedFramework(option.id)}
-                  className={`p-4 rounded-2xl border transition-all duration-200 text-left h-full hover:shadow-md
-                    ${selectedFramework === option.id
-                      ? 'border-blue-500 bg-blue-500/20 text-white shadow-blue-500/5'
-                      : 'border-blue-900/50 hover:border-blue-500/50'
-                    }`}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className={`${selectedFramework === option.id ? 'text-blue-400' : 'text-blue-400'}`}>
-                      {option.icon}
-                    </div>
-                    <span className="font-semibold text-white">{option.name}</span>
-                  </div>
-                  <p className="text-xs text-blue-400 mb-2">{option.description}</p>
-                </button>
-              ))}
-            </div>
-
-            <div
-              className="bg-black/50 rounded-2xl border border-blue-900/50 hover:border-blue-500/30 transition-colors duration-300 shadow-lg shadow-blue-500/20"
-            >
-              <div className="p-4 border-b border-blue-900/50 flex items-center gap-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
+          {/* Left Panel - Contract Input */}
+          <div className="relative bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col p-4 h-full transition-colors duration-300">
+            <div className="flex-1 flex flex-col">
+              <div className="flex items-center gap-2 mb-4 pb-4 border-b border-blue-900/50">
                 <Code className="text-blue-400" size={20} weight="duotone" />
-                <span className="font-mono text-white">Contract Code</span>
+                <span className="font-mono text-white">Contract Input</span>
               </div>
-
               <textarea
                 value={contractCode}
                 onChange={(e) => setContractCode(e.target.value)}
-                placeholder="Paste your smart contract code here..."
-                className="w-full h-[400px] bg-transparent p-6 font-mono text-sm resize-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all duration-200 text-white"
+                placeholder="// Paste your Solidity contract code here..."
+                className="w-full flex-1 p-4 bg-transparent text-white font-mono text-sm resize-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 custom-scrollbar code-editor"
               />
             </div>
-            
-            <button
-              onClick={generateTests}
-              disabled={!contractCode || isGenerating}
-              className={`w-full py-3 px-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all duration-200 ${isGenerating || !contractCode
-                ? 'bg-blue-950 text-blue-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/20'
-                }`}
-            >
-              {isGenerating ? (
-                <>
-                  <CircleNotch className="animate-spin" size={20} weight="bold" />
-                  Generating {TESTING_OPTIONS.find(opt => opt.id === selectedFramework)?.name}...
-                </>
-              ) : (
-                <>
-                  <Lightning size={20} weight="fill" />
-                  Generate {TESTING_OPTIONS.find(opt => opt.id === selectedFramework)?.name}
-                </>
-              )}
-            </button>
-          </div>
-
-          <div className="flex flex-col">
-            <div className="flex-1 bg-black/50 rounded-2xl border border-blue-900/50 hover:border-blue-500/30 transition-colors duration-300 shadow-lg shadow-blue-500/20">
-              <div className="p-4 border-b border-blue-900/50 flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <TestTube className="text-blue-400" size={20} weight="duotone" />
-                  <span className="font-mono text-white">Generated {TESTING_OPTIONS.find(opt => opt.id === selectedFramework)?.name}</span>
-                </div>
-                {generatedTests && (
-                  <button
-                    onClick={() => copyToClipboard(generatedTests)}
-                    className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1 transition-colors duration-200 px-2 py-1 rounded-md hover:bg-blue-500/30"
-                  >
-                    {copySuccess ? <Check size={16} weight="bold" /> : <Copy size={16} weight="bold" />}
-                    {copySuccess ? 'Copied!' : 'Copy Code'}
-                  </button>
-                )}
-              </div>
-
-              <div className="code-container">
-                {generatedTests ? (
+            <div className="pt-4 border-t border-blue-900/50">
+              <button
+                onClick={generateTests}
+                disabled={!contractCode || isGenerating}
+                className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl hover:from-blue-700 hover:to-blue-800 disabled:bg-blue-950 disabled:cursor-not-allowed transition-all duration-300 ease-in-out flex items-center justify-center gap-2"
+              >
+                {isGenerating ? (
                   <>
-                    <div className="line-numbers">
-                      {Array.from({ length: generatedTests.split('\n').length }, (_, i) => i + 1).map(lineNumber => (
-                        <span key={lineNumber} className="line-number">
-                          {lineNumber}
-                        </span>
-                      ))}
-                    </div>
-                    <pre className="code-input font-mono text-sm whitespace-pre-wrap text-white p-4 custom-scrollbar">{generatedTests}</pre>
+                    <CircleNotch className="animate-spin" size={20} weight="bold" />
+                    Generating {TESTING_OPTIONS.find(opt => opt.id === selectedFramework)?.name}...
                   </>
                 ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-blue-400">
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-md"></div>
-                      <TestTube size={48} className="mb-4 relative z-10 text-blue-400" weight="duotone" />
+                  <>
+                    <Lightning size={20} weight="fill" />
+                    Generate {TESTING_OPTIONS.find(opt => opt.id === selectedFramework)?.name}
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Right Panel - Generated Tests */}
+          <div className="h-full bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col transition-colors duration-300">
+            <div className="p-4 border-b border-blue-900/50 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <TestTube className="text-blue-400" size={20} weight="duotone" />
+                <span className="font-mono text-white">Generated {TESTING_OPTIONS.find(opt => opt.id === selectedFramework)?.name}</span>
+              </div>
+              {generatedTests && (
+                <button
+                  onClick={() => copyToClipboard(generatedTests)}
+                  className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1 transition-colors duration-200 px-2 py-1 rounded-md hover:bg-blue-500/10"
+                >
+                  {copySuccess ? <Check size={16} weight="bold" /> : <Copy size={16} weight="bold" />}
+                  {copySuccess ? 'Copied!' : 'Copy Code'}
+                </button>
+              )}
+            </div>
+
+            <div className="flex-1 overflow-auto custom-scrollbar">
+              {generatedTests ? (
+                <pre className="h-full p-6 font-mono text-sm whitespace-pre-wrap text-white">{generatedTests}</pre>
+              ) : (
+                <div className="h-full flex items-center justify-center text-blue-400 p-8">
+                  <div className="text-center">
+                    <div className="relative w-20 h-20 mx-auto mb-6">
+                      <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-2xl"></div>
+                      <TestTube size={80} className="text-blue-400 relative z-10" weight="duotone" />
                     </div>
-                    <p>Select a framework, enter your contract code, and generate tests</p>
-                    <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                    <h3 className="text-xl font-mono mb-4">Test Case Generator</h3>
+                    <p className="text-blue-300 mb-6 max-w-md mx-auto">
+                      Select a testing framework, paste your Solidity code, and generate comprehensive test cases
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-2">
                       {TESTING_OPTIONS.find(opt => opt.id === selectedFramework)?.features.map((feature) => (
                         <span
                           key={feature}
@@ -319,64 +332,32 @@ Return a structured list of testing steps without any extra text.`
                       ))}
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
       <style jsx>{`
-        .code-container {
-          position: relative;
-          width: 100%;
-          height: 600px; /* Set a fixed height for the container */
-        }
-
-        .line-numbers {
-          position: absolute;
-          top: 0;
-          left: 0;
-          height: 100%;
-          padding: 4px;
-          text-align: right;
-          color: #6b7280;
-          font-size: 14px;
-          font-family: monospace;
-          white-space: nowrap;
-          overflow-y: auto; /* Add vertical scroll for line numbers */
-          z-index: 1;
-          background-color: #1f2937;
-          border-right: 1px solid #374151;
-        }
-
-        .line-number {
-          display: block;
-          padding: 0 8px;
-        }
-
-        .code-input {
-          padding-left: 50px; /* Adjust based on line number width */
-          z-index: 2;
-          height: 100%;
-          overflow-y: scroll;
+        .custom-scrollbar {
           scrollbar-width: thin;
           scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
         }
-
-        .code-input::-webkit-scrollbar {
+        
+        .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
-
-        .code-input::-webkit-scrollbar-track {
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
           background: transparent;
         }
-
-        .code-input::-webkit-scrollbar-thumb {
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
           background-color: rgba(59, 130, 246, 0.3);
           border-radius: 3px;
         }
-
-        .code-input::-webkit-scrollbar-thumb:hover {
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background-color: rgba(59, 130, 246, 0.5);
         }
       `}</style>
