@@ -393,10 +393,10 @@ export default function ContractBuilder() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
           {/* Left Panel - Templates and Parameters */}
-          <div className="relative bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col p-4 h-full transition-colors duration-300">
-            <div className="flex-1 flex flex-col space-y-4">
+          <div className="relative bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col p-4 h-full transition-colors duration-300 overflow-hidden">
+            <div className="flex-1 flex flex-col space-y-4 overflow-hidden">
               {/* Template Selection */}
-              <div className="border-b border-blue-900/50 pb-4">
+              <div className="border-b border-blue-900/50 pb-4 flex-shrink-0">
                 <div className="flex items-center gap-2 mb-4">
                   <Robot className="text-blue-400" size={20} weight="duotone" />
                   <span className="font-mono text-white">Contract Templates</span>
@@ -428,13 +428,13 @@ export default function ContractBuilder() {
               
               {/* Parameters Form */}
               {selectedTemplate && (
-                <div className="flex-1 overflow-y-auto custom-scrollbar">
+                <div className="flex-1 overflow-hidden">
                   <div className="flex items-center gap-2 mb-4">
                     <Code className="text-blue-400" size={20} weight="duotone" />
                     <span className="font-mono text-white">Contract Parameters</span>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 overflow-y-auto custom-scrollbar h-full">
                     {Object.entries(contractParams).map(([key, value]) => (
                       <div key={key}>
                         <label className="text-sm text-gray-400 mb-1 block">
@@ -492,8 +492,8 @@ export default function ContractBuilder() {
           </div>
 
           {/* Right Panel - Generated Code and Deployment */}
-          <div className="h-full bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col transition-colors duration-300">
-            <div className="p-4 border-b border-blue-900/50 flex justify-between items-center">
+          <div className="h-full bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col transition-colors duration-300 overflow-hidden">
+            <div className="p-4 border-b border-blue-900/50 flex justify-between items-center flex-shrink-0">
               <div className="flex items-center gap-2">
                 <FileCode className="text-blue-400" size={20} weight="duotone" />
                 <span className="font-mono text-white">Generated Contract</span>
@@ -511,12 +511,12 @@ export default function ContractBuilder() {
               )}
             </div>
 
-            <div className="flex-1 overflow-auto custom-scrollbar">
+            <div className="flex-1 overflow-hidden">
               {displayedCode ? (
                 <textarea
                   value={displayedCode}
                   onChange={handleManualCodeChange}
-                  className="w-full h-full p-6 font-mono text-sm text-white bg-transparent border-none resize-none outline-none"
+                  className="w-full h-full p-6 font-mono text-sm text-white bg-transparent border-none resize-none outline-none overflow-y-auto custom-scrollbar"
                 />
               ) : (
                 <div className="h-full flex items-center justify-center text-blue-400 p-8">

@@ -10,7 +10,8 @@ import {
   Wallet, 
   User, 
   TestTube, 
-  BookOpen, 
+  BookOpen,
+  Code,
   IconProps 
 } from 'phosphor-react';
 
@@ -24,6 +25,7 @@ const navItems: NavItem[] = [
   { path: '/', label: 'Home', icon: House },
   { path: '/audit', label: 'Audit', icon: MagnifyingGlass },
   { path: '/testcase-generator', label: 'Test Cases', icon: TestTube },
+  { path: '/contract-builder', label: 'Builder', icon: Code },
   { path: '/documentor', label: 'Documentation', icon: BookOpen },
   { path: '/wallet', label: 'Wallet', icon: Wallet },
   { path: '/profile', label: 'Profile', icon: User },

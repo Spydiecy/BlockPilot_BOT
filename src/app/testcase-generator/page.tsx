@@ -256,7 +256,7 @@ Return a structured list of testing steps without any extra text.`
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
           {/* Left Panel - Contract Input */}
           <div className="relative bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col p-4 h-full transition-colors duration-300">
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col overflow-hidden">
               <div className="flex items-center gap-2 mb-4 pb-4 border-b border-blue-900/50">
                 <Code className="text-blue-400" size={20} weight="duotone" />
                 <span className="font-mono text-white">Contract Input</span>
@@ -265,7 +265,7 @@ Return a structured list of testing steps without any extra text.`
                 value={contractCode}
                 onChange={(e) => setContractCode(e.target.value)}
                 placeholder="// Paste your Solidity contract code here..."
-                className="w-full flex-1 p-4 bg-transparent text-white font-mono text-sm resize-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 custom-scrollbar code-editor"
+                className="w-full flex-1 p-4 bg-transparent text-white font-mono text-sm resize-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 custom-scrollbar code-editor overflow-y-auto"
               />
             </div>
             <div className="pt-4 border-t border-blue-900/50">
@@ -290,8 +290,8 @@ Return a structured list of testing steps without any extra text.`
           </div>
 
           {/* Right Panel - Generated Tests */}
-          <div className="h-full bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col transition-colors duration-300">
-            <div className="p-4 border-b border-blue-900/50 flex justify-between items-center">
+          <div className="h-full bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col transition-colors duration-300 overflow-hidden">
+            <div className="p-4 border-b border-blue-900/50 flex justify-between items-center flex-shrink-0">
               <div className="flex items-center gap-2">
                 <TestTube className="text-blue-400" size={20} weight="duotone" />
                 <span className="font-mono text-white">Generated {TESTING_OPTIONS.find(opt => opt.id === selectedFramework)?.name}</span>
@@ -307,9 +307,9 @@ Return a structured list of testing steps without any extra text.`
               )}
             </div>
 
-            <div className="flex-1 overflow-auto custom-scrollbar">
+            <div className="flex-1 overflow-hidden">
               {generatedTests ? (
-                <pre className="h-full p-6 font-mono text-sm whitespace-pre-wrap text-white">{generatedTests}</pre>
+                <pre className="h-full p-6 font-mono text-sm whitespace-pre-wrap text-white overflow-y-auto custom-scrollbar">{generatedTests}</pre>
               ) : (
                 <div className="h-full flex items-center justify-center text-blue-400 p-8">
                   <div className="text-center">

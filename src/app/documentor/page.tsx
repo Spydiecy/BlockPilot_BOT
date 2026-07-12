@@ -261,7 +261,7 @@ ${documentation.variables?.map(variable => `### ${variable.name}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-150px)]">
           {/* Left Panel - Contract Input */}
           <div className="relative bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col p-4 h-full transition-colors duration-300">
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col overflow-hidden">
               <div className="flex items-center gap-2 mb-4 pb-4 border-b border-blue-900/50">
                 <FileText className="text-blue-400" size={20} weight="duotone" />
                 <span className="font-mono text-white">Contract Input</span>
@@ -270,7 +270,7 @@ ${documentation.variables?.map(variable => `### ${variable.name}
                 value={contractCode}
                 onChange={(e) => setContractCode(e.target.value)}
                 placeholder="// Paste your Solidity contract code here..."
-                className="w-full flex-1 p-4 bg-transparent text-white font-mono text-sm resize-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 custom-scrollbar code-editor"
+                className="w-full flex-1 p-4 bg-transparent text-white font-mono text-sm resize-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 custom-scrollbar code-editor overflow-y-auto"
               />
             </div>
             <div className="pt-4 border-t border-blue-900/50">
@@ -295,8 +295,8 @@ ${documentation.variables?.map(variable => `### ${variable.name}
           </div>
 
           {/* Right Panel - Documentation Output */}
-          <div className="h-full bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col transition-colors duration-300">
-            <div className="p-4 border-b border-blue-900/50 flex justify-between items-center">
+          <div className="h-full bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col transition-colors duration-300 overflow-hidden">
+            <div className="p-4 border-b border-blue-900/50 flex justify-between items-center flex-shrink-0">
               <div className="flex items-center gap-2">
                 <Article className="text-blue-400" size={20} weight="duotone" />
                 <span className="font-mono text-white">Documentation</span>
@@ -321,8 +321,9 @@ ${documentation.variables?.map(variable => `### ${variable.name}
               )}
             </div>
 
-            <div className="flex-1 overflow-auto p-6 custom-scrollbar">
-              {documentation ? (
+            <div className="flex-1 overflow-hidden">
+              <div className="h-full overflow-y-auto p-6 custom-scrollbar">
+                {documentation ? (
                 <div className="space-y-6">
                   <div>
                     <h2 className="text-2xl font-bold mb-2 text-blue-400">{documentation.name}</h2>
@@ -447,6 +448,7 @@ ${documentation.variables?.map(variable => `### ${variable.name}
             </div>
           </div>
         </div>
+      </div>
       </div>
       <style jsx>{`
         .custom-scrollbar {
