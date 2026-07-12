@@ -339,159 +339,167 @@ export default function ContractBuilder() {
   };
 
   return (
-    <div className="min-h-screen py-12 bg-zinc-900 text-white">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="mb-8">
-          <div className="inline-block mb-3 px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
-            <span className="text-blue-400 text-sm font-semibold">Smart Contract Development</span>
+    <div className="min-h-screen w-full bg-black text-white relative overflow-hidden">
+      <div
+        className="absolute inset-0 h-full w-full bg-black bg-[linear-gradient(to_right,#161616_1px,transparent_1px),linear-gradient(to_bottom,#161616_1px,transparent_1px)] bg-[size:4rem_4rem]"
+      ></div>
+      <div className="absolute inset-0 h-full w-full bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+      <div className="relative z-10 p-4 sm:p-6 lg:p-8">
+        <header className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-500/10 border border-blue-500/20 rounded-full flex items-center justify-center">
+              <Code size={24} className="text-blue-400" weight="fill" />
+            </div>
+            <h1 className="text-2xl font-bold text-white tracking-tighter">Smart Contract Builder</h1>
           </div>
-          <h1 className="text-3xl font-mono font-bold mb-4 text-blue-400">Smart Contract Builder</h1>
-          <p className="text-gray-400">Generate and deploy secure smart contracts on BlockDAG Testnet</p>
-          
-          <AnimatePresence>
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mt-4 bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-2 rounded-lg"
-              >
-                {error}
-              </motion.div>
-            )}
-          </AnimatePresence>
-          {deployedAddress && (
+        </header>
+        
+        <AnimatePresence>
+          {error && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-4 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-4 py-3 rounded-lg"
+              exit={{ opacity: 0, y: -10 }}
+              className="mb-6 bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-2 rounded-2xl"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-semibold mb-1">Contract deployed successfully!</p>
-                  <p className="text-sm font-mono">{deployedAddress}</p>
-                </div>
-                <a
-                  href={getExplorerUrl() || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors duration-200"
-                >
-                  <Link size={20} weight="bold" />
-                  View on Explorer
-                </a>
-              </div>
+              {error}
             </motion.div>
           )}
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Left Column - Templates and Parameters */}
-          <div className="flex flex-col space-y-4">
-            {/* Template Selection */}
-            <div className="bg-gray-900/50 rounded-lg border border-gray-800 hover:border-blue-500/30 transition-colors duration-300 shadow-lg p-4">
-              <div className="flex items-center gap-2 mb-4">
-                <Robot className="text-blue-400" size={20} weight="duotone" />
-                <span className="font-mono text-white">Contract Templates</span>
+        </AnimatePresence>
+        
+        {deployedAddress && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-4 py-3 rounded-2xl"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-semibold mb-1">Contract deployed successfully!</p>
+                <p className="text-sm font-mono">{deployedAddress}</p>
               </div>
-
-              <div className="space-y-4">
-                {CONTRACT_TEMPLATES.map((template) => (
-                  <button
-                    key={template.name}
-                    onClick={() => setSelectedTemplate(template)}
-                    className={`w-full p-4 rounded-lg border transition-all duration-200 text-left hover:shadow-md
-                      ${selectedTemplate?.name === template.name
-                        ? 'border-blue-500 bg-blue-500/10 text-white shadow-blue-500/5'
-                        : 'border-gray-800 hover:border-blue-500/50'
-                      }`}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className={`${selectedTemplate?.name === template.name ? 'text-blue-400' : 'text-gray-400'}`}>
-                        {template.icon}
-                      </div>
-                      <span className="font-semibold text-white">{template.name}</span>
-                    </div>
-                    <p className="text-xs text-gray-400 mb-2">{template.description}</p>
-                  </button>
-                ))}
-              </div>
+              <a
+                href={getExplorerUrl() || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors duration-200"
+              >
+                <Link size={20} weight="bold" />
+                View on Explorer
+              </a>
             </div>
+          </motion.div>
+        )}
 
-            {/* Generate Button - Moved Here */}
-            <button
-              onClick={generateContract}
-              disabled={!selectedTemplate || isGenerating}
-              className={`w-full py-3 px-4 rounded-lg font-bold flex items-center justify-center gap-2 transition-all duration-200 ${isGenerating || !selectedTemplate
-                ? 'bg-gray-800 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                }`}
-            >
-              {isGenerating ? (
-                <>
-                  <CircleNotch className="animate-spin" size={20} weight="bold" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Robot size={20} weight="duotone" />
-                  Generate Contract
-                </>
-              )}
-            </button>
-
-            {/* Parameters Form */}
-            {selectedTemplate && (
-              <div className="bg-gray-900/50 rounded-lg border border-gray-800 hover:border-blue-500/30 transition-colors duration-300 shadow-lg p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
+          {/* Left Panel - Templates and Parameters */}
+          <div className="relative bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col p-4 h-full transition-colors duration-300">
+            <div className="flex-1 flex flex-col space-y-4">
+              {/* Template Selection */}
+              <div className="border-b border-blue-900/50 pb-4">
                 <div className="flex items-center gap-2 mb-4">
-                  <Code className="text-blue-400" size={20} weight="duotone" />
-                  <span className="font-mono text-white">Contract Parameters</span>
+                  <Robot className="text-blue-400" size={20} weight="duotone" />
+                  <span className="font-mono text-white">Contract Templates</span>
                 </div>
 
-                <div className="p-6">
-                  {Object.entries(contractParams).map(([key, value]) => (
-                    <div key={key} className="mb-4">
+                <div className="space-y-3 max-h-48 overflow-y-auto custom-scrollbar">
+                  {CONTRACT_TEMPLATES.map((template) => (
+                    <button
+                      key={template.name}
+                      onClick={() => setSelectedTemplate(template)}
+                      className={`w-full p-3 rounded-2xl border transition-all duration-200 text-left hover:shadow-md
+                        ${selectedTemplate?.name === template.name
+                          ? 'border-blue-500 bg-blue-500/20 text-white shadow-blue-500/5'
+                          : 'border-blue-900/50 hover:border-blue-500/50 bg-black/20'
+                        }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="text-blue-400">
+                          {template.icon}
+                        </div>
+                        <span className="font-semibold text-white text-sm">{template.name}</span>
+                      </div>
+                      <p className="text-xs text-blue-400">{template.description}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              
+              {/* Parameters Form */}
+              {selectedTemplate && (
+                <div className="flex-1 overflow-y-auto custom-scrollbar">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Code className="text-blue-400" size={20} weight="duotone" />
+                    <span className="font-mono text-white">Contract Parameters</span>
+                  </div>
+
+                  <div className="space-y-4">
+                    {Object.entries(contractParams).map(([key, value]) => (
+                      <div key={key}>
+                        <label className="text-sm text-gray-400 mb-1 block">
+                          {key.charAt(0).toUpperCase() + key.slice(1)}
+                        </label>
+                        <input
+                          type="text"
+                          value={value}
+                          onChange={(e) =>
+                            setContractParams((prev) => ({
+                              ...prev,
+                              [key]: e.target.value,
+                            }))
+                          }
+                          className="w-full bg-transparent rounded-lg border border-blue-900/50 p-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all duration-200"
+                        />
+                      </div>
+                    ))}
+                    <div>
                       <label className="text-sm text-gray-400 mb-1 block">
-                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                        Custom Features
                       </label>
-                      <input
-                        type="text"
-                        value={value}
-                        onChange={(e) =>
-                          setContractParams((prev) => ({
-                            ...prev,
-                            [key]: e.target.value,
-                          }))
-                        }
-                        className="w-full bg-transparent rounded-lg border border-gray-700 p-2 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all duration-200"
+                      <textarea
+                        value={customFeatures}
+                        onChange={(e) => setCustomFeatures(e.target.value)}
+                        placeholder="Describe additional features..."
+                        className="w-full h-24 bg-transparent rounded-lg border border-blue-900/50 p-3 text-white resize-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all duration-200"
                       />
                     </div>
-                  ))}
-                  <div>
-                    <label className="text-sm text-gray-400 mb-1 block">
-                      Custom Features
-                    </label>
-                    <textarea
-                      value={customFeatures}
-                      onChange={(e) => setCustomFeatures(e.target.value)}
-                      placeholder="Describe additional features..."
-                      className="w-full h-24 bg-transparent rounded-lg border border-gray-700 p-2 text-white resize-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all duration-200"
-                    />
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+            
+            {/* Generate Button */}
+            <div className="pt-4 border-t border-blue-900/50">
+              <button
+                onClick={generateContract}
+                disabled={!selectedTemplate || isGenerating}
+                className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl hover:from-blue-700 hover:to-blue-800 disabled:bg-blue-950 disabled:cursor-not-allowed transition-all duration-300 ease-in-out flex items-center justify-center gap-2"
+              >
+                {isGenerating ? (
+                  <>
+                    <CircleNotch className="animate-spin" size={20} weight="bold" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Robot size={20} weight="duotone" />
+                    Generate Contract
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
-          {/* Right Column - Code Display and Deployment */}
-          <div className="flex flex-col">
-            <div className="flex-1 bg-gray-900/50 rounded-lg border border-gray-800 hover:border-blue-500/30 transition-colors duration-300 shadow-lg">
-              <div className="p-4 border-b border-gray-800 flex justify-between items-center">
+          {/* Right Panel - Generated Code and Deployment */}
+          <div className="h-full bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col transition-colors duration-300">
+            <div className="p-4 border-b border-blue-900/50 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <FileCode className="text-blue-400" size={20} weight="duotone" />
+                <span className="font-mono text-white">Generated Contract</span>
+              </div>
+              {displayedCode && (
                 <div className="flex items-center gap-2">
-                  <FileCode className="text-blue-400" size={20} weight="duotone" />
-                  <span className="font-mono text-white">Generated Contract</span>
-                </div>
-                {displayedCode && (
                   <button
                     onClick={() => copyToClipboard(displayedCode)}
                     className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1 transition-colors duration-200 px-2 py-1 rounded-md hover:bg-blue-500/10"
@@ -499,113 +507,76 @@ export default function ContractBuilder() {
                     {copySuccess ? <Check size={16} weight="bold" /> : <Copy size={16} weight="bold" />}
                     {copySuccess ? 'Copied!' : 'Copy Code'}
                   </button>
-                )}
-              </div>
-
-              <div className="code-container">
-                {displayedCode ? (
-                  <>
-                    <div className="line-numbers">
-                      {Array.from({ length: displayedCode.split('\n').length }, (_, i) => i + 1).map(lineNumber => (
-                        <span key={lineNumber} className="line-number">
-                          {lineNumber}
-                        </span>
-                      ))}
-                    </div>
-                    <textarea
-                      value={displayedCode}
-                      onChange={handleManualCodeChange}
-                      className="code-input font-mono text-sm text-white bg-transparent border-none resize-none outline-none p-4 w-full h-full absolute top-0 left-0 overflow-y-scroll custom-scrollbar"
-                    />
-                  </>
-                ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-gray-400">
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-blue-500/10 rounded-full blur-md"></div>
-                      <Robot size={48} className="mb-4 relative z-10 text-blue-400" weight="duotone" />
-                    </div>
-                    <p>Select a template and generate your contract to see the code here</p>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
-            
+
+            <div className="flex-1 overflow-auto custom-scrollbar">
+              {displayedCode ? (
+                <textarea
+                  value={displayedCode}
+                  onChange={handleManualCodeChange}
+                  className="w-full h-full p-6 font-mono text-sm text-white bg-transparent border-none resize-none outline-none"
+                />
+              ) : (
+                <div className="h-full flex items-center justify-center text-blue-400 p-8">
+                  <div className="text-center">
+                    <div className="relative w-20 h-20 mx-auto mb-6">
+                      <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-2xl"></div>
+                      <Code size={80} className="text-blue-400 relative z-10" weight="duotone" />
+                    </div>
+                    <h3 className="text-xl font-mono mb-4">Smart Contract Builder</h3>
+                    <p className="text-blue-300 mb-6 max-w-md mx-auto">
+                      Select a template and configure parameters to generate your smart contract
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/20">
+                        ERC-20 Tokens
+                      </span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/20">
+                        NFT Collections
+                      </span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/20">
+                        Custom Logic
+                      </span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/20">
+                        One-Click Deploy
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Deploy Section */}
             {displayedCode && (
-              <div className="border-t border-gray-700 p-4 bg-gray-900/50 rounded-b-lg shadow-lg">
+              <div className="p-4 border-t border-blue-900/50">
                 {!walletConnected ? (
                   <button
                     onClick={handleConnectWallet}
-                    className="w-full py-3 px-4 rounded-lg font-bold flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-200 shadow-lg shadow-blue-500/20"
+                    className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 ease-in-out flex items-center justify-center gap-2"
                   >
                     <Lightning size={20} weight="fill" />
                     Connect Wallet to Deploy
                   </button>
                 ) : (
-                  <div className="space-y-4">
-                    {/* Network information */}
-                    {currentChain ? (
-                      <div className="text-sm flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-lg px-3 py-2">
-                        <span>Network:</span>
-                        <span className="text-blue-400 font-mono flex items-center gap-1">
-                          <img 
-                            src={CHAIN_CONFIG[currentChain].iconPath}
-                            alt={CHAIN_CONFIG[currentChain].chainName}
-                            className="w-4 h-4 rounded-full"
-                          />
-                          {CHAIN_CONFIG[currentChain].chainName}
-                        </span>
-                      </div>
+                  <button
+                    onClick={deployContract}
+                    disabled={isDeploying}
+                    className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold rounded-2xl hover:from-green-700 hover:to-green-800 disabled:bg-gray-800 disabled:cursor-not-allowed transition-all duration-300 ease-in-out flex items-center justify-center gap-2"
+                  >
+                    {isDeploying ? (
+                      <>
+                        <CircleNotch className="animate-spin" size={20} weight="bold" />
+                        Deploying...
+                      </>
                     ) : (
-                      <div className="text-sm text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-3 py-2">
-                        Please connect to BlockDAG Testnet to deploy
-                      </div>
+                      <>
+                        <Rocket size={20} weight="fill" />
+                        Deploy to BlockDAG Testnet
+                      </>
                     )}
-
-                    <button
-                      onClick={deployContract}
-                      disabled={isDeploying || !currentChain || (currentChain !== 'pharosDevnet')}
-                      className={`w-full py-3 px-4 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors duration-200
-                        ${isDeploying || !currentChain || (currentChain !== 'pharosDevnet')
-                          ? 'bg-gray-800 text-gray-400 cursor-not-allowed'
-                          : 'bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                        }`}
-                    >
-                      {isDeploying ? (
-                        <>
-                          <CircleNotch className="animate-spin" size={20} weight="bold" />
-                          Deploying Contract...
-                        </>
-                      ) : (
-                        <>
-                          <Rocket size={20} weight="fill" />
-                          Deploy Contract
-                        </>
-                      )}
-                    </button>
-                    
-                    {deploymentError && (
-                      <div className="mt-4 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                        {deploymentError}
-                      </div>
-                    )}
-                    
-                    {securityNotes.length > 0 && (
-                      <div className="mt-4 bg-blue-500/5 border border-blue-500/20 rounded-lg p-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Shield className="text-blue-400" size={16} weight="fill" />
-                          <h3 className="text-sm font-semibold text-blue-400">Security Notes</h3>
-                        </div>
-                        <ul className="text-xs text-gray-300 space-y-1">
-                          {securityNotes.map((note, index) => (
-                            <li key={index} className="flex items-start gap-2">
-                              <ArrowRight className="text-blue-400 mt-0.5 flex-shrink-0" size={12} />
-                              <span>{note}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
+                  </button>
                 )}
               </div>
             )}
@@ -613,56 +584,25 @@ export default function ContractBuilder() {
         </div>
       </div>
       <style jsx>{`
-        .code-container {
-          position: relative;
-          width: 100%;
-          height: 600px; /* Set a fixed height for the container */
-        }
-
-        .line-numbers {
-          position: absolute;
-          top: 0;
-          left: 0;
-          height: 100%;
-          padding: 4px;
-          text-align: right;
-          color: #6b7280;
-          font-size: 14px;
-          font-family: monospace;
-          white-space: nowrap;
-          overflow-y: auto; /* Add vertical scroll for line numbers */
-          z-index: 1;
-          background-color: #1f2937;
-          border-right: 1px solid #374151;
-        }
-
-        .line-number {
-          display: block;
-          padding: 0 8px;
-        }
-
-        .code-input {
-          padding-left: 50px; /* Adjust based on line number width */
-          z-index: 2;
-          height: 100%;
+        .custom-scrollbar {
           scrollbar-width: thin;
           scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
         }
-
-        .code-input::-webkit-scrollbar {
+        
+        .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
-
-        .code-input::-webkit-scrollbar-track {
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
           background: transparent;
         }
-
-        .code-input::-webkit-scrollbar-thumb {
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
           background-color: rgba(59, 130, 246, 0.3);
           border-radius: 3px;
         }
-
-        .code-input::-webkit-scrollbar-thumb:hover {
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background-color: rgba(59, 130, 246, 0.5);
         }
       `}</style>
