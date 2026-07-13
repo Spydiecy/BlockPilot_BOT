@@ -315,7 +315,7 @@ export default function ContractBuilder() {
   const getExplorerUrl = () => {
     if (!currentChain || !deployedAddress) return null;
     const baseUrl = CHAIN_CONFIG[currentChain].blockExplorerUrls[0];
-    return `${baseUrl}/address/${deployedAddress}`;
+    return `https://primordial.bdagscan.com/contractOverview/${deployedAddress}`;
   };
 
   const handleConnectWallet = async () => {
