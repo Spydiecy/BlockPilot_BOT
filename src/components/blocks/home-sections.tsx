@@ -82,12 +82,7 @@ const workflowSteps: Step[] = [
 ];
 
 const supportedChains: Chain[] = [
-  { id: 1 },
-  { id: 2 },
-  { id: 3 },
-  { id: 4 },
-  { id: 5 },
-  { id: 6 },
+  { id: 1, name: "BlockDAG Testnet", icon: "/chains/blockdag.png" },
 ];
 
 const latestAudits: Audit[] = [
@@ -174,16 +169,22 @@ const ChainsSupported = () => {
       <div className="relative text-center mb-20">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold mb-4 leading-tight text-white">
           SUPPORTED<br />
-          <span className="text-blue-400">CHAINS</span>
+          <span className="text-blue-400">NETWORKS</span>
         </h2>
+        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+          Currently supporting BlockDAG Testnet for development and testing
+        </p>
+        <div className="mt-4 inline-flex items-center px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm">
+          🚀 Mainnet coming soon!
+        </div>
       </div>
 
       {/* Chains Grid */}
-      <div className="relative grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div className="relative flex justify-center">
         {supportedChains.map((chain) => (
           <div
             key={chain.id}
-            className="relative group bg-black/50 backdrop-blur-sm rounded-lg p-4 hover:bg-black/70 transition-all duration-300"
+            className="relative group bg-black/50 backdrop-blur-sm rounded-2xl p-8 hover:bg-black/70 transition-all duration-300 border border-neutral-800/50 hover:border-blue-500/50 max-w-sm"
           >
             {/* Card Background with Gradient */}
             <div className="absolute inset-0 bg-neutral-900/50 backdrop-blur-sm rounded-2xl border border-neutral-800/50 transition-all duration-300 group-hover:border-blue-500/50">
@@ -192,27 +193,51 @@ const ChainsSupported = () => {
             </div>
 
             {/* Content Container */}
-            <div className="relative h-full flex flex-col items-center justify-center p-6">
-              {/* Placeholder for chain logo/icon */}
-              <div className="w-16 h-16 bg-neutral-800 rounded-xl mb-4 flex items-center justify-center">
-                <div className="text-blue-400 group-hover:text-blue-300 transition-colors duration-300">
-                  {/* Icon placeholder */}
-                </div>
+            <div className="relative h-full flex flex-col items-center justify-center text-center">
+              {/* BlockDAG Logo */}
+              <div className="w-20 h-20 bg-neutral-800 rounded-xl mb-6 flex items-center justify-center overflow-hidden">
+                {chain.icon ? (
+                  <img 
+                    src={chain.icon} 
+                    alt={chain.name} 
+                    className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300"
+                  />
+                ) : (
+                  <div className="text-blue-400 group-hover:text-blue-300 transition-colors duration-300 text-xl font-bold">
+                    BD
+                  </div>
+                )}
               </div>
 
-              {/* Hover Details */}
-              <div className="absolute inset-x-0 bottom-0 p-6 opacity-0 group-hover:opacity-100 transition-all duration-300 text-center">
-                <div className="flex items-center justify-center text-sm text-blue-400 group-hover:text-blue-300">
-                  View Details
-                  <IconChevronRight className="w-4 h-4 ml-1" />
-                </div>
+              {/* Network Name */}
+              <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors duration-300">
+                {chain.name}
+              </h3>
+              
+              {/* Status Badge */}
+              <div className="inline-flex items-center px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-sm mb-4">
+                🟢 Live & Active
               </div>
+              
+              {/* Description */}
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Secure smart contract auditing and deployment on BlockDAG's revolutionary network architecture
+              </p>
             </div>
 
             {/* Glowing Effect */}
             <div className="absolute -inset-0.5 bg-blue-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-all duration-300" />
           </div>
         ))}
+      </div>
+
+      {/* Coming Soon Section */}
+      <div className="mt-16 text-center">
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-full">
+          <span className="text-blue-400 font-mono text-sm">MAINNET</span>
+          <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+          <span className="text-gray-300 text-sm">Coming Q2 2025</span>
+        </div>
       </div>
     </div>
   );
@@ -315,7 +340,7 @@ const Footer = () => {
     product: [
       { name: "Features", href: "#features" },
       { name: "How it Works", href: "#how-it-works" },
-      { name: "Chains", href: "#chains" },
+      { name: "Networks", href: "#chains" },
       { name: "Audits", href: "#audits" },
       { name: "Documentation", href: "#" },
     ],
@@ -487,9 +512,9 @@ export function HomeSections() {
       icon: <IconShieldLock className="w-6 h-6" />,
     },
     {
-      title: "Multi-Chain Support",
+      title: "BlockDAG Network Optimized",
       description: 
-        "Comprehensive security coverage for smart contracts deployed on the Electroneum network.",
+        "Specialized security coverage and optimization specifically designed for BlockDAG Network architecture.",
       icon: <IconBolt className="w-6 h-6" />,
     },
     {
@@ -607,20 +632,26 @@ export function HomeSections() {
             {/* Section Header */}
             <div className="relative text-center mb-20">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold mb-4 leading-tight text-white">
-                CHAINS<br />
+                NETWORKS<br />
                 <span className="text-blue-400">SUPPORTED</span>
               </h2>
+              <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-4">
+                Currently supporting BlockDAG Testnet for development and testing
+              </p>
               <div className="text-xs text-gray-400 tracking-wider mb-6">
-                SECURE · SCALABLE · MULTI-CHAIN · RELIABLE
+                SECURE · SCALABLE · REVOLUTIONARY · RELIABLE
+              </div>
+              <div className="inline-flex items-center px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm">
+                🚀 Mainnet coming soon!
               </div>
             </div>
 
             {/* Chains Grid */}
-            <div className="relative grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+            <div className="relative flex justify-center">
               {supportedChains.map((chain) => (
                 <div
                   key={chain.id}
-                  className="group relative aspect-square"
+                  className="group relative bg-black/50 backdrop-blur-sm rounded-2xl p-8 hover:bg-black/70 transition-all duration-300 border border-neutral-800/50 hover:border-blue-500/50 max-w-sm"
                 >
                   {/* Card Background with Gradient */}
                   <div className="absolute inset-0 bg-neutral-900/50 backdrop-blur-sm rounded-2xl border border-neutral-800/50 transition-all duration-300 group-hover:border-blue-500/50">
@@ -629,21 +660,36 @@ export function HomeSections() {
                   </div>
 
                   {/* Content Container */}
-                  <div className="relative h-full flex flex-col items-center justify-center p-6">
-                    {/* Placeholder for chain logo/icon */}
-                    <div className="w-16 h-16 bg-neutral-800 rounded-xl mb-4 flex items-center justify-center">
-                      <div className="text-blue-400 group-hover:text-blue-300 transition-colors duration-300">
-                        {/* Icon placeholder */}
-                      </div>
+                  <div className="relative h-full flex flex-col items-center justify-center text-center">
+                    {/* BlockDAG Logo */}
+                    <div className="w-20 h-20 bg-neutral-800 rounded-xl mb-6 flex items-center justify-center overflow-hidden">
+                      {chain.icon ? (
+                        <img 
+                          src={chain.icon} 
+                          alt={chain.name} 
+                          className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="text-blue-400 group-hover:text-blue-300 transition-colors duration-300 text-xl font-bold">
+                          BD
+                        </div>
+                      )}
                     </div>
 
-                    {/* Hover Details */}
-                    <div className="absolute inset-x-0 bottom-0 p-6 opacity-0 group-hover:opacity-100 transition-all duration-300 text-center">
-                      <div className="flex items-center justify-center text-sm text-blue-400 group-hover:text-blue-300">
-                        View Details
-                        <IconChevronRight className="w-4 h-4 ml-1" />
-                      </div>
+                    {/* Network Name */}
+                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors duration-300">
+                      {chain.name}
+                    </h3>
+                    
+                    {/* Status Badge */}
+                    <div className="inline-flex items-center px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-sm mb-4">
+                      🟢 Live & Active
                     </div>
+                    
+                    {/* Description */}
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      Secure smart contract auditing and deployment on BlockDAG's revolutionary network architecture
+                    </p>
                   </div>
 
                   {/* Glowing Effect */}
@@ -652,10 +698,12 @@ export function HomeSections() {
               ))}
             </div>
 
-            {/* Coming Soon Badge */}
-            <div className="relative mt-16 text-center">
-              <div className="inline-block px-4 py-2 bg-blue-500/10 rounded-full border border-blue-500/20">
-                <span className="text-sm text-blue-400">More Chains Coming Soon</span>
+            {/* Coming Soon Section */}
+            <div className="mt-16 text-center">
+              <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-full">
+                <span className="text-blue-400 font-mono text-sm">MAINNET</span>
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                <span className="text-gray-300 text-sm">Coming Q2 2025</span>
               </div>
             </div>
           </div>
