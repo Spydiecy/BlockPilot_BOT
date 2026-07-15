@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, ReactNode, useCallback, useState } from 'react';
 import { ethers } from 'ethers';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { formatBalance, getChain, getDefaultChain, getSupportedChains, type SupportedChain } from '@/config/wallet';
 import type { EthereumProvider } from '@/types/ethereum';
 import { setWalletConnected } from '@/utils/walletUtils';
@@ -53,8 +53,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [currentChain, setCurrentChain] = useState<SupportedChain | undefined>();
   
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirect = searchParams?.get('redirect') || '/';
 
   // Check if wallet is connected on mount and set up listeners
   useEffect(() => {
@@ -143,12 +141,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (ethereum) {
         await updateBalance(account);
       }
-      // Redirect if needed
-      if (redirect !== '/') {
-        router.push(redirect);
-      }
     }
-  }, [router, redirect]);
+  }, [router]);
 
   // Handle chain changes
   const handleChainChanged = useCallback((chainIdHex: string) => {

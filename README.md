@@ -2,7 +2,8 @@
 
 # 🛡️ AuditFi - The Future of Smart Contract Security
 
-**⚡ Revolutionary AI-Powered Security Auditing for BlockDAG Network ⚡**
+**Revolutionary AI-Powered Security Auditing for### 🎯 *## 💎 **The AuditFi Advantage**[👆 LIVE DEMO - Try AuditFi Now!](https://auditfi-bdag.netlify.app/)**
+*Experience the future of smart contract security in your browser*lockDAG Network**
 
 *Transforming smart contract security from weeks to seconds with cutting-edge Mistral AI*
 
@@ -18,7 +19,7 @@
 
 > **Traditional smart contract audits take weeks and cost thousands.** 
 > 
-> **AuditFi delivers enterprise-grade security analysis in under 30 seconds.** ⚡
+> **AuditFi delivers enterprise-grade security analysis in under 30 seconds.**
 
 **The Problem:** Developers deploy vulnerable contracts because security audits are too slow and expensive.
 
@@ -33,45 +34,45 @@ Our Mistral AI doesn't just scan code—it **understands** it. Trained on thousa
 
 ![BlockDAG Integration](https://github.com/user-attachments/assets/e3bbd5d5-b304-4d07-aa05-f006cd994d5a)
 
-### ⛓️ **Born for BlockDAG Network**
-- **⚡ Lightning-fast deployment** to BlockDAG Testnet
-- **🔍 Network-specific vulnerability detection** 
-- **⛽ Gas optimization** that saves you real money
-- **🌐 Instant verification** on BlockDAG Explorer
-- **🎯 Zero false positives** with BlockDAG-tuned algorithms
+### **Born for BlockDAG Network**
+- Lightning-fast deployment to BlockDAG Testnet
+- Network-specific vulnerability detection 
+- Gas optimization that saves you real money
+- Instant verification on BlockDAG Explorer
+- Zero false positives with BlockDAG-tuned algorithms
 
-### 🏗️ **Smart Contract Templates That Just Work**
+### **Smart Contract Templates That Just Work**
 Forget fragile dependencies and security nightmares:
-- **🛡️ Battle-tested ERC20/ERC721** implementations
-- **🤖 AI-generated contracts** from your specifications  
-- **🔒 Security-first architecture** built into every template
-- **📈 Optimized for BlockDAG** gas efficiency
+- Battle-tested ERC20/ERC721 implementations
+- AI-generated contracts from your specifications  
+- Security-first architecture built into every template
+- Optimized for BlockDAG gas efficiency
 
 ![Contract Templates](https://github.com/user-attachments/assets/97ea0ad7-46f9-44c7-b3a0-c87082e15c72)
 
-### 🏢 **Enterprise-Grade Security Building**
-- **🏗️ Zero-dependency architecture** (no supply chain attacks)
-- **📋 Security best practices** enforced automatically
-- **📡 Complete event transparency** for full auditability
-- **🔐 Military-grade access controls**
-- **🚀 BlockDAG-optimized performance**
+### **Enterprise-Grade Security Building**
+- Zero-dependency architecture (no supply chain attacks)
+- Security best practices enforced automatically
+- Complete event transparency for full auditability
+- Military-grade access controls
+- BlockDAG-optimized performance
 
 ![Secure Building](https://github.com/user-attachments/assets/3a3e1d04-aacb-4edc-86a6-d79148c5d185)
 
-### 🔗 **Immutable On-Chain Proof**
+### **Immutable On-Chain Proof**
 Every audit becomes **permanent blockchain evidence**:
-- **📚 Audit reports stored forever** on BlockDAG Network
-- **🔍 Traceable security history** for compliance
-- **🌐 Public verification** via BlockDAG Explorer  
-- **⭐ Verifiable security scores** that build trust
+- Audit reports stored forever on BlockDAG Network
+- Traceable security history for compliance
+- Public verification via BlockDAG Explorer  
+- Verifiable security scores that build trust
 
 ![On-Chain Verification](https://github.com/user-attachments/assets/eafb5182-7542-41fd-a3f1-bdebbe0bd26c)
 
-### 🎮 **Developer Experience That Feels Like Magic**
-- **⚡ Real-time code analysis** as you type
-- **🔄 Instant security feedback** with fix suggestions
-- **📊 Live deployment monitoring** 
-- **🟢 Network status at a glance**
+### **Developer Experience That Feels Like Magic**
+- Real-time code analysis as you type
+- Instant security feedback with fix suggestions
+- Live deployment monitoring 
+- Network status at a glance
 
 ![Developer Experience](https://github.com/user-attachments/assets/7d211ccd-a685-4f98-a60d-391f61534ba4)
 
@@ -79,7 +80,7 @@ Every audit becomes **permanent blockchain evidence**:
 
 ## ⚡ Get Started in 60 Seconds
 
-### 🎯 **What You Need:**
+### **What You Need:**
 ```bash
 ✅ MetaMask or Web3 wallet
 ✅ BlockDAG Network access (Testnet)
@@ -94,9 +95,9 @@ Every audit becomes **permanent blockchain evidence**:
 
 | **Frontend** | **AI Engine** | **Blockchain** | **Experience** |
 |:---:|:---:|:---:|:---:|
-| ⚛️ **Next.js 14** | 🧠 **Mistral AI** | ⛓️ **ethers.js** | 🎨 **Framer Motion** |
-| 🎨 **Tailwind CSS** | 🤖 **Large Language Model** | 🔗 **BlockDAG Network** | 🎭 **Phosphor Icons** |
-| 🧩 **Shadcn UI** | 🔍 **Pattern Recognition** | 🌐 **Web3 Integration** | ✅ **Zod Validation** |
+| **Next.js 14** | **Mistral AI** | **ethers.js** | **Framer Motion** |
+| **Tailwind CSS** | **Large Language Model** | **BlockDAG Network** | **Phosphor Icons** |
+| **Shadcn UI** | **Pattern Recognition** | **Web3 Integration** | **Zod Validation** |
 
 </div>
 
@@ -132,38 +133,38 @@ Every audit becomes **permanent blockchain evidence**:
 
 ## � **The AuditFi Advantage**
 
-### 🤖 **AI Security Analysis**
+### **AI Security Analysis**
 > **Traditional auditing:** Manual review by humans (slow, expensive, error-prone)
 > 
 > **AuditFi approach:** AI that learns from every exploit ever discovered
 
-- ⚡ **Real-time vulnerability detection** (no waiting weeks)
-- 🎯 **Custom validation** against known attack vectors  
-- 📈 **Gas optimization** recommendations that save money
-- 🛡️ **BlockDAG-specific** security patterns enforcement
+- Real-time vulnerability detection (no waiting weeks)
+- Custom validation against known attack vectors  
+- Gas optimization recommendations that save money
+- BlockDAG-specific security patterns enforcement
 
-### 🏗️ **Smart Contract Builder**
+### **Smart Contract Builder**
 > **Why reinvent the wheel when you can get a Tesla?**
 
-- 🧱 **Self-contained templates** (no dependency hell)
-- 🔒 **Security-by-design** architecture
-- ⚙️ **BlockDAG-optimized** for maximum efficiency  
-- 🎛️ **Configurable parameters** with built-in validation
+- Self-contained templates (no dependency hell)
+- Security-by-design architecture
+- BlockDAG-optimized for maximum efficiency  
+- Configurable parameters with built-in validation
 
-### 🚀 **One-Click Deployment Pipeline**
+### **One-Click Deployment Pipeline**
 > **From code to blockchain in under 60 seconds**
 
-- 🎯 **One-click deployment** to BlockDAG Network
-- 🔍 **Automatic security verification** before going live
-- 📊 **Real-time monitoring** of your transactions  
-- 🌐 **Seamless explorer** integration for transparency
+- One-click deployment to BlockDAG Network
+- Automatic security verification before going live
+- Real-time monitoring of your transactions  
+- Seamless explorer integration for transparency
 
-### 📚 **Documentation & Testing That Doesn't Suck**
+### **Documentation & Testing That Doesn't Suck**
 > **Because good code deserves good docs**
 
-- 📖 **Auto-generated documentation** that actually makes sense
-- 🧪 **AI-powered test cases** for multiple frameworks
-- 🔄 **Living documentation** that updates with your code
+- Auto-generated documentation that actually makes sense
+- AI-powered test cases for multiple frameworks
+- Living documentation that updates with your code
 
 ![Documentation Demo](https://github.com/user-attachments/assets/1e124ba6-c391-4967-ad6c-c31b9bffe584)
 
@@ -181,12 +182,12 @@ Every audit becomes **permanent blockchain evidence**:
 
 | **Feature** | **Why It's Game-Changing** |
 |:---|:---|
-| 🚀 **Secure Deployment** | Deploy with confidence knowing your contracts are BlockDAG-optimized |
-| 🔍 **Deep Analysis** | Security patterns specifically tuned for BlockDAG's architecture |
-| ✅ **On-Chain Verification** | Every audit permanently recorded on BlockDAG's immutable ledger |
-| 💾 **Audit Storage** | Your security history lives forever on the blockchain |
-| ⛽ **Gas Optimization** | Save real money with BlockDAG-specific efficiency improvements |
-| 🎯 **Security Patterns** | Protection strategies designed for BlockDAG's unique features |
+| **Secure Deployment** | Deploy with confidence knowing your contracts are BlockDAG-optimized |
+| **Deep Analysis** | Security patterns specifically tuned for BlockDAG's architecture |
+| **On-Chain Verification** | Every audit permanently recorded on BlockDAG's immutable ledger |
+| **Audit Storage** | Your security history lives forever on the blockchain |
+| **Gas Optimization** | Save real money with BlockDAG-specific efficiency improvements |
+| **Security Patterns** | Protection strategies designed for BlockDAG's unique features |
 
 ![BlockDAG Network Integration](https://github.com/user-attachments/assets/4c6b05e2-1b5b-4a38-b114-37f3893217be)
 
@@ -196,12 +197,12 @@ Every audit becomes **permanent blockchain evidence**:
 
 <div align="center">
 
-### 🎮 **Ready to secure the future?**
+### **Ready to secure the future?**
 
 [![Follow Twitter](https://img.shields.io/badge/🐦_Follow-@AuditFi__ai-1da1f2?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/AuditFi_ai)
 [![Visit BlockDAG](https://img.shields.io/badge/🌐_Learn_More-BlockDAG.network-green?style=for-the-badge)](https://blockdag.network/)
 
-**💡 Got ideas? Found bugs? Want to contribute?**  
+**Got ideas? Found bugs? Want to contribute?**  
 *We're building the future of smart contract security together!*
 
 </div>
@@ -216,7 +217,7 @@ Every audit becomes **permanent blockchain evidence**:
 
 ---
 
-<sub>🚀 **Made with ❤️ for the BlockDAG community**</sub>
+<sub>Made with ❤️ for the BlockDAG community</sub>
 
 <sub>⭐ **Star this repo if AuditFi secured your contracts!**</sub>
 

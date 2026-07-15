@@ -58,7 +58,7 @@ function ScreenshotSection({ screenshotRef }: { screenshotRef: React.MutableRefO
       <div ref={screenshotRef} className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50 w-full md:w-[80%] lg:w-[70%] mx-auto">
         <div>
           <img
-            src="https://cdn.sanity.io/images/s6lu43cv/production-v4/13b6177b537aee0fc311a867ea938f16416e8670-3840x2160.jpg?w=3840&h=2160&q=10&auto=format&fm=jpg"
+            src="/screenshot.png"
             alt="App Screenshot"
             className="w-full h-auto block rounded-lg mx-auto"
           />
