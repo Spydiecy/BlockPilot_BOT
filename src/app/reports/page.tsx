@@ -16,7 +16,7 @@ import {
   Copy
 } from 'phosphor-react';
 import Image from 'next/image';
-import { CHAIN_CONFIG } from '@/utils/web3';
+import { SUPPORTED_CHAINS, ChainId } from '@/config/wallet';
 import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI, ChainKey } from '@/utils/contracts';
 
 interface AuditReport {
@@ -98,46 +98,44 @@ export default function ReportsPage() {
             });
             
             if (!response.ok) {
-              throw new Error('Failed to fetch audits batch');
+              console.warn(`Failed to fetch batch ${processed}-${processed + BATCH_SIZE}: ${response.statusText}`);
+              break;
             }
             
             const data = await response.json();
-            const audits = data.result;
-            console.log(`Batch fetched: ${audits.length} audits (processed: ${processed})`);
+            console.log(`Fetched batch ${processed}-${processed + BATCH_SIZE}, found ${data.result.length} audits`);
             
-            for (const audit of audits) {
-              allAudits.push({
-                contractHash: audit.contractHash,
-                transactionHash: audit.transactionHash || "0x", // Default if not available
-                stars: audit.stars,
-                summary: audit.summary,
-                auditor: audit.auditor,
-                timestamp: audit.timestamp,
-                chain: 'blockdagTestnet' // Since we're only using BlockDAG Testnet
-              });
+            const batchAudits = data.result.map((audit: any) => ({
+              contractHash: audit.contractHash,
+              transactionHash: audit.transactionHash || "0x",
+              stars: Number(audit.stars),
+              summary: audit.summary,
+              auditor: audit.auditor,
+              timestamp: Number(audit.timestamp),
+              chain: 'blockdagTestnet' as ChainKey
+            }));
+            
+            allAudits.push(...batchAudits);
+            processed += BATCH_SIZE;
+            
+            // Small delay to avoid overwhelming the RPC
+            if (processed < totalContracts) {
+              await new Promise(resolve => setTimeout(resolve, 100));
             }
-            
-            processed += audits.length;
-            console.log(`Processed ${processed}/${totalContracts} audits so far (this batch: ${audits.length})`);
-            
-            // If audits.length is 0, we've reached the end, so break
-            if (audits.length === 0) break;
-            // If audits.length < BATCH_SIZE but processed < totalContracts, keep looping to ensure all are fetched
-          } catch (batchError) {
-            console.error(`Error fetching batch at ${processed}:`, batchError);
+          } catch (error) {
+            console.error(`Error fetching batch ${processed}:`, error);
             break;
           }
         }
         
+        console.log(`Total audits fetched: ${allAudits.length}`);
       } catch (error) {
-        console.error('Error fetching audits:', error);
+        console.error('Error fetching BlockDAG audits:', error);
       }
-
-      console.log(`Total audits collected: ${allAudits.length}`);
-      setReports(allAudits.sort((a, b) => b.timestamp - a.timestamp));
-
+      
+      setReports(allAudits);
     } catch (error) {
-      console.error('Failed to fetch audits:', error);
+      console.error('Error fetching all chain audits:', error);
     } finally {
       setIsLoading(false);
     }
@@ -148,35 +146,48 @@ export default function ReportsPage() {
   }, []);
 
   const getFilteredReports = () => {
-    return reports.filter(report => {
-      if (filters.search && 
-          !report.contractHash.toLowerCase().includes(filters.search.toLowerCase()) &&
-          !report.auditor.toLowerCase().includes(filters.search.toLowerCase())) {
-        return false;
+    const filtered = reports.filter(report => {
+      // Search filter
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        const matchesHash = report.contractHash.toLowerCase().includes(searchLower);
+        const matchesAuditor = report.auditor.toLowerCase().includes(searchLower);
+        if (!matchesHash && !matchesAuditor) return false;
       }
-      
+
+      // Chain filter
       if (filters.chain !== 'all' && report.chain !== filters.chain) {
         return false;
       }
 
-      if (filters.minStars > 0 && report.stars < filters.minStars) {
-        return false;
-      }
-
+      // Date range filter
       if (filters.dateRange !== 'all') {
         const now = Date.now() / 1000;
-        const ranges = {
-          day: 86400,
-          week: 604800,
-          month: 2592000
-        };
-        if (now - report.timestamp > ranges[filters.dateRange]) {
-          return false;
+        const reportTime = report.timestamp;
+        const daySeconds = 86400;
+        
+        switch (filters.dateRange) {
+          case 'day':
+            if (now - reportTime > daySeconds) return false;
+            break;
+          case 'week':
+            if (now - reportTime > daySeconds * 7) return false;
+            break;
+          case 'month':
+            if (now - reportTime > daySeconds * 30) return false;
+            break;
         }
+      }
+
+      // Stars filter
+      if (report.stars < filters.minStars) {
+        return false;
       }
 
       return true;
     });
+
+    return filtered.sort((a, b) => b.timestamp - a.timestamp);
   };
 
   const exportReport = (report: AuditReport) => {
@@ -188,12 +199,12 @@ export default function ReportsPage() {
       auditor: report.auditor,
       timestamp: Number(report.timestamp),
       chain: report.chain,
-      chainName: CHAIN_CONFIG[report.chain].chainName,
+      chainName: SUPPORTED_CHAINS[report.chain as ChainId].name,
       exportDate: new Date().toISOString(),
       network: {
-        name: CHAIN_CONFIG[report.chain].chainName,
-        chainId: CHAIN_CONFIG[report.chain].chainId,
-        contractAddress: CONTRACT_ADDRESSES[report.chain as ChainKey],
+        name: SUPPORTED_CHAINS[report.chain as ChainId].name,
+        id: SUPPORTED_CHAINS[report.chain as ChainId].id,
+        contractAddress: CONTRACT_ADDRESSES[report.chain],
       },
       auditDate: new Date(Number(report.timestamp) * 1000).toLocaleString(),
     };
@@ -216,36 +227,53 @@ export default function ReportsPage() {
     }
   };
 
+  const filteredReports = getFilteredReports();
+
   return (
-    <div className="min-h-screen py-12 bg-black">
-      <div className="max-w-6xl mx-auto px-4">
+    <div className="min-h-screen w-full bg-black text-white relative overflow-hidden">
+      {/* Background Grid */}
+      <div
+        className="absolute inset-0 h-full w-full bg-black bg-[linear-gradient(to_right,#161616_1px,transparent_1px),linear-gradient(to_bottom,#161616_1px,transparent_1px)] bg-[size:4rem_4rem]"
+      ></div>
+      <div className="absolute inset-0 h-full w-full bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+      
+      <div className="relative z-10 p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="inline-block mb-3 px-4 py-1 rounded-full bg-blue-500/20 border border-blue-500/20">
-            <span className="text-blue-400 text-sm font-semibold">Security Verification</span>
+        <header className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-500/10 border border-blue-500/20 rounded-full flex items-center justify-center">
+              <FileText size={24} className="text-blue-400" weight="fill" />
+            </div>
+            <h1 className="text-2xl font-bold text-white tracking-tighter">Audit Reports</h1>
           </div>
-          <h1 className="text-3xl font-mono font-bold mb-4 text-blue-400">Audit Reports</h1>
-          <p className="text-blue-400">View and analyze smart contract audits across multiple chains</p>
-        </div>
+        </header>
 
         {/* Search and Filters */}
-        <div className="mb-8">
-          <div className="flex gap-4 items-center">
-            <div className="flex-1 relative">
+        <div className="mb-6">
+          <div className="flex flex-col md:flex-row gap-4 items-center">
+            <div className="relative flex-1">
+              <MagnifyingGlass 
+                size={20} 
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400" 
+                weight="bold" 
+              />
               <input
                 type="text"
-                placeholder="Search by contract hash or auditor address..."
+                placeholder="Search by contract hash or auditor..."
                 value={filters.search}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                className="w-full bg-blue-900/80 border border-blue-900/50 rounded-2xl px-4 py-2 pl-10 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200"
+                className="w-full bg-black/50 border border-blue-900/50 rounded-2xl pl-10 pr-4 py-3 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200 text-white placeholder-gray-400"
               />
-              <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-400" size={20} weight="bold" />
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="px-4 py-2 bg-blue-900/80 border border-blue-900/50 rounded-2xl hover:bg-blue-800 hover:border-blue-500/30 transition-all duration-200 flex items-center gap-2"
+              className={`px-4 py-3 rounded-2xl border transition-all duration-200 flex items-center gap-2 ${
+                showFilters 
+                  ? 'bg-blue-500/20 border-blue-500/50 text-blue-400' 
+                  : 'bg-black/50 border-blue-900/50 text-blue-400 hover:border-blue-500/50'
+              }`}
             >
-              <FunnelSimple size={20} className="text-blue-400" weight="bold" />
+              <FunnelSimple size={20} weight="bold" />
               Filters
             </button>
           </div>
@@ -255,7 +283,7 @@ export default function ReportsPage() {
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-4 bg-blue-900/80 border border-blue-900/50 rounded-2xl p-4 shadow-lg shadow-blue-500/10"
+              className="mt-4 bg-black/50 border border-blue-900/50 rounded-2xl p-4 shadow-lg shadow-blue-500/10"
             >
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -263,11 +291,11 @@ export default function ReportsPage() {
                   <select
                     value={filters.chain}
                     onChange={(e) => setFilters({ ...filters, chain: e.target.value })}
-                    className="w-full bg-blue-800 border border-blue-700 rounded-2xl px-3 py-2 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200"
+                    className="w-full bg-black/50 border border-blue-900/50 rounded-2xl px-3 py-2 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200 text-white"
                   >
                     <option value="all">All Chains</option>
-                    {Object.entries(CHAIN_CONFIG).map(([key, chain]) => (
-                      <option key={key} value={key}>{chain.chainName}</option>
+                    {Object.entries(SUPPORTED_CHAINS).map(([key, chain]) => (
+                      <option key={key} value={key}>{chain.name}</option>
                     ))}
                   </select>
                 </div>
@@ -277,7 +305,7 @@ export default function ReportsPage() {
                   <select
                     value={filters.dateRange}
                     onChange={(e) => setFilters({ ...filters, dateRange: e.target.value as FilterState['dateRange'] })}
-                    className="w-full bg-blue-800 border border-blue-700 rounded-2xl px-3 py-2 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200"
+                    className="w-full bg-black/50 border border-blue-900/50 rounded-2xl px-3 py-2 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200 text-white"
                   >
                     <option value="all">All Time</option>
                     <option value="day">Last 24 Hours</option>
@@ -291,7 +319,7 @@ export default function ReportsPage() {
                   <select
                     value={filters.minStars}
                     onChange={(e) => setFilters({ ...filters, minStars: Number(e.target.value) })}
-                    className="w-full bg-blue-800 border border-blue-700 rounded-2xl px-3 py-2 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200"
+                    className="w-full bg-black/50 border border-blue-900/50 rounded-2xl px-3 py-2 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200 text-white"
                   >
                     <option value={0}>Any Rating</option>
                     {[1, 2, 3, 4, 5].map(stars => (
@@ -305,12 +333,36 @@ export default function ReportsPage() {
         </div>
 
         {/* Reports Table */}
-        <div className="bg-blue-900/80 border border-blue-900/50 hover:border-blue-500/30 transition-colors duration-300 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/10">
-          <div className="overflow-x-auto">
+        <div className="bg-black/50 border border-blue-900/50 hover:border-blue-500/30 transition-colors duration-300 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/10">
+          <div 
+            className="overflow-x-auto"
+            style={{
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#3b82f6 #1e293b'
+            }}
+          >
+            <style dangerouslySetInnerHTML={{
+              __html: `
+                .overflow-x-auto::-webkit-scrollbar {
+                  height: 8px;
+                }
+                .overflow-x-auto::-webkit-scrollbar-track {
+                  background: #1e293b;
+                  border-radius: 4px;
+                }
+                .overflow-x-auto::-webkit-scrollbar-thumb {
+                  background: #3b82f6;
+                  border-radius: 4px;
+                }
+                .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+                  background: #2563eb;
+                }
+              `
+            }} />
             <table className="w-full">
               <thead>
                 <tr className="border-b border-blue-900/50">
-                  <th className="py-4 px-6 text-left text-sm font-mono text-blue-400">CONTRACT</th>
+                  <th className="py-4 px-6 text-left text-sm font-mono text-blue-400">CONTRACT HASH</th>
                   <th className="py-4 px-6 text-left text-sm font-mono text-blue-400">CHAIN</th>
                   <th className="py-4 px-6 text-left text-sm font-mono text-blue-400">RATING</th>
                   <th className="py-4 px-6 text-left text-sm font-mono text-blue-400">AUDITOR</th>
@@ -319,27 +371,46 @@ export default function ReportsPage() {
                 </tr>
               </thead>
               <tbody>
-                {getFilteredReports().map((report) => (
+                {filteredReports.map((report) => (
                   <tr 
                     key={`${report.contractHash}-${report.chain}`}
-                    className="border-b border-blue-900/50/50 hover:bg-blue-500/5 transition-colors duration-200"
+                    className="border-b border-blue-900/50 hover:bg-blue-500/5 transition-colors duration-200"
                   >
-                    <td className="py-4 px-6 font-mono">
-                      {report.contractHash.slice(0, 10)}...{report.contractHash.slice(-8)}
+                    <td className="py-4 px-6 font-mono text-white">
+                      <div className="flex items-center gap-2">
+                        <span className="text-blue-400">
+                          {report.contractHash ? (
+                            `${report.contractHash.slice(0, 10)}...${report.contractHash.slice(-8)}`
+                          ) : (
+                            'N/A'
+                          )}
+                        </span>
+                        {report.contractHash && (
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(report.contractHash);
+                            }}
+                            className="p-1 hover:bg-blue-500/20 rounded transition-colors duration-200"
+                            title="Copy contract hash"
+                          >
+                            <Copy size={14} weight="bold" className="text-blue-400" />
+                          </button>
+                        )}
+                      </div>
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
                         <div className="relative">
                           <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-[2px]"></div>
                           <Image
-                            src={CHAIN_CONFIG[report.chain].iconPath}
-                            alt={CHAIN_CONFIG[report.chain].chainName}
+                            src={SUPPORTED_CHAINS[report.chain].iconPath}
+                            alt={SUPPORTED_CHAINS[report.chain].name}
                             width={20}
                             height={20}
                             className="rounded-full relative z-10"
                           />
                         </div>
-                        <span>{CHAIN_CONFIG[report.chain].chainName}</span>
+                        <span className="text-white">{SUPPORTED_CHAINS[report.chain].name}</span>
                       </div>
                     </td>
                     <td className="py-4 px-6">
@@ -354,11 +425,11 @@ export default function ReportsPage() {
                         ))}
                       </div>
                     </td>
-                    <td className="py-4 px-6 font-mono">
-                      {report.auditor.slice(0, 6)}...{report.auditor.slice(-4)}
+                    <td className="py-4 px-6 font-mono text-blue-400">
+                      {report.auditor ? `${report.auditor.slice(0, 6)}...${report.auditor.slice(-4)}` : 'N/A'}
                     </td>
                     <td className="py-4 px-6 text-blue-400">
-                      {new Date(report.timestamp * 1000).toLocaleDateString()}
+                      {report.timestamp ? new Date(report.timestamp * 1000).toLocaleDateString() : 'N/A'}
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex justify-end gap-2">
@@ -393,7 +464,7 @@ export default function ReportsPage() {
             </div>
           )}
 
-          {!isLoading && getFilteredReports().length === 0 && (
+          {!isLoading && filteredReports.length === 0 && (
             <div className="py-12 text-center">
               <div className="inline-flex items-center px-4 py-2 bg-blue-500/20 text-blue-400 rounded-2xl">
                 <ListChecks className="mr-2" size={20} weight="bold" />
@@ -409,7 +480,7 @@ export default function ReportsPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-blue-900 border border-blue-900/50 rounded-2xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto shadow-xl shadow-blue-900/10"
+              className="bg-black/90 border border-blue-900/50 rounded-2xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto shadow-xl shadow-blue-900/10 backdrop-blur-sm"
             >
               <div className="p-6">
                 <div className="flex justify-between items-start mb-6">
@@ -417,55 +488,105 @@ export default function ReportsPage() {
                     <div className="inline-block mb-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/20">
                       <span className="text-blue-400 text-xs font-medium">Audit Details</span>
                     </div>
-                    <h3 className="text-xl font-bold">Contract Security Report</h3>
+                    <h3 className="text-xl font-bold text-white">Contract Security Report</h3>
                   </div>
                   <button
                     onClick={() => setSelectedReport(null)}
-                    className="p-1 hover:bg-blue-800 rounded-2xl transition-colors duration-200 hover:text-blue-400"
+                    className="p-1 hover:bg-blue-800/50 rounded-2xl transition-colors duration-200 hover:text-blue-400 text-white"
                   >
                     <X size={20} weight="bold" />
                   </button>
                 </div>
 
-                <div className="space-y-6">
-                    <div>
-                    <label className="block text-sm text-blue-400 mb-1">Transaction Hash</label>
-                    <div className="font-mono bg-blue-900/80 px-3 py-2 rounded-2xl border border-blue-900/40 flex items-center justify-between">
+                <div 
+                  className="space-y-6 max-h-[60vh] overflow-y-auto"
+                  style={{
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#3b82f6 #1e293b'
+                  }}
+                >
+                  <style dangerouslySetInnerHTML={{
+                    __html: `
+                      .space-y-6::-webkit-scrollbar {
+                        width: 8px;
+                      }
+                      .space-y-6::-webkit-scrollbar-track {
+                        background: #1e293b;
+                        border-radius: 4px;
+                      }
+                      .space-y-6::-webkit-scrollbar-thumb {
+                        background: #3b82f6;
+                        border-radius: 4px;
+                      }
+                      .space-y-6::-webkit-scrollbar-thumb:hover {
+                        background: #2563eb;
+                      }
+                    `
+                  }} />
+                  <div>
+                    <label className="block text-sm text-blue-400 mb-1">Contract Hash</label>
+                    <div className="font-mono bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40 flex items-center justify-between text-white">
                       <span className="truncate">
-                      {selectedReport.transactionHash.slice(0, 28)}...{selectedReport.transactionHash.slice(-24)}
+                        {selectedReport.contractHash || 'N/A'}
                       </span>
+                      {selectedReport.contractHash && (
                         <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(selectedReport.transactionHash);
-                        }}
-                        className="ml-2 p-1.5 hover:bg-blue-500/30 rounded-md transition-colors duration-200"
-                        title="Copy txn hash"
+                          onClick={() => {
+                            navigator.clipboard.writeText(selectedReport.contractHash);
+                          }}
+                          className="ml-2 p-1.5 hover:bg-blue-500/30 rounded-md transition-colors duration-200"
+                          title="Copy contract hash"
                         >
-                        <Copy size={18} weight="bold" className="text-blue-400" />
-                      </button>
+                          <Copy size={18} weight="bold" className="text-blue-400" />
+                        </button>
+                      )}
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm text-blue-400 mb-1">Transaction Hash</label>
+                    <div className="font-mono bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40 flex items-center justify-between text-white">
+                      <span className="truncate">
+                        {selectedReport.transactionHash && selectedReport.transactionHash !== "0x" ? (
+                          `${selectedReport.transactionHash.slice(0, 28)}...${selectedReport.transactionHash.slice(-24)}`
+                        ) : (
+                          'N/A'
+                        )}
+                      </span>
+                      {selectedReport.transactionHash && selectedReport.transactionHash !== "0x" && (
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(selectedReport.transactionHash);
+                          }}
+                          className="ml-2 p-1.5 hover:bg-blue-500/30 rounded-md transition-colors duration-200"
+                          title="Copy transaction hash"
+                        >
+                          <Copy size={18} weight="bold" className="text-blue-400" />
+                        </button>
+                      )}
                     </div>
+                  </div>
 
                   <div>
                     <label className="block text-sm text-blue-400 mb-1">Chain</label>
-                    <div className="flex items-center gap-2 bg-blue-900/80 px-3 py-2 rounded-2xl border border-blue-900/40">
+                    <div className="flex items-center gap-2 bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40">
                       <div className="relative">
                         <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-[2px]"></div>
                         <Image
-                          src={CHAIN_CONFIG[selectedReport.chain].iconPath}
-                          alt={CHAIN_CONFIG[selectedReport.chain].chainName}
+                          src={SUPPORTED_CHAINS[selectedReport.chain].iconPath}
+                          alt={SUPPORTED_CHAINS[selectedReport.chain].name}
                           width={20}
                           height={20}
                           className="rounded-full relative z-10"
                         />
                       </div>
-                      <span>{CHAIN_CONFIG[selectedReport.chain].chainName}</span>
+                      <span className="text-white">{SUPPORTED_CHAINS[selectedReport.chain].name}</span>
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-sm text-blue-400 mb-1">Security Rating</label>
-                    <div className="flex gap-1 bg-blue-900/80 px-3 py-2 rounded-2xl border border-blue-900/40">
+                    <div className="flex gap-1 bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
@@ -479,30 +600,32 @@ export default function ReportsPage() {
 
                   <div>
                     <label className="block text-sm text-blue-400 mb-1">Summary</label>
-                    <div className="bg-blue-900/80 px-3 py-2 rounded-2xl border border-blue-900/40">
-                      {selectedReport.summary}
+                    <div className="bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40 text-white">
+                      {selectedReport.summary || 'No summary available'}
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-sm text-blue-400 mb-1">Auditor</label>
-                    <div className="font-mono bg-blue-900/80 px-3 py-2 rounded-2xl border border-blue-900/40 flex items-center justify-between">
-                      <span>{selectedReport.auditor}</span>
-                      <a
-                        href={`${CHAIN_CONFIG[selectedReport.chain].blockExplorerUrls[0]}/address/${selectedReport.auditor}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors duration-200"
-                      >
-                        View on Explorer <ArrowSquareOut size={16} weight="bold" />
-                      </a>
+                    <div className="font-mono bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40 flex items-center justify-between text-white">
+                      <span>{selectedReport.auditor || 'N/A'}</span>
+                      {selectedReport.auditor && (
+                        <a
+                          href={`${SUPPORTED_CHAINS[selectedReport.chain].explorerUrl}/address/${selectedReport.auditor}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors duration-200"
+                        >
+                          View on Explorer <ArrowSquareOut size={16} weight="bold" />
+                        </a>
+                      )}
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-sm text-blue-400 mb-1">Timestamp</label>
-                    <div className="bg-blue-900/80 px-3 py-2 rounded-2xl border border-blue-900/40">
-                      {new Date(selectedReport.timestamp * 1000).toLocaleString()}
+                    <div className="bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40 text-white">
+                      {selectedReport.timestamp ? new Date(selectedReport.timestamp * 1000).toLocaleString() : 'N/A'}
                     </div>
                   </div>
 
@@ -514,15 +637,17 @@ export default function ReportsPage() {
                       <Download size={20} weight="bold" />
                       Export Report
                     </button>
-                    <a
-                      href={`${CHAIN_CONFIG[selectedReport.chain].blockExplorerUrls[0]}/tx/${selectedReport.transactionHash}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 bg-blue-800 rounded-2xl hover:bg-blue-900/40 transition-colors duration-200 flex items-center gap-2"
-                    >
-                      View on Explorer
-                      <ArrowSquareOut size={20} weight="bold" />
-                    </a>
+                    {selectedReport.transactionHash && selectedReport.transactionHash !== "0x" && (
+                      <a
+                        href={`${SUPPORTED_CHAINS[selectedReport.chain].explorerUrl}/tx/${selectedReport.transactionHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 bg-blue-800/50 rounded-2xl hover:bg-blue-900/40 transition-colors duration-200 flex items-center gap-2 text-white"
+                      >
+                        View on Explorer
+                        <ArrowSquareOut size={20} weight="bold" />
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
@@ -530,6 +655,6 @@ export default function ReportsPage() {
           </div>
         )}
       </div>
-      </div>
-    );
-  }
+    </div>
+  );
+}
