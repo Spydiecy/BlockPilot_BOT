@@ -247,12 +247,12 @@ export default function ContractBuilder() {
       const { provider, signer } = await connectWallet();
       const detectedChain = await detectCurrentNetwork();
       
-      // Validate we're on BlockDAG Testnet
+      // Validate we're on Lisk Testnet
       const network = await provider.getNetwork();
       const currentChainId = '0x' + network.chainId.toString(16);
 
-      if (currentChainId !== CHAIN_CONFIG.blockdagTestnet.chainId) {
-        throw new Error('Please switch to BlockDAG Testnet to deploy contracts');
+      if (currentChainId !== CHAIN_CONFIG.liskTestnet.chainId) {
+        throw new Error('Please switch to Lisk Sepolia Testnet to deploy contracts');
       }
 
       // Compile contract
@@ -315,7 +315,7 @@ export default function ContractBuilder() {
   const getExplorerUrl = () => {
     if (!currentChain || !deployedAddress) return null;
     const baseUrl = CHAIN_CONFIG[currentChain].blockExplorerUrls[0];
-    return `https://primordial.bdagscan.com/contractOverview/${deployedAddress}`;
+    return `https://sepolia-blockscout.lisk.com/address/${deployedAddress}`;
   };
 
   const handleConnectWallet = async () => {
@@ -573,7 +573,7 @@ export default function ContractBuilder() {
                     ) : (
                       <>
                         <Rocket size={20} weight="fill" />
-                        Deploy to BlockDAG Testnet
+                        Deploy to Lisk Sepolia Testnet
                       </>
                     )}
                   </button>

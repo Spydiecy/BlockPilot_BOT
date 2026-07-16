@@ -149,7 +149,7 @@ export function ReportDisplay({
         <div className="absolute inset-0 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center text-center p-8 rounded-2xl">
           <h3 className="text-2xl font-bold text-white mb-4">Unlock Full Report</h3>
           <p className="text-gray-400 mb-6 max-w-sm">
-            Register this audit on the BlockDAG Testnet to permanently store the results and receive a verifiable proof-of-audit.
+            Register this audit on the Lisk Sepolia Testnet to permanently store the results and receive a verifiable proof-of-audit.
           </p>
           <div className="w-full max-w-xs">
             <button 
@@ -172,7 +172,7 @@ export function ReportDisplay({
             
             {!isCorrectNetwork && isConnected && (
               <div className="mt-4 text-yellow-400 text-sm">
-                Please switch to BlockDAG Testnet to register.
+                Please switch to Lisk Sepolia Testnet to register.
               </div>
             )}
           </div>

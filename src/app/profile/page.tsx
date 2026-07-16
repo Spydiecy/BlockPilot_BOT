@@ -77,7 +77,7 @@ export default function ProfilePage() {
       const chainCounts: Record<string, number> = {};
       let totalStars = 0;
 
-      const chainKey: ChainKey = 'blockdagTestnet';
+      const chainKey: ChainKey = 'liskTestnet';
       const contractAddress = CONTRACT_ADDRESSES[chainKey];
       const defaultChain = getDefaultChain();
 
@@ -163,7 +163,7 @@ export default function ProfilePage() {
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tighter">Connect Your Wallet</h1>
             <p className="text-gray-400 mb-8 max-w-sm mx-auto">
-              Connect your wallet to view your personalized audit history and statistics on the BlockDAG network.
+              Connect your wallet to view your personalized audit history and statistics on the Lisk network.
             </p>
             <button 
               onClick={connectWallet}
@@ -318,7 +318,7 @@ export default function ProfilePage() {
                   <div className="text-center py-16 text-gray-500 border-2 border-dashed border-gray-800 rounded-xl">
                     <FileSearch size={48} className="mx-auto mb-4 text-gray-600" weight="duotone" />
                     <p className="font-bold text-lg text-gray-400">No Audits Found</p>
-                    <p className="text-sm">You haven't performed any audits on the BlockDAG Testnet yet.</p>
+                    <p className="text-sm">You haven't performed any audits on the Lisk Sepolia Testnet yet.</p>
                   </div>
                 )}
               </div>

@@ -7,6 +7,29 @@ const publicPaths = ['/', '/wallet'];
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Skip middleware for static assets
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.includes('.') && (
+      pathname.endsWith('.png') ||
+      pathname.endsWith('.jpg') ||
+      pathname.endsWith('.jpeg') ||
+      pathname.endsWith('.gif') ||
+      pathname.endsWith('.svg') ||
+      pathname.endsWith('.ico') ||
+      pathname.endsWith('.webp') ||
+      pathname.endsWith('.js') ||
+      pathname.endsWith('.css') ||
+      pathname.endsWith('.woff') ||
+      pathname.endsWith('.woff2') ||
+      pathname.endsWith('.ttf') ||
+      pathname.endsWith('.eot')
+    )
+  ) {
+    return NextResponse.next();
+  }
+
   // Always allow public paths
   if (publicPaths.some(path => pathname === path || pathname.startsWith(`${path}/`))) {
     return NextResponse.next();
@@ -35,10 +58,9 @@ export const config = {
     /*
      * Match all request paths except for the ones starting with:
      * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
+     * - _next (Next.js internals)
+     * - Static files with extensions
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next).*)',
   ],
 };

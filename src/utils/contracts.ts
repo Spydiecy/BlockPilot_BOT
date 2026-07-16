@@ -1,6 +1,6 @@
 // constants/contracts.ts
 export const CONTRACT_ADDRESSES = {
-  blockdagTestnet: '0x16f16b1742ECA434faf9442a9f9d933A766acfCA',
+  liskTestnet: '0xC27106b03AadbFFec555C64F461784fCE850A51b',
 } as const;
 
 export const AUDIT_REGISTRY_ABI = [

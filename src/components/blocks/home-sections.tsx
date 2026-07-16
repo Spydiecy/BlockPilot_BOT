@@ -82,7 +82,7 @@ const workflowSteps: Step[] = [
 ];
 
 const supportedChains: Chain[] = [
-  { id: 1, name: "BlockDAG Testnet", icon: "/chains/blockdag.png" },
+  { id: 1, name: "Lisk Sepolia Testnet", icon: "/chains/lisk.svg" },
 ];
 
 const latestAudits: Audit[] = [
@@ -172,7 +172,7 @@ const ChainsSupported = () => {
           <span className="text-blue-400">NETWORKS</span>
         </h2>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-          Currently supporting BlockDAG Testnet for development and testing
+          Currently supporting Lisk Sepolia Testnet for development and testing
         </p>
         <div className="mt-4 inline-flex items-center px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm">
           🚀 Mainnet coming soon!
@@ -194,7 +194,7 @@ const ChainsSupported = () => {
 
             {/* Content Container */}
             <div className="relative h-full flex flex-col items-center justify-center text-center">
-              {/* BlockDAG Logo */}
+              {/* Lisk Logo */}
               <div className="w-20 h-20 bg-neutral-800 rounded-xl mb-6 flex items-center justify-center overflow-hidden">
                 {chain.icon ? (
                   <img 
@@ -204,7 +204,7 @@ const ChainsSupported = () => {
                   />
                 ) : (
                   <div className="text-blue-400 group-hover:text-blue-300 transition-colors duration-300 text-xl font-bold">
-                    BD
+                    LK
                   </div>
                 )}
               </div>
@@ -221,7 +221,7 @@ const ChainsSupported = () => {
               
               {/* Description */}
               <p className="text-gray-400 text-sm leading-relaxed">
-                Secure smart contract auditing and deployment on BlockDAG's revolutionary network architecture
+                Secure smart contract auditing and deployment on Lisk's scalable and developer-friendly network
               </p>
             </div>
 
@@ -512,9 +512,9 @@ export function HomeSections() {
       icon: <IconShieldLock className="w-6 h-6" />,
     },
     {
-      title: "BlockDAG Network Optimized",
+      title: "Lisk Network Optimized",
       description: 
-        "Specialized security coverage and optimization specifically designed for BlockDAG Network architecture.",
+        "Specialized security coverage and optimization specifically designed for Lisk Network architecture.",
       icon: <IconBolt className="w-6 h-6" />,
     },
     {
@@ -636,7 +636,7 @@ export function HomeSections() {
                 <span className="text-blue-400">SUPPORTED</span>
               </h2>
               <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-4">
-                Currently supporting BlockDAG Testnet for development and testing
+                Currently supporting Lisk Sepolia Testnet for development and testing
               </p>
               <div className="text-xs text-gray-400 tracking-wider mb-6">
                 SECURE · SCALABLE · REVOLUTIONARY · RELIABLE
@@ -661,7 +661,7 @@ export function HomeSections() {
 
                   {/* Content Container */}
                   <div className="relative h-full flex flex-col items-center justify-center text-center">
-                    {/* BlockDAG Logo */}
+                    {/* Lisk Logo */}
                     <div className="w-20 h-20 bg-neutral-800 rounded-xl mb-6 flex items-center justify-center overflow-hidden">
                       {chain.icon ? (
                         <img 
@@ -671,7 +671,7 @@ export function HomeSections() {
                         />
                       ) : (
                         <div className="text-blue-400 group-hover:text-blue-300 transition-colors duration-300 text-xl font-bold">
-                          BD
+                          LK
                         </div>
                       )}
                     </div>
@@ -688,7 +688,7 @@ export function HomeSections() {
                     
                     {/* Description */}
                     <p className="text-gray-400 text-sm leading-relaxed">
-                      Secure smart contract auditing and deployment on BlockDAG's revolutionary network architecture
+                      Secure smart contract auditing and deployment on Lisk's scalable and developer-friendly network
                     </p>
                   </div>
 

@@ -14,14 +14,14 @@ export interface Chain {
 
 // Supported chains configuration
 export const SUPPORTED_CHAINS = {
-  blockdagTestnet: {
-    id: 1043,
-    key: 'blockdagTestnet',
-    name: 'BlockDAG Testnet',
-    rpcUrl: 'https://rpc.primordial.bdagscan.com',
-    explorerUrl: 'https://primordial.bdagscan.com',
-    currency: 'BDAG',
-    iconPath: '/chains/blockdag.png',
+  liskTestnet: {
+    id: 4202,
+    key: 'liskTestnet',
+    name: 'Lisk Sepolia',
+    rpcUrl: 'https://rpc.sepolia-api.lisk.com',
+    explorerUrl: 'https://sepolia-blockscout.lisk.com',
+    currency: 'ETH',
+    iconPath: '/chains/lisk.svg',
     testnet: true,
   },
   ethereum: {
@@ -70,7 +70,7 @@ export type ChainId = keyof typeof SUPPORTED_CHAINS;
 export type SupportedChain = typeof SUPPORTED_CHAINS[ChainId];
 
 // Default chain to use
-const DEFAULT_CHAIN: ChainId = 'blockdagTestnet';
+const DEFAULT_CHAIN: ChainId = 'liskTestnet';
 
 // Helper to get chain by ID
 export const getChainById = (chainId: number): SupportedChain | undefined => {

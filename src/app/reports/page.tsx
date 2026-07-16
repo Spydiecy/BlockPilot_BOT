@@ -55,7 +55,7 @@ export default function ReportsPage() {
       const allAudits: AuditReport[] = [];
       
       try {
-        console.log('Fetching audit reports from BlockDAG Testnet...');
+        console.log('Fetching audit reports from Lisk Sepolia Testnet...');
         
         // First get the total number of contracts
         const totalResponse = await fetch('/api/blockchain', {
@@ -75,7 +75,7 @@ export default function ReportsPage() {
         
         const totalData = await totalResponse.json();
         const totalContracts = totalData.result;
-        console.log(`Found ${totalContracts} contracts on BlockDAG Testnet`);
+        console.log(`Found ${totalContracts} contracts on Lisk Sepolia Testnet`);
         
         // Fetch in batches to respect rate limits
         const BATCH_SIZE = 10; 
@@ -112,7 +112,7 @@ export default function ReportsPage() {
               summary: audit.summary,
               auditor: audit.auditor,
               timestamp: Number(audit.timestamp),
-              chain: 'blockdagTestnet' as ChainKey
+              chain: 'liskTestnet' as ChainKey
             }));
             
             allAudits.push(...batchAudits);
@@ -130,7 +130,7 @@ export default function ReportsPage() {
         
         console.log(`Total audits fetched: ${allAudits.length}`);
       } catch (error) {
-        console.error('Error fetching BlockDAG audits:', error);
+        console.error('Error fetching Lisk Sepolia audits:', error);
       }
       
       setReports(allAudits);

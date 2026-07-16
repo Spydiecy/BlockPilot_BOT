@@ -44,17 +44,17 @@ declare global {
 }
 
 export const CHAIN_CONFIG: Record<string, ChainConfig> = {
-  blockdagTestnet: {
-    chainId: '0x413', // 1043 in hex
-    chainName: 'BlockDAG Testnet',
+  liskTestnet: {
+    chainId: '0x106a', // 4202 in hex
+    chainName: 'Lisk Sepolia',
     nativeCurrency: {
-      name: 'BlockDAG Testnet',
-      symbol: 'BDAG',
+      name: 'Lisk Sepolia Testnet',
+      symbol: 'ETH',
       decimals: 18
     },
-    rpcUrls: ['https://rpc.primordial.bdagscan.com'],
-    blockExplorerUrls: ['https://primordial.bdagscan.com'],
-    iconPath: '/chains/blockdag.png'
+    rpcUrls: ['https://rpc.sepolia-api.lisk.com'],
+    blockExplorerUrls: ['https://sepolia-blockscout.lisk.com'],
+    iconPath: '/chains/lisk.svg'
   }
 } as const;
 

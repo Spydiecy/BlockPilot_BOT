@@ -3,9 +3,9 @@ import { ethers } from 'ethers';
 import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI } from '@/utils/contracts';
 import { CHAIN_CONFIG } from '@/utils/web3';
 
-const PHAROS_RPC_URL = 'https://rpc.primordial.bdagscan.com';
-const provider = new ethers.JsonRpcProvider(PHAROS_RPC_URL);
-const contractAddress = CONTRACT_ADDRESSES.blockdagTestnet;
+const LISK_RPC_URL = 'https://rpc.sepolia-api.lisk.com';
+const provider = new ethers.JsonRpcProvider(LISK_RPC_URL);
+const contractAddress = CONTRACT_ADDRESSES.liskTestnet;
 
 // Initialize contract
 const contract = new ethers.Contract(
