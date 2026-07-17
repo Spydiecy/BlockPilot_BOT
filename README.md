@@ -216,7 +216,7 @@ Every audit becomes **permanent blockchain evidence**:
 
 ---
 
-<sub>Made with ❤️ for the BlockDAG community</sub>
+<sub>Made with ❤️ for the Lisk community</sub>
 
 <sub>⭐ **Star this repo if AuditFi secured your contracts!**</sub>
 
