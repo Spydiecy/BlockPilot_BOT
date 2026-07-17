@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconCopy, IconCheck, IconLogout, IconWallet, IconArrowLeft } from '@tabler/icons-react';
 import { WalletConnectButton } from '@/components/wallet/WalletConnectButton';
@@ -35,6 +35,8 @@ const itemVariants = {
 
 export default function WalletPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/';
   
   // Wallet connection state
   const { 
@@ -55,6 +57,7 @@ export default function WalletPage() {
   const [showTestnetWarning, setShowTestnetWarning] = useState(false);
   const [isTestnet, setIsTestnet] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   
   // Handle copy address to clipboard
   const copyAddress = useCallback(() => {
@@ -111,6 +114,22 @@ export default function WalletPage() {
     }
   }, [isConnected, address]);
 
+  // Handle redirect after wallet connection
+  useEffect(() => {
+    if (isConnected && redirectTo && redirectTo !== '/wallet') {
+      setIsRedirecting(true);
+      // Set wallet connected cookie
+      document.cookie = 'wallet-connected=true; path=/; max-age=86400'; // 24 hours
+      
+      // Small delay to ensure everything is properly set up
+      const timer = setTimeout(() => {
+        router.push(redirectTo);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isConnected, redirectTo, router]);
+
   return (
     <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 relative">
       {/* Background Grid */}
@@ -140,6 +159,16 @@ export default function WalletPage() {
           >
             {isConnected && address ? (
               <div className="p-6 space-y-6">
+                {/* Show redirect message */}
+                {isRedirecting && (
+                  <div className="text-center p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                    <div className="flex items-center justify-center space-x-2 text-blue-400">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
+                      <span className="text-sm font-medium">Redirecting...</span>
+                    </div>
+                  </div>
+                )}
+                
                 {/* Address Section */}
                 <div>
                   <label className="text-xs text-blue-400 uppercase tracking-wider">Wallet Address</label>
@@ -178,7 +207,14 @@ export default function WalletPage() {
             ) : (
               <div className="p-8 text-center space-y-6">
                 <IconWallet size={48} className="mx-auto text-blue-400"/>
-                <p className="text-neutral-300">Connect your wallet to manage your assets.</p>
+                {redirectTo && redirectTo !== '/' ? (
+                  <div className="space-y-2">
+                    <p className="text-neutral-300">Connect your wallet to continue to:</p>
+                    <p className="text-blue-400 font-medium">{redirectTo}</p>
+                  </div>
+                ) : (
+                  <p className="text-neutral-300">Connect your wallet to manage your assets.</p>
+                )}
                 <WalletConnectButton />
               </div>
             )}
