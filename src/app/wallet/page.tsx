@@ -96,7 +96,7 @@ function WalletPageContent() {
   // Check if current network is testnet
   useEffect(() => {
     if (!chainId) return;
-    const isTestnetChain = [5, 80001, 11155111, 4202].includes(chainId); // Added Lisk Sepolia (4202)
+    const isTestnetChain = [5, 80001, 11155111].includes(chainId);
     setIsTestnet(isTestnetChain);
     setShowTestnetWarning(isTestnetChain);
   }, [chainId]);
