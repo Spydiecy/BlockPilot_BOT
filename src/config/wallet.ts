@@ -14,14 +14,14 @@ export interface Chain {
 
 // Supported chains configuration
 export const SUPPORTED_CHAINS = {
-  liskTestnet: {
-    id: 4202,
-    key: 'liskTestnet',
-    name: 'Lisk Sepolia',
-    rpcUrl: 'https://rpc.sepolia-api.lisk.com',
-    explorerUrl: 'https://sepolia-blockscout.lisk.com',
-    currency: 'ETH',
-    iconPath: '/chains/lisk.svg',
+  somniaTestnet: {
+    id: 50312,
+    key: 'somniaTestnet',
+    name: 'Somnia Testnet',
+    rpcUrl: 'https://dream-rpc.somnia.network',
+    explorerUrl: 'https://shannon-explorer.somnia.network',
+    currency: 'STT',
+    iconPath: '/chains/somnia.png',
     testnet: true,
   },
   ethereum: {
@@ -70,7 +70,7 @@ export type ChainId = keyof typeof SUPPORTED_CHAINS;
 export type SupportedChain = typeof SUPPORTED_CHAINS[ChainId];
 
 // Default chain to use
-const DEFAULT_CHAIN: ChainId = 'liskTestnet';
+const DEFAULT_CHAIN: ChainId = 'somniaTestnet';
 
 // Helper to get chain by ID
 export const getChainById = (chainId: number): SupportedChain | undefined => {

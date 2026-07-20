@@ -60,7 +60,7 @@ interface TransactionState {
 const COOLDOWN_TIME = 30;
 
 const CHAIN_ID_TO_KEY: { [key: number]: ChainKey } = {
-  [getDefaultChain().id]: 'liskTestnet',
+  [getDefaultChain().id]: 'somniaTestnet',
 };
 
 export default function AuditPage() {
@@ -156,7 +156,7 @@ export default function AuditPage() {
 
     try {
       const response = await mistralClient.chat.complete({
-        model: "mistral-large-latest",
+        model: "open-mistral-7b",
         messages: [
           {
             role: "system",
@@ -226,10 +226,18 @@ export default function AuditPage() {
       setShowResult(true);
       setCooldown(COOLDOWN_TIME);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Analysis failed:', error);
-      // The error state was unused, directly log or use txState for user feedback
-      setTxState({ isProcessing: false, hash: null, error: 'Analysis failed. Please try again.' });
+      
+      // Handle specific API errors with user-friendly messages
+      let errorMessage = 'Analysis failed. Please try again.';
+      if (error?.message?.includes('service_tier_capacity_exceeded') || error?.message?.includes('429')) {
+        errorMessage = 'AI service is currently at capacity. Please try again in a few moments.';
+      } else if (error?.message?.includes('rate_limit')) {
+        errorMessage = 'Rate limit reached. Please wait a moment before trying again.';
+      }
+      
+      setTxState({ isProcessing: false, hash: null, error: errorMessage });
     } finally {
       setIsAnalyzing(false);
     }

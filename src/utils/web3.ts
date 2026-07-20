@@ -44,17 +44,17 @@ declare global {
 }
 
 export const CHAIN_CONFIG: Record<string, ChainConfig> = {
-  liskTestnet: {
-    chainId: '0x106a', // 4202 in hex
-    chainName: 'Lisk Sepolia',
+  somniaTestnet: {
+    chainId: '0xc488', // 50312 in hex
+    chainName: 'Somnia Testnet',
     nativeCurrency: {
-      name: 'Lisk Sepolia Testnet',
-      symbol: 'ETH',
+      name: 'Somnia Testnet',
+      symbol: 'STT',
       decimals: 18
     },
-    rpcUrls: ['https://rpc.sepolia-api.lisk.com'],
-    blockExplorerUrls: ['https://sepolia-blockscout.lisk.com'],
-    iconPath: '/chains/lisk.svg'
+    rpcUrls: ['https://dream-rpc.somnia.network'],
+    blockExplorerUrls: ['https://shannon-explorer.somnia.network'],
+    iconPath: '/chains/somnia.png'
   }
 } as const;
 

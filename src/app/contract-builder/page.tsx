@@ -170,7 +170,7 @@ export default function ContractBuilder() {
 
     try {
       const response = await mistralClient.chat.complete({
-        model: "mistral-large-latest",
+        model: "open-mistral-7b",
         messages: [
           {
             role: "system",
@@ -178,13 +178,16 @@ export default function ContractBuilder() {
 
         Important Rules:
         1. Use Solidity version 0.8.19
-        2. DO NOT use ANY external imports or libraries
+        2. DO NOT use ANY external imports or libraries - write everything inline
         3. Include all necessary functionality directly in the contract
         4. Add proper access control and safety checks
         5. Include events for all state changes
         6. Implement comprehensive security measures
         7. Add gas optimizations
-        8. Return response in exact JSON format
+        8. Return ONLY valid, compilable Solidity code in the JSON response
+        9. DO NOT include markdown code blocks, comments outside the code, or any formatting
+        10. DO NOT use placeholders like "...", "{ ... }", or incomplete code
+        11. Write COMPLETE implementations - every function must have a full body
         
         Security Considerations:
         - Include reentrancy guards where needed
@@ -193,7 +196,16 @@ export default function ContractBuilder() {
         - Add checks for integer overflow
         - Validate addresses
         - Include event emissions
-        - Handle edge cases`
+        - Handle edge cases
+        
+        Code Quality:
+        - Ensure all syntax is correct
+        - Use proper Solidity formatting
+        - All functions must be properly closed with complete implementations
+        - No missing semicolons or commas
+        - Proper pragma declaration at the top
+        - NO placeholders or ellipsis (...) - write complete code
+        - Every contract must be fully implemented, not inherited with placeholders`
           },
           {
             role: "user",
@@ -203,12 +215,24 @@ export default function ContractBuilder() {
         Custom Features: ${customFeatures || 'Standard features'}
         Parameters: ${JSON.stringify(contractParams)}
         
-        Return in this exact format:
+        CRITICAL INSTRUCTIONS:
+        1. Write ONE complete contract with ALL functionality inline
+        2. DO NOT create abstract contracts or use inheritance
+        3. DO NOT use placeholders like "...", "{ ... }", or incomplete implementations
+        4. If creating a token, implement ALL ERC20 functions directly in the contract
+        5. Include complete function bodies for: transfer, approve, transferFrom, mint, burn
+        6. Define ALL state variables: balances mapping, allowances mapping, totalSupply, etc.
+        7. Implement ALL events: Transfer, Approval, etc.
+        
+        Return ONLY this exact JSON format with valid Solidity code:
         {
-          "code": "complete solidity code",
+          "code": "// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.19;\\n\\ncontract YourContract {\\n  // Complete implementation here\\n}",
           "features": ["list of implemented features"],
           "securityNotes": ["list of security measures implemented"]
-        }`
+        }
+        
+        The code field must contain ONLY valid Solidity syntax with proper line breaks (\\n).
+        Every function must have a complete implementation, not just a declaration.`
           }
         ],
         responseFormat: { type: "json_object" },
@@ -222,13 +246,65 @@ export default function ContractBuilder() {
       // Validate response against schema
       const validatedResponse = ContractSchema.parse(parsedResponse);
 
-      setGeneratedCode(validatedResponse.code);
+      // Enhanced code cleaning to remove markdown and fix common issues
+      let cleanedCode = validatedResponse.code;
+      if (typeof cleanedCode === 'string') {
+        cleanedCode = cleanedCode
+          // Remove markdown code block markers
+          .replace(/```solidity\n?/g, '')
+          .replace(/```javascript\n?/g, '')
+          .replace(/```\n?/g, '')
+          // Remove escaped newlines and fix formatting
+          .replace(/\\n/g, '\n')
+          .replace(/\\t/g, '\t')
+          .replace(/\\"/g, '"')
+          // Remove any leading/trailing whitespace
+          .trim();
+        
+        // Validate it starts with SPDX or pragma
+        if (!cleanedCode.includes('SPDX-License-Identifier') && !cleanedCode.startsWith('pragma')) {
+          console.warn('Generated code missing license or pragma, using template');
+          if (selectedTemplate.baseCode) {
+            cleanedCode = selectedTemplate.baseCode;
+          }
+        }
+        
+        // Check for placeholders that indicate incomplete code
+        const hasPlaceholders = 
+          cleanedCode.includes('{ ... }') ||
+          cleanedCode.includes('{...}') ||
+          cleanedCode.includes('// ...') ||
+          /contract\s+\w+\s*\{\s*\.\.\.\s*\}/.test(cleanedCode);
+        
+        if (hasPlaceholders) {
+          console.warn('Generated code contains placeholders, using template');
+          setError('AI generated incomplete code with placeholders. Using template instead.');
+          if (selectedTemplate.baseCode) {
+            cleanedCode = selectedTemplate.baseCode;
+          }
+        }
+      }
+
+      setGeneratedCode(cleanedCode);
       setSecurityNotes(validatedResponse.securityNotes);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Generation failed:', error);
-      setError('Failed to generate contract. Please try again.');
-      if (selectedTemplate.baseCode) {
+      
+      // Handle specific API errors
+      if (error?.message?.includes('service_tier_capacity_exceeded') || error?.message?.includes('429')) {
+        setError('AI service is currently at capacity. Please try again in a few moments or use the template code below.');
+      } else if (error?.message?.includes('rate_limit')) {
+        setError('Rate limit reached. Please wait a moment before trying again.');
+      } else if (error?.name === 'ZodError') {
+        setError('AI generated invalid response format. Using template code instead.');
+      } else {
+        setError('Failed to generate contract. Using template code instead.');
+      }
+      
+      // Always fall back to template code if available
+      if (selectedTemplate?.baseCode) {
         setGeneratedCode(selectedTemplate.baseCode);
+        setError('AI generation failed. Showing template code - you can edit it as needed.');
       }
     } finally {
       setIsGenerating(false);
@@ -247,25 +323,51 @@ export default function ContractBuilder() {
       const { provider, signer } = await connectWallet();
       const detectedChain = await detectCurrentNetwork();
       
-      // Validate we're on Lisk Testnet
+      // Enhanced code cleaning before deployment to remove any artifacts
+      let cleanCode = displayedCode;
+      if (typeof cleanCode === 'string') {
+        cleanCode = cleanCode
+          // Remove markdown code block markers
+          .replace(/```solidity\n?/g, '')
+          .replace(/```javascript\n?/g, '')
+          .replace(/```\n?/g, '')
+          // Fix escaped characters
+          .replace(/\\n/g, '\n')
+          .replace(/\\t/g, '\t')
+          .replace(/\\"/g, '"')
+          // Remove leading/trailing whitespace
+          .trim();
+      }
+      
+      // Validate we're on Somnia Testnet
       const network = await provider.getNetwork();
       const currentChainId = '0x' + network.chainId.toString(16);
 
-      if (currentChainId !== CHAIN_CONFIG.liskTestnet.chainId) {
-        throw new Error('Please switch to Lisk Sepolia Testnet to deploy contracts');
+      if (currentChainId !== CHAIN_CONFIG.somniaTestnet.chainId) {
+        throw new Error('Please switch to Somnia Testnet to deploy contracts');
       }
 
-      // Compile contract
+      // Compile contract with cleaned code
       const response = await fetch('/api/compile-contract', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sourceCode: displayedCode }),
+        body: JSON.stringify({ sourceCode: cleanCode }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         const errorDetails = errorData.details || (await response.text());
-        throw new Error(`Compilation failed: ${errorDetails}`);
+        
+        // Show compilation error with helpful message
+        const errorMessage = `Compilation failed: ${errorDetails}`;
+        setDeploymentError(errorMessage);
+        
+        // If it's a syntax error, suggest using the template
+        if (errorDetails.includes('ParserError') || errorDetails.includes('SyntaxError')) {
+          setError('The generated code has syntax errors. Try regenerating or edit the code manually before deploying.');
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const { abi, bytecode } = await response.json();
@@ -315,7 +417,7 @@ export default function ContractBuilder() {
   const getExplorerUrl = () => {
     if (!currentChain || !deployedAddress) return null;
     const baseUrl = CHAIN_CONFIG[currentChain].blockExplorerUrls[0];
-    return `https://sepolia-blockscout.lisk.com/address/${deployedAddress}`;
+    return `${baseUrl}/address/${deployedAddress}`;
   };
 
   const handleConnectWallet = async () => {
@@ -360,9 +462,22 @@ export default function ContractBuilder() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mb-6 bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-2 rounded-2xl"
+              className="mb-6 bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-2xl"
             >
-              {error}
+              <div className="flex items-start justify-between gap-3">
+                <p className="flex-1">{error}</p>
+                {selectedTemplate?.baseCode && (
+                  <button
+                    onClick={() => {
+                      setGeneratedCode(selectedTemplate.baseCode);
+                      setError(null);
+                    }}
+                    className="text-xs bg-red-500/20 hover:bg-red-500/30 px-3 py-1 rounded-lg transition-colors whitespace-nowrap"
+                  >
+                    Use Template
+                  </button>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -470,7 +585,12 @@ export default function ContractBuilder() {
             </div>
             
             {/* Generate Button */}
-            <div className="pt-4 border-t border-blue-900/50">
+            <div className="pt-4 border-t border-blue-900/50 space-y-3">
+              {selectedTemplate && (selectedTemplate.name.includes('Token') || selectedTemplate.name.includes('NFT')) && (
+                <div className="text-xs text-yellow-400/80 bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
+                  💡 <strong>Tip:</strong> Token templates are production-ready. You can deploy them directly or use "Generate Contract" to customize with AI.
+                </div>
+              )}
               <button
                 onClick={generateContract}
                 disabled={!selectedTemplate || isGenerating}
@@ -573,7 +693,7 @@ export default function ContractBuilder() {
                     ) : (
                       <>
                         <Rocket size={20} weight="fill" />
-                        Deploy to Lisk Sepolia Testnet
+                        Deploy to Somnia Testnet
                       </>
                     )}
                   </button>

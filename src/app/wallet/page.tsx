@@ -115,7 +115,9 @@ function WalletPageContent() {
 
   // Handle redirect after wallet connection
   useEffect(() => {
-    if (isConnected && redirectTo && redirectTo !== '/wallet') {
+    // Only redirect if there's a valid redirect parameter (not default '/')
+    // and user just connected (not already connected)
+    if (isConnected && redirectTo && redirectTo !== '/wallet' && redirectTo !== '/') {
       // Set wallet connected cookie
       document.cookie = 'wallet-connected=true; path=/; max-age=86400'; // 24 hours
       
@@ -159,7 +161,7 @@ function WalletPageContent() {
               <div className="p-6 space-y-6">
                 {/* Address Section */}
                 <div>
-                  <label className="text-xs text-blue-400 uppercase tracking-wider">Wallet Address</label>
+                  <div className="text-xs text-blue-400 uppercase tracking-wider">Wallet Address</div>
                   <div className="flex items-center justify-between mt-2 bg-neutral-900 p-3 rounded-md border border-neutral-700">
                     <span className="font-mono text-sm text-neutral-300">{formattedAddress}</span>
                     <button onClick={copyAddress} className="text-neutral-400 hover:text-white transition-colors">
@@ -171,11 +173,11 @@ function WalletPageContent() {
                 {/* Balance & Network */}
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="text-xs text-blue-400 uppercase tracking-wider">Balance</label>
+                    <div className="text-xs text-blue-400 uppercase tracking-wider">Balance</div>
                     <p className="text-2xl font-semibold text-white mt-1">{balance ? formatBalance(balance) : '0.00'}</p>
                   </div>
                   <div>
-                    <label className="text-xs text-blue-400 uppercase tracking-wider">Network</label>
+                    <div className="text-xs text-blue-400 uppercase tracking-wider">Network</div>
                     <p className="text-lg font-medium text-neutral-300 mt-2 flex items-center">
                       <span className={`w-2 h-2 rounded-full mr-2.5 ${isTestnet ? 'bg-yellow-400' : 'bg-green-400'}`}></span>
                       {chainName}

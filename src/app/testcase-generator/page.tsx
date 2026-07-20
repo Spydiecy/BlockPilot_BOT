@@ -144,7 +144,7 @@ Return a structured list of testing steps without any extra text.`
     setError(null);
     try {
       const response = await mistralClient.chat.complete({
-        model: "mistral-large-latest",
+        model: "open-mistral-7b",
         messages: [
           {
             role: "user",
@@ -171,9 +171,18 @@ Return a structured list of testing steps without any extra text.`
 
       setGeneratedTests(cleanCode);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Test generation failed:', error);
-      setError('Failed to generate test cases. Please try again.');
+      
+      // Handle specific API errors with user-friendly messages
+      let errorMessage = 'Failed to generate test cases. Please try again.';
+      if (error?.message?.includes('service_tier_capacity_exceeded') || error?.message?.includes('429')) {
+        errorMessage = 'AI service is currently at capacity. Please try again in a few moments.';
+      } else if (error?.message?.includes('rate_limit')) {
+        errorMessage = 'Rate limit reached. Please wait a moment before trying again.';
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsGenerating(false);
     }

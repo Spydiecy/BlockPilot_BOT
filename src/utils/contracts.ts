@@ -1,6 +1,6 @@
 // constants/contracts.ts
 export const CONTRACT_ADDRESSES = {
-  liskTestnet: '0xC27106b03AadbFFec555C64F461784fCE850A51b',
+  somniaTestnet: '0x2c51D62d65b8ba191Db7aC3420F213D38c853aFd',
 } as const;
 
 export const AUDIT_REGISTRY_ABI = [

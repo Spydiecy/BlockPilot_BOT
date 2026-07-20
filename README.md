@@ -2,12 +2,12 @@
 
 # 🛡️ AuditFi - The Future of Smart Contract Security
 
-**Revolutionary AI-Powered Security Auditing for Lisk Network**
+**Revolutionary AI-Powered Security Auditing for Somnia Network**
 
 *Transforming smart contract security from weeks to seconds with cutting-edge Mistral AI*
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now-blue?style=for-the-badge)](https://auditfi-lisk.netlify.app/)
-[![Lisk Network](https://img.shields.io/badge/⛓️_Built_for-Lisk-green?style=for-the-badge)](https://lisk.com/)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now-blue?style=for-the-badge)](https://auditfi-somnia.netlify.app/)
+[![Somnia Network](https://img.shields.io/badge/⛓️_Built_for-Somnia-green?style=for-the-badge)](https://somnia.network/)
 [![MIT License](https://img.shields.io/badge/📄_License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 </div>
@@ -33,19 +33,19 @@ Our Mistral AI doesn't just scan code—it **understands** it. Trained on thousa
 
 <img width="908" height="849" alt="image" src="https://github.com/user-attachments/assets/fe59eb67-043f-4b57-b2a9-b9a4f149c764" />
 
-### **Born for Lisk Network**
-- Lightning-fast deployment to Lisk Sepolia Testnet
+### **Born for Somnia Network**
+- Lightning-fast deployment to Somnia Testnet
 - Network-specific vulnerability detection 
 - Gas optimization that saves you real money
-- Instant verification on Lisk Explorer
-- Zero false positives with Lisk-tuned algorithms
+- Instant verification on Somnia Explorer
+- Zero false positives with Somnia-tuned algorithms
 
 ### **Smart Contract Templates That Just Work**
 Forget fragile dependencies and security nightmares:
 - Battle-tested ERC20/ERC721 implementations
 - AI-generated contracts from your specifications  
 - Security-first architecture built into every template
-- Optimized for Lisk gas efficiency
+- Optimized for Somnia gas efficiency
 
 <img width="888" height="329" alt="image" src="https://github.com/user-attachments/assets/a4e63c5d-e9ed-4599-8df0-735cffcbb2da" />
 
@@ -54,15 +54,15 @@ Forget fragile dependencies and security nightmares:
 - Security best practices enforced automatically
 - Complete event transparency for full auditability
 - Military-grade access controls
-- Lisk-optimized performance
+- Somnia-optimized performance
 
 <img width="1860" height="803" alt="image" src="https://github.com/user-attachments/assets/f9680e09-0482-410f-9ec8-2cdd711880c9" />
 
 ### **Immutable On-Chain Proof**
 Every audit becomes **permanent blockchain evidence**:
-- Audit reports stored forever on Lisk Network
+- Audit reports stored forever on Somnia Network
 - Traceable security history for compliance
-- Public verification via Lisk Explorer  
+- Public verification via Somnia Explorer  
 - Verifiable security scores that build trust
 
 <img width="1863" height="822" alt="image" src="https://github.com/user-attachments/assets/3d146b53-cf29-42fc-bc82-100b9e36ed8a" />
@@ -82,8 +82,8 @@ Every audit becomes **permanent blockchain evidence**:
 ### **What You Need:**
 ```bash
 ✅ MetaMask or Web3 wallet
-✅ Lisk Network access (Sepolia Testnet)
-✅ ETH tokens for deployment
+✅ Somnia Network access (Testnet)
+✅ STT tokens for deployment
 ```
 
 ---
@@ -95,7 +95,7 @@ Every audit becomes **permanent blockchain evidence**:
 | **Frontend** | **AI Engine** | **Blockchain** | **Experience** |
 |:---:|:---:|:---:|:---:|
 | **Next.js 14** | **Mistral AI** | **ethers.js** | **Framer Motion** |
-| **Tailwind CSS** | **Large Language Model** | **Lisk Network** | **Phosphor Icons** |
+| **Tailwind CSS** | **Large Language Model** | **Somnia Network** | **Phosphor Icons** |
 | **Shadcn UI** | **Pattern Recognition** | **Web3 Integration** | **Zod Validation** |
 
 </div>
@@ -108,7 +108,7 @@ Every audit becomes **permanent blockchain evidence**:
 
 | **Rating** | **What It Means** | **Deploy Status** |
 |:---:|:---|:---:|
-| ⭐⭐⭐⭐⭐ | **LEGENDARY** - Zero vulnerabilities, Lisk-optimized perfection | ✅ **DEPLOY NOW** |
+| ⭐⭐⭐⭐⭐ | **LEGENDARY** - Zero vulnerabilities, Somnia-optimized perfection | ✅ **DEPLOY NOW** |
 | ⭐⭐⭐⭐ | **EXCELLENT** - Minor optimizations needed, production-ready | ✅ **DEPLOY READY** |
 | ⭐⭐⭐ | **GOOD** - High severity issues found, needs fixes | ⚠️ **FIX FIRST** |
 | ⭐⭐ | **RISKY** - Critical vulnerabilities detected | ❌ **DO NOT DEPLOY** |
@@ -123,7 +123,7 @@ Every audit becomes **permanent blockchain evidence**:
 
 <div align="center">
 
-### 🎯 **[👆 LIVE DEMO - Try AuditFi Now!](https://auditfi-lisk.netlify.app/)**
+### 🎯 **[👆 LIVE DEMO - Try AuditFi Now!](https://auditfi-somnia.netlify.app/)**
 *Experience the future of smart contract security in your browser*
 
 </div>
@@ -140,20 +140,20 @@ Every audit becomes **permanent blockchain evidence**:
 - Real-time vulnerability detection (no waiting weeks)
 - Custom validation against known attack vectors  
 - Gas optimization recommendations that save money
-- Lisk-specific security patterns enforcement
+- Somnia-specific security patterns enforcement
 
 ### **Smart Contract Builder**
 > **Why reinvent the wheel when you can get a Tesla?**
 
 - Self-contained templates (no dependency hell)
 - Security-by-design architecture
-- Lisk-optimized for maximum efficiency  
+- Somnia-optimized for maximum efficiency  
 - Configurable parameters with built-in validation
 
 ### **One-Click Deployment Pipeline**
 > **From code to blockchain in under 60 seconds**
 
-- One-click deployment to Lisk Network
+- One-click deployment to Somnia Network
 - Automatic security verification before going live
 - Real-time monitoring of your transactions  
 - Seamless explorer integration for transparency
@@ -171,22 +171,22 @@ Every audit becomes **permanent blockchain evidence**:
 
 ---
 
-## ⛓️ **Why Lisk Network?**
+## ⛓️ **Why Somnia Network?**
 
 <div align="center">
 
-**AuditFi is exclusively built for Lisk Network - Here's why that matters:**
+**AuditFi is exclusively built for Somnia Network - Here's why that matters:**
 
 </div>
 
 | **Feature** | **Why It's Game-Changing** |
 |:---|:---|
-| **Secure Deployment** | Deploy with confidence knowing your contracts are Lisk-optimized |
-| **Deep Analysis** | Security patterns specifically tuned for Lisk's architecture |
-| **On-Chain Verification** | Every audit permanently recorded on Lisk's immutable ledger |
+| **Secure Deployment** | Deploy with confidence knowing your contracts are Somnia-optimized |
+| **Deep Analysis** | Security patterns specifically tuned for Somnia's architecture |
+| **On-Chain Verification** | Every audit permanently recorded on Somnia's immutable ledger |
 | **Audit Storage** | Your security history lives forever on the blockchain |
-| **Gas Optimization** | Save real money with Lisk-specific efficiency improvements |
-| **Security Patterns** | Protection strategies designed for Lisk's unique features |
+| **Gas Optimization** | Save real money with Somnia-specific efficiency improvements |
+| **Security Patterns** | Protection strategies designed for Somnia's unique features |
 
 <img width="1848" height="812" alt="image" src="https://github.com/user-attachments/assets/beac2fbf-f43d-44e2-83fe-94db716b4cc1" />
 
@@ -199,7 +199,7 @@ Every audit becomes **permanent blockchain evidence**:
 ### **Ready to secure the future?**
 
 [![Follow Twitter](https://img.shields.io/badge/🐦_Follow-@AuditFi__ai-1da1f2?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/AuditFi_ai)
-[![Visit Lisk](https://img.shields.io/badge/🌐_Learn_More-Lisk.com-green?style=for-the-badge)](https://lisk.com/)
+[![Visit Somnia](https://img.shields.io/badge/🌐_Learn_More-Somnia.network-green?style=for-the-badge)](https://somnia.network/)
 
 **Got ideas? Found bugs? Want to contribute?**  
 *We're building the future of smart contract security together!*
@@ -216,7 +216,7 @@ Every audit becomes **permanent blockchain evidence**:
 
 ---
 
-<sub>Made with ❤️ for the Lisk community</sub>
+<sub>Made with ❤️ for the Somnia community</sub>
 
 <sub>⭐ **Star this repo if AuditFi secured your contracts!**</sub>
 
