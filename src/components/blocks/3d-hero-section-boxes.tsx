@@ -73,7 +73,7 @@ function HeroContent() {
     <div className="text-white px-4 max-w-screen-xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start lg:items-center py-16">
       <div className="w-full lg:w-1/2 pr-0 lg:pr-8 mb-8 lg:mb-0">
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-          Smart Contract<br />Security by <br/>AuditFi AI
+          Smart Contract<br />Security by <br/>BlockPilot AI
         </h1>
         <div className="text-sm text-gray-400 tracking-wider">
           INTELLIGENT AGENT · REAL-TIME AUDITS · BLOCKCHAIN SECURITY

@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ AuditFi - The Future of Smart Contract Security
+# 🛡️ BlockPilot - The Future of Smart Contract Security
 
 **Revolutionary AI-Powered Security Auditing for Somnia Network**
 
@@ -14,11 +14,11 @@
 
 ---
 
-## 🔥 Why AuditFi Will Change Everything
+## 🔥 Why BlockPilot Will Change Everything
 
 > **Traditional smart contract audits take weeks and cost thousands.** 
 > 
-> **AuditFi delivers enterprise-grade security analysis in under 30 seconds.**
+> **BlockPilot delivers enterprise-grade security analysis in under 30 seconds.**
 
 **The Problem:** Developers deploy vulnerable contracts because security audits are too slow and expensive.
 
@@ -26,7 +26,7 @@
 
 <img width="1639" height="811" alt="image" src="https://github.com/user-attachments/assets/c6674f49-6526-4e19-b486-26176f4a183b" />
 
-## 🚀 What Makes AuditFi Legendary?
+## 🚀 What Makes BlockPilot Legendary?
 
 ### 🧠 **AI That Thinks Like a Security Expert**
 Our Mistral AI doesn't just scan code—it **understands** it. Trained on thousands of exploit patterns, it catches vulnerabilities that even experienced auditors miss.
@@ -119,23 +119,23 @@ Every audit becomes **permanent blockchain evidence**:
 
 ---
 
-## 🎯 **See AuditFi in Action**
+## 🎯 **See BlockPilot in Action**
 
 <div align="center">
 
-### 🎯 **[👆 LIVE DEMO - Try AuditFi Now!](https://auditfi-somnia.netlify.app/)**
+### 🎯 **[👆 LIVE DEMO - Try BlockPilot Now!](https://auditfi-somnia.netlify.app/)**
 *Experience the future of smart contract security in your browser*
 
 </div>
 
 ---
 
-## � **The AuditFi Advantage**
+## � **The BlockPilot Advantage**
 
 ### **AI Security Analysis**
 > **Traditional auditing:** Manual review by humans (slow, expensive, error-prone)
 > 
-> **AuditFi approach:** AI that learns from every exploit ever discovered
+> **BlockPilot approach:** AI that learns from every exploit ever discovered
 
 - Real-time vulnerability detection (no waiting weeks)
 - Custom validation against known attack vectors  
@@ -175,7 +175,7 @@ Every audit becomes **permanent blockchain evidence**:
 
 <div align="center">
 
-**AuditFi is exclusively built for Somnia Network - Here's why that matters:**
+**BlockPilot is exclusively built for Somnia Network - Here's why that matters:**
 
 </div>
 
@@ -198,7 +198,7 @@ Every audit becomes **permanent blockchain evidence**:
 
 ### **Ready to secure the future?**
 
-[![Follow Twitter](https://img.shields.io/badge/🐦_Follow-@AuditFi__ai-1da1f2?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/AuditFi_ai)
+[![Follow Twitter](https://img.shields.io/badge/🐦_Follow-@BlockPilot__ai-1da1f2?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/BlockPilot_ai)
 [![Visit Somnia](https://img.shields.io/badge/🌐_Learn_More-Somnia.network-green?style=for-the-badge)](https://somnia.network/)
 
 **Got ideas? Found bugs? Want to contribute?**  
@@ -218,6 +218,6 @@ Every audit becomes **permanent blockchain evidence**:
 
 <sub>Made with ❤️ for the Somnia community</sub>
 
-<sub>⭐ **Star this repo if AuditFi secured your contracts!**</sub>
+<sub>⭐ **Star this repo if BlockPilot secured your contracts!**</sub>
 
 </div>

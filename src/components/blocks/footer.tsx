@@ -158,7 +158,7 @@ export function Footer() {
             ))}
           </div>
           <p className="mt-8 text-xs leading-5 text-gray-400 md:order-1 md:mt-0">
-            &copy; {new Date().getFullYear()} AuditFi Security. All rights reserved.
+            &copy; {new Date().getFullYear()} BlockPilot Security. All rights reserved.
           </p>
         </div>
       </div>

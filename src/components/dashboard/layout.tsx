@@ -119,7 +119,7 @@ export default function DashboardLayout({
                 
                 {/* Text */}
                 <span className="text-xl font-mono font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-300 group-hover:from-blue-400 group-hover:to-white transition duration-300">
-                  AuditFi
+                  BlockPilot
                 </span>
               </div>
             </div>

@@ -236,7 +236,7 @@ const ChainsSupported = () => {
         <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-full">
           <span className="text-blue-400 font-mono text-sm">MAINNET</span>
           <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-          <span className="text-gray-300 text-sm">Coming Q2 2025</span>
+          <span className="text-gray-300 text-sm">Coming Q2 2026</span>
         </div>
       </div>
     </div>
@@ -386,7 +386,7 @@ const Footer = () => {
                     
                     {/* Text */}
                     <span className="text-xl font-mono font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-300 group-hover:from-blue-400 group-hover:to-white transition duration-300">
-                      AuditFi
+                      BlockPilot
                     </span>
                   </div>
                 </div>
@@ -467,7 +467,7 @@ const Footer = () => {
           {/* Bottom Bar */}
           <div className="pt-8 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center">
             <p className="text-neutral-400 text-sm">
-              © 2025 AuditFi. All rights reserved.
+              © 2026 BlockPilot. All rights reserved.
             </p>
             <div className="flex items-center space-x-4 mt-4 md:mt-0">
               <a href="#" className="text-neutral-400 hover:text-blue-400 transition-colors duration-300 text-sm">
@@ -703,7 +703,7 @@ export function HomeSections() {
               <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-full">
                 <span className="text-blue-400 font-mono text-sm">MAINNET</span>
                 <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                <span className="text-gray-300 text-sm">Coming Q2 2025</span>
+                <span className="text-gray-300 text-sm">Coming Q2 2026</span>
               </div>
             </div>
           </div>
