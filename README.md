@@ -24,14 +24,14 @@
 
 **Our Solution:** Instant, AI-powered security analysis that catches vulnerabilities before they cost millions.
 
-![AuditFi Hero](https://github.com/user-attachments/assets/6b211909-365d-441b-a8f0-ec9ac9f0b7f4)
+<img width="1639" height="811" alt="image" src="https://github.com/user-attachments/assets/c6674f49-6526-4e19-b486-26176f4a183b" />
 
 ## 🚀 What Makes AuditFi Legendary?
 
 ### 🧠 **AI That Thinks Like a Security Expert**
 Our Mistral AI doesn't just scan code—it **understands** it. Trained on thousands of exploit patterns, it catches vulnerabilities that even experienced auditors miss.
 
-![Lisk Integration](https://github.com/user-attachments/assets/e3bbd5d5-b304-4d07-aa05-f006cd994d5a)
+<img width="908" height="849" alt="image" src="https://github.com/user-attachments/assets/fe59eb67-043f-4b57-b2a9-b9a4f149c764" />
 
 ### **Born for Lisk Network**
 - Lightning-fast deployment to Lisk Sepolia Testnet
@@ -47,7 +47,7 @@ Forget fragile dependencies and security nightmares:
 - Security-first architecture built into every template
 - Optimized for Lisk gas efficiency
 
-![Contract Templates](https://github.com/user-attachments/assets/97ea0ad7-46f9-44c7-b3a0-c87082e15c72)
+<img width="888" height="329" alt="image" src="https://github.com/user-attachments/assets/a4e63c5d-e9ed-4599-8df0-735cffcbb2da" />
 
 ### **Enterprise-Grade Security Building**
 - Zero-dependency architecture (no supply chain attacks)
@@ -56,7 +56,7 @@ Forget fragile dependencies and security nightmares:
 - Military-grade access controls
 - Lisk-optimized performance
 
-![Secure Building](https://github.com/user-attachments/assets/3a3e1d04-aacb-4edc-86a6-d79148c5d185)
+<img width="1860" height="803" alt="image" src="https://github.com/user-attachments/assets/f9680e09-0482-410f-9ec8-2cdd711880c9" />
 
 ### **Immutable On-Chain Proof**
 Every audit becomes **permanent blockchain evidence**:
@@ -65,7 +65,7 @@ Every audit becomes **permanent blockchain evidence**:
 - Public verification via Lisk Explorer  
 - Verifiable security scores that build trust
 
-![On-Chain Verification](https://github.com/user-attachments/assets/eafb5182-7542-41fd-a3f1-bdebbe0bd26c)
+<img width="1863" height="822" alt="image" src="https://github.com/user-attachments/assets/3d146b53-cf29-42fc-bc82-100b9e36ed8a" />
 
 ### **Developer Experience That Feels Like Magic**
 - Real-time code analysis as you type
@@ -73,7 +73,7 @@ Every audit becomes **permanent blockchain evidence**:
 - Live deployment monitoring 
 - Network status at a glance
 
-![Developer Experience](https://github.com/user-attachments/assets/7d211ccd-a685-4f98-a60d-391f61534ba4)
+<img width="1872" height="471" alt="image" src="https://github.com/user-attachments/assets/2683d301-209c-4ff8-9463-587e17aa9eb9" />
 
 ---
 
@@ -165,9 +165,9 @@ Every audit becomes **permanent blockchain evidence**:
 - AI-powered test cases for multiple frameworks
 - Living documentation that updates with your code
 
-![Documentation Demo](https://github.com/user-attachments/assets/1e124ba6-c391-4967-ad6c-c31b9bffe584)
+<img width="1878" height="832" alt="image" src="https://github.com/user-attachments/assets/9720edec-aa50-4ad3-bd58-ca210b24f218" />
 
-![Testing Framework](https://github.com/user-attachments/assets/6c83078a-2ac1-4dda-b8e1-00fceb76528b)
+<img width="1857" height="822" alt="image" src="https://github.com/user-attachments/assets/04ba1291-5cd9-41bd-bd41-d2da4b63b2eb" />
 
 ---
 
@@ -188,7 +188,7 @@ Every audit becomes **permanent blockchain evidence**:
 | **Gas Optimization** | Save real money with Lisk-specific efficiency improvements |
 | **Security Patterns** | Protection strategies designed for Lisk's unique features |
 
-![Lisk Network Integration](https://github.com/user-attachments/assets/4c6b05e2-1b5b-4a38-b114-37f3893217be)
+<img width="1848" height="812" alt="image" src="https://github.com/user-attachments/assets/beac2fbf-f43d-44e2-83fe-94db716b4cc1" />
 
 ---
 
