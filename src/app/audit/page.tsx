@@ -60,7 +60,7 @@ interface TransactionState {
 const COOLDOWN_TIME = 30;
 
 const CHAIN_ID_TO_KEY: { [key: number]: ChainKey } = {
-  [getDefaultChain().id]: 'somniaTestnet',
+  [getDefaultChain().id]: 'polygonAmoy',
 };
 
 export default function AuditPage() {

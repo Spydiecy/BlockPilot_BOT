@@ -3,9 +3,9 @@ import { ethers } from 'ethers';
 import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI } from '@/utils/contracts';
 import { CHAIN_CONFIG } from '@/utils/web3';
 
-const SOMNIA_RPC_URL = 'https://dream-rpc.somnia.network';
-const provider = new ethers.JsonRpcProvider(SOMNIA_RPC_URL);
-const contractAddress = CONTRACT_ADDRESSES.somniaTestnet;
+const POLYGON_AMOY_RPC_URL = 'https://rpc-amoy.polygon.technology';
+const provider = new ethers.JsonRpcProvider(POLYGON_AMOY_RPC_URL);
+const contractAddress = CONTRACT_ADDRESSES.polygonAmoy;
 
 // Initialize contract
 const contract = new ethers.Contract(

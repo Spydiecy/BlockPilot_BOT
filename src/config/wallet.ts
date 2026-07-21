@@ -14,55 +14,15 @@ export interface Chain {
 
 // Supported chains configuration
 export const SUPPORTED_CHAINS = {
-  somniaTestnet: {
-    id: 50312,
-    key: 'somniaTestnet',
-    name: 'Somnia Testnet',
-    rpcUrl: 'https://dream-rpc.somnia.network',
-    explorerUrl: 'https://shannon-explorer.somnia.network',
-    currency: 'STT',
-    iconPath: '/chains/somnia.png',
+  polygonAmoy: {
+    id: 80002,
+    key: 'polygonAmoy',
+    name: 'Polygon Amoy Testnet',
+    rpcUrl: 'https://rpc-amoy.polygon.technology',
+    explorerUrl: 'https://amoy.polygonscan.com',
+    currency: 'POL',
+    iconPath: '/chains/polygon.png',
     testnet: true,
-  },
-  ethereum: {
-    id: 1,
-    key: 'ethereum',
-    name: 'Ethereum',
-    rpcUrl: 'https://eth.llamarpc.com',
-    explorerUrl: 'https://etherscan.io',
-    currency: 'ETH',
-    iconPath: '/chains/ethereum.svg',
-    testnet: false,
-  },
-  polygon: {
-    id: 137,
-    key: 'polygon',
-    name: 'Polygon',
-    rpcUrl: 'https://polygon-rpc.com',
-    explorerUrl: 'https://polygonscan.com',
-    currency: 'MATIC',
-    iconPath: '/chains/polygon.svg',
-    testnet: false,
-  },
-  optimism: {
-    id: 10,
-    key: 'optimism',
-    name: 'Optimism',
-    rpcUrl: 'https://mainnet.optimism.io',
-    explorerUrl: 'https://optimistic.etherscan.io',
-    currency: 'ETH',
-    iconPath: '/chains/optimism.svg',
-    testnet: false,
-  },
-  arbitrum: {
-    id: 42161,
-    key: 'arbitrum',
-    name: 'Arbitrum',
-    rpcUrl: 'https://arb1.arbitrum.io/rpc',
-    explorerUrl: 'https://arbiscan.io',
-    currency: 'ETH',
-    iconPath: '/chains/arbitrum.svg',
-    testnet: false,
   },
 } as const;
 
@@ -70,7 +30,7 @@ export type ChainId = keyof typeof SUPPORTED_CHAINS;
 export type SupportedChain = typeof SUPPORTED_CHAINS[ChainId];
 
 // Default chain to use
-const DEFAULT_CHAIN: ChainId = 'somniaTestnet';
+const DEFAULT_CHAIN: ChainId = 'polygonAmoy';
 
 // Helper to get chain by ID
 export const getChainById = (chainId: number): SupportedChain | undefined => {

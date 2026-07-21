@@ -44,17 +44,17 @@ declare global {
 }
 
 export const CHAIN_CONFIG: Record<string, ChainConfig> = {
-  somniaTestnet: {
-    chainId: '0xc488', // 50312 in hex
-    chainName: 'Somnia Testnet',
+  polygonAmoy: {
+    chainId: '0x13882', // 80002 in hex
+    chainName: 'Polygon Amoy Testnet',
     nativeCurrency: {
-      name: 'Somnia Testnet',
-      symbol: 'STT',
+      name: 'POL',
+      symbol: 'POL',
       decimals: 18
     },
-    rpcUrls: ['https://dream-rpc.somnia.network'],
-    blockExplorerUrls: ['https://shannon-explorer.somnia.network'],
-    iconPath: '/chains/somnia.png'
+    rpcUrls: ['https://rpc-amoy.polygon.technology'],
+    blockExplorerUrls: ['https://amoy.polygonscan.com'],
+    iconPath: '/chains/polygon.png'
   }
 } as const;
 

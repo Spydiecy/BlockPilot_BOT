@@ -339,12 +339,12 @@ export default function ContractBuilder() {
           .trim();
       }
       
-      // Validate we're on Somnia Testnet
+      // Validate we're on Polygon Amoy Testnet
       const network = await provider.getNetwork();
       const currentChainId = '0x' + network.chainId.toString(16);
 
-      if (currentChainId !== CHAIN_CONFIG.somniaTestnet.chainId) {
-        throw new Error('Please switch to Somnia Testnet to deploy contracts');
+      if (currentChainId !== CHAIN_CONFIG.polygonAmoy.chainId) {
+        throw new Error('Please switch to Polygon Amoy Testnet to deploy contracts');
       }
 
       // Compile contract with cleaned code
@@ -693,7 +693,7 @@ export default function ContractBuilder() {
                     ) : (
                       <>
                         <Rocket size={20} weight="fill" />
-                        Deploy to Somnia Testnet
+                        Deploy to Polygon Amoy
                       </>
                     )}
                   </button>

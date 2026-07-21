@@ -1,6 +1,6 @@
 // constants/contracts.ts
 export const CONTRACT_ADDRESSES = {
-  somniaTestnet: '0x2c51D62d65b8ba191Db7aC3420F213D38c853aFd',
+  polygonAmoy: '0xCa36dD890F987EDcE1D6D7C74Fb9df627c216BF6',
 } as const;
 
 export const AUDIT_REGISTRY_ABI = [

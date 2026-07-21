@@ -82,7 +82,7 @@ const workflowSteps: Step[] = [
 ];
 
 const supportedChains: Chain[] = [
-  { id: 1, name: "Somnia Testnet", icon: "/chains/somnia.png" },
+  { id: 1, name: "Polygon Amoy Testnet", icon: "/chains/polygon.png" },
 ];
 
 const latestAudits: Audit[] = [
@@ -172,7 +172,7 @@ const ChainsSupported = () => {
           <span className="text-blue-400">NETWORKS</span>
         </h2>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-          Currently supporting Somnia Testnet for development and testing
+          Currently supporting Polygon Amoy Testnet for development and testing
         </p>
         <div className="mt-4 inline-flex items-center px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm">
           🚀 Mainnet coming soon!
@@ -194,7 +194,7 @@ const ChainsSupported = () => {
 
             {/* Content Container */}
             <div className="relative h-full flex flex-col items-center justify-center text-center">
-              {/* Somnia Logo */}
+              {/* Polygon Logo */}
               <div className="w-20 h-20 bg-neutral-800 rounded-xl mb-6 flex items-center justify-center overflow-hidden">
                 {chain.icon ? (
                   <img 
@@ -221,7 +221,7 @@ const ChainsSupported = () => {
               
               {/* Description */}
               <p className="text-gray-400 text-sm leading-relaxed">
-                Secure smart contract auditing and deployment on Somnia's scalable and developer-friendly network
+                Secure smart contract auditing and deployment on Polygon's scalable and developer-friendly network
               </p>
             </div>
 
@@ -512,9 +512,9 @@ export function HomeSections() {
       icon: <IconShieldLock className="w-6 h-6" />,
     },
     {
-      title: "Somnia Network Optimized",
+      title: "Polygon Network Optimized",
       description: 
-        "Specialized security coverage and optimization specifically designed for Somnia Network architecture.",
+        "Specialized security coverage and optimization specifically designed for Polygon Network architecture.",
       icon: <IconBolt className="w-6 h-6" />,
     },
     {
@@ -636,7 +636,7 @@ export function HomeSections() {
                 <span className="text-blue-400">SUPPORTED</span>
               </h2>
               <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-4">
-                Currently supporting Somnia Testnet for development and testing
+                Currently supporting Polygon Amoy Testnet for development and testing
               </p>
               <div className="text-xs text-gray-400 tracking-wider mb-6">
                 SECURE · SCALABLE · REVOLUTIONARY · RELIABLE
@@ -661,7 +661,7 @@ export function HomeSections() {
 
                   {/* Content Container */}
                   <div className="relative h-full flex flex-col items-center justify-center text-center">
-                    {/* Somnia Logo */}
+                    {/* Polygon Logo */}
                     <div className="w-20 h-20 bg-neutral-800 rounded-xl mb-6 flex items-center justify-center overflow-hidden">
                       {chain.icon ? (
                         <img 
@@ -688,7 +688,7 @@ export function HomeSections() {
                     
                     {/* Description */}
                     <p className="text-gray-400 text-sm leading-relaxed">
-                      Secure smart contract auditing and deployment on Somnia's scalable and developer-friendly network
+                      Secure smart contract auditing and deployment on Polygon's scalable and developer-friendly network
                     </p>
                   </div>
 
