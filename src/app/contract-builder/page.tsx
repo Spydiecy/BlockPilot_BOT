@@ -395,8 +395,11 @@ export default function ContractBuilder() {
         }
       });
 
-      // Deploy contract
-      const contract = await contractFactory.deploy(...constructorArgs);
+      // Deploy contract with proper gas settings for Polygon Amoy
+      const contract = await contractFactory.deploy(...constructorArgs, {
+        maxPriorityFeePerGas: ethers.parseUnits('30', 'gwei'), // 30 Gwei tip (above minimum of 25 Gwei)
+        maxFeePerGas: ethers.parseUnits('50', 'gwei'), // 50 Gwei max fee
+      });
       const receipt = await contract.deploymentTransaction()?.wait();
 
       if (!receipt?.contractAddress) {
