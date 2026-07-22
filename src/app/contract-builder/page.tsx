@@ -420,7 +420,14 @@ export default function ContractBuilder() {
   const getExplorerUrl = () => {
     if (!currentChain || !deployedAddress) return null;
     const baseUrl = CHAIN_CONFIG[currentChain].blockExplorerUrls[0];
-    return `${baseUrl}/address/${deployedAddress}`;
+    
+    // Check if it's a token contract (ERC20 or ERC721/NFT)
+    const isToken = selectedTemplate?.name.toLowerCase().includes('token') || 
+                    selectedTemplate?.name.toLowerCase().includes('nft') ||
+                    selectedTemplate?.name.toLowerCase().includes('erc');
+    
+    const path = isToken ? 'token' : 'address';
+    return `${baseUrl}/${path}/${deployedAddress}`;
   };
 
   const handleConnectWallet = async () => {
