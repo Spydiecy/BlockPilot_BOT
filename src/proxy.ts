@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 // Define public paths that don't require wallet connection
 const publicPaths = ['/', '/wallet'];
 
-export function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip middleware for static assets
