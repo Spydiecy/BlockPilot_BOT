@@ -31,7 +31,7 @@
 ### 🧠 **AI That Thinks Like a Security Expert**
 Our Mistral AI doesn't just scan code—it **understands** it. Trained on thousands of exploit patterns, it catches vulnerabilities that even experienced auditors miss.
 
-<img width="908" height="849" alt="image" src="https://github.com/user-attachments/assets/fe59eb67-043f-4b57-b2a9-b9a4f149c764" />
+<img width="908" height="849" alt="image" src="https://github.com/user-attachments/assets/96095eb9-8acf-4a8b-aabf-7600b6950e75" />
 
 ### **Born for Polygon Network**
 - Lightning-fast deployment to Polygon Amoy Testnet
@@ -56,8 +56,6 @@ Forget fragile dependencies and security nightmares:
 - Military-grade access controls
 - Polygon-optimized performance
 
-<img width="1860" height="803" alt="image" src="https://github.com/user-attachments/assets/f9680e09-0482-410f-9ec8-2cdd711880c9" />
-
 ### **Immutable On-Chain Proof**
 Every audit becomes **permanent blockchain evidence**:
 - Audit reports stored forever on Polygon Network
@@ -72,8 +70,6 @@ Every audit becomes **permanent blockchain evidence**:
 - Instant security feedback with fix suggestions
 - Live deployment monitoring 
 - Network status at a glance
-
-<img width="1872" height="471" alt="image" src="https://github.com/user-attachments/assets/2683d301-209c-4ff8-9463-587e17aa9eb9" />
 
 ---
 
@@ -167,7 +163,7 @@ Every audit becomes **permanent blockchain evidence**:
 
 <img width="1878" height="832" alt="image" src="https://github.com/user-attachments/assets/9720edec-aa50-4ad3-bd58-ca210b24f218" />
 
-<img width="1857" height="822" alt="image" src="https://github.com/user-attachments/assets/04ba1291-5cd9-41bd-bd41-d2da4b63b2eb" />
+<img width="1857" height="822" alt="image" src="https://github.com/user-attachments/assets/56fa14cb-dc84-4cda-87ca-fb12f2a40f5d" />
 
 ---
 
@@ -188,7 +184,7 @@ Every audit becomes **permanent blockchain evidence**:
 | **Gas Optimization** | Save real money with Polygon-specific efficiency improvements |
 | **Security Patterns** | Protection strategies designed for Polygon's unique features |
 
-<img width="1848" height="812" alt="image" src="https://github.com/user-attachments/assets/beac2fbf-f43d-44e2-83fe-94db716b4cc1" />
+<img width="1848" height="812" alt="image" src="https://github.com/user-attachments/assets/27c8031f-809a-438b-bfee-b3440e9c68dd" />
 
 ---
 
