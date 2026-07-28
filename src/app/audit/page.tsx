@@ -122,10 +122,21 @@ export default function AuditPage() {
         signer
       );
 
+      // Polygon Amoy requires a minimum priority fee of 25 gwei
+      const feeData = await provider.getFeeData();
+      const minPriorityFee = ethers.parseUnits('25', 'gwei');
+      const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas && feeData.maxPriorityFeePerGas > minPriorityFee
+        ? feeData.maxPriorityFeePerGas
+        : minPriorityFee;
+      const maxFeePerGas = feeData.maxFeePerGas && feeData.maxFeePerGas > minPriorityFee
+        ? feeData.maxFeePerGas
+        : minPriorityFee * BigInt(2);
+
       const tx = await contract.registerAudit(
         contractHash,
         result.stars,
-        result.summary
+        result.summary,
+        { maxPriorityFeePerGas, maxFeePerGas }
       );
 
       const receipt = await tx.wait();

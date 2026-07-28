@@ -1,7 +1,8 @@
 'use client';
 
-import { Star, CheckCircle, Lightning, Lock, CircleNotch, ArrowSquareOut, Warning } from 'phosphor-react';
+import { Star, CheckCircle, Lightning, Lock, CircleNotch, ArrowSquareOut, Warning, DownloadSimple } from 'phosphor-react';
 import { SupportedChain } from '@/config/wallet';
+import { generateAuditPDF } from '@/utils/generatePDF';
 
 // Shared types - ideally in a dedicated types file
 interface AuditResult {
@@ -70,30 +71,43 @@ interface ReportDisplayProps {
   isCorrectNetwork: boolean;
   isConnected: boolean;
   defaultChain: SupportedChain;
+  code?: string;
 }
 
-export function ReportDisplay({ 
-  result, 
-  txState, 
-  isReviewBlurred, 
-  registerAuditOnChain, 
-  isCorrectNetwork, 
-  isConnected, 
-  defaultChain 
+export function ReportDisplay({
+  result,
+  txState,
+  isReviewBlurred,
+  registerAuditOnChain,
+  isCorrectNetwork,
+  isConnected,
+  defaultChain,
+  code,
 }: ReportDisplayProps) {
   return (
     <div className="h-full bg-black/50 rounded-2xl border border-blue-900/50 p-6 overflow-y-auto custom-scrollbar relative">
-      {txState.hash && (
-        <a 
-          href={`${defaultChain.explorerUrl}/tx/${txState.hash}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="absolute top-4 right-4 bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-xs font-mono flex items-center gap-2 hover:bg-green-500/20 transition-colors"
-        >
-          <ArrowSquareOut size={14} />
-          View Transaction
-        </a>
-      )}
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        {!isReviewBlurred && (
+          <button
+            onClick={() => generateAuditPDF(result, code, txState.hash)}
+            className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full text-xs font-mono flex items-center gap-2 hover:bg-blue-500/20 transition-colors border border-blue-500/20"
+          >
+            <DownloadSimple size={14} weight="bold" />
+            Download PDF
+          </button>
+        )}
+        {txState.hash && (
+          <a
+            href={`${defaultChain.explorerUrl}/tx/${txState.hash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-xs font-mono flex items-center gap-2 hover:bg-green-500/20 transition-colors"
+          >
+            <ArrowSquareOut size={14} />
+            View Transaction
+          </a>
+        )}
+      </div>
       <div className={`transition-all duration-500 ${isReviewBlurred ? 'blur-sm' : ''}`}>
         <div className="text-center mb-6">
           <div className="flex justify-center items-center gap-1 mb-2">

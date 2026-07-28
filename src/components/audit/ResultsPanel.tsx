@@ -35,18 +35,20 @@ interface ResultsPanelProps {
   isCorrectNetwork: boolean;
   isConnected: boolean;
   defaultChain: SupportedChain;
+  code?: string;
 }
 
-export function ResultsPanel({ 
-  isAnalyzing, 
-  result, 
-  showResult, 
-  txState, 
-  isReviewBlurred, 
-  registerAuditOnChain, 
-  isCorrectNetwork, 
-  isConnected, 
-  defaultChain 
+export function ResultsPanel({
+  isAnalyzing,
+  result,
+  showResult,
+  txState,
+  isReviewBlurred,
+  registerAuditOnChain,
+  isCorrectNetwork,
+  isConnected,
+  defaultChain,
+  code,
 }: ResultsPanelProps) {
   if (isAnalyzing) {
     return <AnalyzingState />;
@@ -54,7 +56,7 @@ export function ResultsPanel({
 
   if (result && showResult) {
     return (
-      <ReportDisplay 
+      <ReportDisplay
         result={result}
         txState={txState}
         isReviewBlurred={isReviewBlurred}
@@ -62,6 +64,7 @@ export function ResultsPanel({
         isCorrectNetwork={isCorrectNetwork}
         isConnected={isConnected}
         defaultChain={defaultChain}
+        code={code}
       />
     );
   }
