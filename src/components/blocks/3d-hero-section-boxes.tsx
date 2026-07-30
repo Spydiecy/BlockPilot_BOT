@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
-import Spline from '@splinetool/react-spline';
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
+
+const Spline = dynamic(() => import('@splinetool/react-spline'), {
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-black/30" />,
+});
 
 const smoothScrollTo = (elementId: string) => {
   const element = document.getElementById(elementId);
@@ -56,11 +62,15 @@ function ScreenshotSection({ screenshotRef }: { screenshotRef: React.MutableRefO
   return (
     <section className="relative z-10 container mx-auto px-4 md:px-6 lg:px-8 -mb-48 mt-24">
       <div ref={screenshotRef} className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50 w-full md:w-[80%] lg:w-[70%] mx-auto">
-        <div>
-          <img
-            src="/screenshot.png"
+        <div className="relative">
+          <Image
+            src="/screenshot.jpg"
             alt="App Screenshot"
+            width={1400}
+            height={617}
             className="w-full h-auto block rounded-lg mx-auto"
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
           />
         </div>
       </div>
@@ -152,4 +162,3 @@ const HeroSection = () => {
 };
 
 export { HeroSection }
-

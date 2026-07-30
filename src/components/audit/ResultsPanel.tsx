@@ -1,9 +1,16 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { SupportedChain } from '@/config/wallet';
 import { AnalyzingState } from './AnalyzingState';
 import { InitialState } from './InitialState';
-import { ReportDisplay } from './ReportDisplay';
+
+const ReportDisplay = dynamic(
+  () => import('./ReportDisplay').then((mod) => mod.ReportDisplay),
+  {
+    loading: () => <AnalyzingState />,
+  }
+);
 
 // These types should be co-located or imported from a shared types file
 interface AuditResult {

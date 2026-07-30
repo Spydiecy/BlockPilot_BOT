@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { cn } from "@/lib/utils";
+import Image from 'next/image';
 import {
   IconShieldLock,
   IconBrain,
@@ -197,9 +198,11 @@ const ChainsSupported = () => {
               {/* Polygon Logo */}
               <div className="w-20 h-20 bg-neutral-800 rounded-xl mb-6 flex items-center justify-center overflow-hidden">
                 {chain.icon ? (
-                  <img 
-                    src={chain.icon} 
-                    alt={chain.name} 
+                  <Image
+                    src={chain.icon}
+                    alt={chain.name || 'Network icon'}
+                    width={48}
+                    height={48}
                     className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300"
                   />
                 ) : (
@@ -664,9 +667,11 @@ export function HomeSections() {
                     {/* Polygon Logo */}
                     <div className="w-20 h-20 bg-neutral-800 rounded-xl mb-6 flex items-center justify-center overflow-hidden">
                       {chain.icon ? (
-                        <img 
-                          src={chain.icon} 
-                          alt={chain.name} 
+                        <Image
+                          src={chain.icon}
+                          alt={chain.name || 'Network icon'}
+                          width={48}
+                          height={48}
                           className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300"
                         />
                       ) : (
