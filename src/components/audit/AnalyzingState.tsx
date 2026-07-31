@@ -1,8 +1,9 @@
 'use client';
 
+import { memo } from 'react';
 import { Cube } from 'phosphor-react';
 
-export function AnalyzingState() {
+export const AnalyzingState = memo(function AnalyzingState() {
   return (
     <div className="h-full bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col items-center justify-center text-center p-8">
       <div className="relative w-24 h-24 mb-6">
@@ -15,4 +16,4 @@ export function AnalyzingState() {
       </p>
     </div>
   );
-}
+});

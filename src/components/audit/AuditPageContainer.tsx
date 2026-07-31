@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import { memo, type ReactNode } from 'react';
 
-export const AuditPageContainer = ({ children }: { children: React.ReactNode }) => {
+export const AuditPageContainer = memo(function AuditPageContainer({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen w-full bg-black text-white relative overflow-hidden">
       <div
@@ -14,4 +14,4 @@ export const AuditPageContainer = ({ children }: { children: React.ReactNode }) 
       </div>
     </div>
   );
-};
+});

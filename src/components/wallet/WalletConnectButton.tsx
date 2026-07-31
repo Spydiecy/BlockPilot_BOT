@@ -2,13 +2,13 @@
 
 import { useWallet } from '@/contexts/WalletContext';
 import { formatAddress } from '@/config/wallet';
-import { useState, useCallback, useEffect } from 'react';
+import { memo, useState, useCallback, useEffect } from 'react';
 
 interface WalletConnectButtonProps {
   className?: string;
 }
 
-export function WalletConnectButton({ className = '' }: WalletConnectButtonProps) {
+export const WalletConnectButton = memo(function WalletConnectButton({ className = '' }: WalletConnectButtonProps) {
   const { 
     isConnected, 
     isConnecting, 
@@ -40,6 +40,10 @@ export function WalletConnectButton({ className = '' }: WalletConnectButtonProps
       console.error('Failed to disconnect wallet:', error);
     }
   }, [disconnect]);
+
+  const handleToggleDropdown = useCallback(() => {
+    setIsDropdownOpen((prev) => !prev);
+  }, []);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -94,7 +98,7 @@ export function WalletConnectButton({ className = '' }: WalletConnectButtonProps
   return (
     <div className="relative wallet-dropdown">
       <button
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        onClick={handleToggleDropdown}
         className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
       >
         <div className="w-2 h-2 rounded-full bg-green-500"></div>
@@ -151,4 +155,4 @@ export function WalletConnectButton({ className = '' }: WalletConnectButtonProps
       )}
     </div>
   );
-}
+});

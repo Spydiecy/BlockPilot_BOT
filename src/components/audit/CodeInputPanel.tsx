@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { memo, useCallback, type ChangeEvent } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { CircleNotch, FileText } from 'phosphor-react';
 
@@ -12,7 +12,7 @@ interface CodeInputPanelProps {
   cooldown: number;
 }
 
-export function CodeInputPanel({ 
+export const CodeInputPanel = memo(function CodeInputPanel({ 
   code, 
   setCode, 
   analyzeContract, 
@@ -39,6 +39,10 @@ export function CodeInputPanel({
     noClick: true, // The dropzone is the whole panel, but we don't want to trigger file dialog on click
   });
 
+  const handleCodeChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
+    setCode(event.target.value);
+  }, [setCode]);
+
   return (
     <div {...getRootProps()} className="relative bg-black/50 rounded-2xl border border-blue-900/50 flex flex-col p-4 h-full transition-colors duration-300">
       {isDragActive && (
@@ -53,7 +57,7 @@ export function CodeInputPanel({
           className="w-full h-full p-4 bg-transparent text-white font-mono text-sm resize-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 custom-scrollbar code-editor"
           placeholder="// Paste your Solidity code here or drop a .sol file..."
           value={code}
-          onChange={(e) => setCode(e.target.value)}
+          onChange={handleCodeChange}
         />
         <input {...getInputProps()} />
       </div>
@@ -77,4 +81,4 @@ export function CodeInputPanel({
       </div>
     </div>
   );
-}
+});

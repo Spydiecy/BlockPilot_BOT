@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import dynamic from 'next/dynamic';
 import { SupportedChain } from '@/config/wallet';
 import { AnalyzingState } from './AnalyzingState';
@@ -45,7 +46,7 @@ interface ResultsPanelProps {
   code?: string;
 }
 
-export function ResultsPanel({
+export const ResultsPanel = memo(function ResultsPanel({
   isAnalyzing,
   result,
   showResult,
@@ -77,4 +78,4 @@ export function ResultsPanel({
   }
 
   return <InitialState />;
-}
+});

@@ -1,8 +1,9 @@
 'use client';
 
+import { memo } from 'react';
 import { Shield } from 'phosphor-react';
 
-export function InitialState() {
+export const InitialState = memo(function InitialState() {
   return (
     <div className="h-full bg-black/50 rounded-2xl border border-blue-900/50 flex items-center justify-center text-blue-400 p-8">
       <div className="text-center">
@@ -31,4 +32,4 @@ export function InitialState() {
       </div>
     </div>
   );
-}
+});

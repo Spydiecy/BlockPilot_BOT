@@ -334,31 +334,7 @@ export default function ReportsPage() {
 
         {/* Reports Table */}
         <div className="bg-black/50 border border-blue-900/50 hover:border-blue-500/30 transition-colors duration-300 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/10">
-          <div 
-            className="overflow-x-auto"
-            style={{
-              scrollbarWidth: 'thin',
-              scrollbarColor: '#3b82f6 #1e293b'
-            }}
-          >
-            <style dangerouslySetInnerHTML={{
-              __html: `
-                .overflow-x-auto::-webkit-scrollbar {
-                  height: 8px;
-                }
-                .overflow-x-auto::-webkit-scrollbar-track {
-                  background: #1e293b;
-                  border-radius: 4px;
-                }
-                .overflow-x-auto::-webkit-scrollbar-thumb {
-                  background: #3b82f6;
-                  border-radius: 4px;
-                }
-                .overflow-x-auto::-webkit-scrollbar-thumb:hover {
-                  background: #2563eb;
-                }
-              `
-            }} />
+          <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-blue-900/50">
@@ -498,31 +474,7 @@ export default function ReportsPage() {
                   </button>
                 </div>
 
-                <div 
-                  className="space-y-6 max-h-[60vh] overflow-y-auto"
-                  style={{
-                    scrollbarWidth: 'thin',
-                    scrollbarColor: '#3b82f6 #1e293b'
-                  }}
-                >
-                  <style dangerouslySetInnerHTML={{
-                    __html: `
-                      .space-y-6::-webkit-scrollbar {
-                        width: 8px;
-                      }
-                      .space-y-6::-webkit-scrollbar-track {
-                        background: #1e293b;
-                        border-radius: 4px;
-                      }
-                      .space-y-6::-webkit-scrollbar-thumb {
-                        background: #3b82f6;
-                        border-radius: 4px;
-                      }
-                      .space-y-6::-webkit-scrollbar-thumb:hover {
-                        background: #2563eb;
-                      }
-                    `
-                  }} />
+                <div className="space-y-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
                   <div>
                     <label className="block text-sm text-blue-400 mb-1">Contract Hash</label>
                     <div className="font-mono bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40 flex items-center justify-between text-white">

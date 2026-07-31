@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import { Mistral } from "@mistralai/mistralai";
 import { z } from "zod";
@@ -64,7 +64,7 @@ const CHAIN_ID_TO_KEY: { [key: number]: ChainKey } = {
 };
 
 export default function AuditPage() {
-  const { chainId, isConnected, provider, signer, connect: connectWallet } = useWallet();
+  const { chainId, isConnected, provider, signer } = useWallet();
   const [code, setCode] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AuditResult | null>(null);
@@ -88,22 +88,22 @@ export default function AuditPage() {
   }, [cooldown]);
 
   // Validation functions
-  const isSolidityCode = (code: string): boolean => {
+  const handleCodeChange = useCallback((nextCode: string) => {
+    setCode(nextCode);
+  }, []);
+
+  const isSolidityCode = useCallback((sourceCode: string): boolean => {
     const pragmaRegex = /pragma\s+solidity\s*\^?[0-9]+\.[0-9]+\.[0-9]+;?/;
     const contractRegex = /contract\s+[A-Za-z_][A-Za-z0-9_]*\s*\{/;
     const importRegex = /import\s+['"].*['"];/;
-    return pragmaRegex.test(code) || contractRegex.test(code) || importRegex.test(code);
-  };
-
-
+    return pragmaRegex.test(sourceCode) || contractRegex.test(sourceCode) || importRegex.test(sourceCode);
+  }, []);
 
   // Chain registration function
-  const registerAuditOnChain = async () => {
-    if (!result || !code) return;
+  const registerAuditOnChain = useCallback(async () => {
+    if (!result || !code || !provider || !signer || !chainId) return;
 
     setTxState({ isProcessing: true, hash: null, error: null });
-
-    if (!provider || !signer || !chainId) return;
 
     try {
       // Calculate contract hash
@@ -147,10 +147,10 @@ export default function AuditPage() {
       const errorMessage = err.reason || err.message || 'An unknown error occurred.';
       setTxState({ isProcessing: false, hash: null, error: errorMessage });
     }
-  };
+  }, [chainId, code, provider, result, signer]);
 
   // Main analysis function
-  const analyzeContract = async () => {
+  const analyzeContract = useCallback(async () => {
     if (!code.trim()) {
       console.error('Please enter your smart contract code.');
       setTxState({ isProcessing: false, hash: null, error: 'Please enter your smart contract code.' });
@@ -252,9 +252,7 @@ export default function AuditPage() {
     } finally {
       setIsAnalyzing(false);
     }
-  };
-
-
+  }, [code, isSolidityCode]);
 
   return (
     <AuditPageContainer>
@@ -269,7 +267,7 @@ export default function AuditPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-150px)]">
         <CodeInputPanel 
           code={code}
-          setCode={setCode}
+          setCode={handleCodeChange}
           analyzeContract={analyzeContract}
           isAnalyzing={isAnalyzing}
           cooldown={cooldown}
