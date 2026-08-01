@@ -29,22 +29,27 @@ const isThemeMode = (value: string | null): value is ThemeMode =>
 const getSystemTheme = (): ThemeMode =>
   window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 
+const getInitialTheme = (): ThemeMode => {
+  if (typeof window === 'undefined') {
+    return 'dark';
+  }
+
+  const storedTheme = window.localStorage.getItem(STORAGE_KEY);
+  return isThemeMode(storedTheme) ? storedTheme : getSystemTheme();
+};
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeMode>('dark');
+  const [theme, setThemeState] = useState<ThemeMode>(getInitialTheme);
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem(STORAGE_KEY);
-    const initialTheme = isThemeMode(storedTheme) ? storedTheme : getSystemTheme();
-    setThemeState(initialTheme);
+    document.documentElement.setAttribute('data-theme', theme);
     setIsHydrated(true);
-  }, []);
+  }, [theme]);
 
   useEffect(() => {
-    if (!isHydrated) return;
-    document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem(STORAGE_KEY, theme);
-  }, [theme, isHydrated]);
+  }, [theme]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FiHome, FiFileText, FiShield, FiUser, FiZap, FiCreditCard, FiBookOpen, FiCode } from 'react-icons/fi';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface NavItem {
   name: string;
@@ -13,6 +14,8 @@ interface NavItem {
 
 export function AnimatedNavbar() {
   const pathname = usePathname();
+  const { theme } = useTheme();
+  const isLightTheme = theme === 'light';
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -80,8 +83,11 @@ export function AnimatedNavbar() {
             isHovered ? 'h-0 opacity-0' : 'h-1.5 opacity-100'
           }`}
           style={{
-            background: 'linear-gradient(90deg, rgba(0,0,0,0), #4a4a4a, #6b6b6b, #8a8a8a, #a8a8a8, #c5c5c5, #a8a8a8, #8a8a8a, #6b6b6b, #4a4a4a, rgba(0,0,0,0))',
+            backgroundImage: isLightTheme
+              ? 'linear-gradient(90deg, rgba(59,130,246,0), rgba(96,165,250,0.45), rgba(59,130,246,0.7), rgba(29,78,216,0.8), rgba(59,130,246,0.7), rgba(96,165,250,0.45), rgba(59,130,246,0))'
+              : 'linear-gradient(90deg, rgba(0,0,0,0), #4a4a4a, #6b6b6b, #8a8a8a, #a8a8a8, #c5c5c5, #a8a8a8, #8a8a8a, #6b6b6b, #4a4a4a, rgba(0,0,0,0))',
             backgroundSize: '300% 100%',
+            backgroundRepeat: 'no-repeat',
             animation: isHovered ? 'none' : 'flow 8s ease-in-out infinite',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             cursor: 'pointer',
@@ -90,7 +96,11 @@ export function AnimatedNavbar() {
 
         {/* Navbar that appears from the line */}
         <div 
-          className={`bg-black/90 backdrop-blur-lg rounded-t-2xl border border-gray-700 shadow-2xl transition-all duration-300 absolute bottom-0 left-0 w-full ${
+          className={`backdrop-blur-lg rounded-t-2xl border transition-all duration-300 absolute bottom-0 left-0 w-full ${
+            isLightTheme
+              ? 'bg-white/90 border-blue-200/80 shadow-xl shadow-blue-500/15'
+              : 'bg-black/90 border-gray-700 shadow-2xl'
+          } ${
             isHovered ? 'opacity-100 h-16 -translate-y-0' : 'opacity-0 h-0 -translate-y-2 overflow-hidden border-t-0 border-l-0 border-r-0'
           }`}
         >
@@ -102,7 +112,9 @@ export function AnimatedNavbar() {
                 className={`flex flex-col items-center justify-center px-4 py-3 transition-all duration-300 ${
                   pathname === item.path 
                     ? 'text-blue-400' 
-                    : 'text-gray-400 hover:text-white'
+                    : isLightTheme
+                      ? 'text-slate-500 hover:text-slate-900'
+                      : 'text-gray-400 hover:text-white'
                 }`}
               >
                 <div className="text-xl transition-transform duration-300 hover:scale-125">

@@ -7,22 +7,8 @@ import { useTheme } from '@/contexts/ThemeContext';
 
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
   ssr: false,
-  loading: () => <div className="h-full w-full bg-slate-900/30" />,
+  loading: () => <div className="h-full w-full" style={{ backgroundColor: 'var(--theme-surface)' }} />,
 });
-
-const smoothScrollTo = (elementId: string) => {
-  const element = document.getElementById(elementId);
-  if (element) {
-    const offset = 80; // Account for fixed navbar height
-    const elementPosition = element.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.pageYOffset - offset;
-
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: 'smooth'
-    });
-  }
-};
 
 function HeroSplineBackground({ isLightTheme }: { isLightTheme: boolean }) {
   return (
@@ -109,18 +95,22 @@ function ScreenshotSection({
 
 function HeroContent({ isLightTheme }: { isLightTheme: boolean }) {
   return (
-    <div className="text-white px-4 max-w-screen-xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start lg:items-center py-16">
+    <div
+      className={`px-4 max-w-screen-xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start lg:items-center py-16 ${
+        isLightTheme ? 'text-slate-950' : 'text-white'
+      }`}
+    >
       <div className="w-full lg:w-1/2 pr-0 lg:pr-8 mb-8 lg:mb-0">
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
           Smart Contract<br />Security by <br/>BlockPilot AI
         </h1>
-        <div className="text-sm text-gray-400 tracking-wider">
+        <div className={`text-sm tracking-wider ${isLightTheme ? 'text-slate-600' : 'text-gray-400'}`}>
           INTELLIGENT AGENT · REAL-TIME AUDITS · BLOCKCHAIN SECURITY
         </div>
       </div>
 
       <div className="w-full lg:w-1/2 pl-0 lg:pl-8 flex flex-col items-start">
-         <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-xl leading-relaxed">
+         <p className={`text-xl sm:text-2xl mb-8 max-w-xl leading-relaxed ${isLightTheme ? 'text-slate-700' : 'text-gray-300'}`}>
            Our AI agent continuously monitors and protects your smart contracts with real-time threat detection
         </p>
         <div className="flex pointer-events-auto flex-col sm:flex-row items-start space-y-3 sm:space-y-0 sm:space-x-4">
@@ -159,8 +149,8 @@ function HeroContent({ isLightTheme }: { isLightTheme: boolean }) {
 
 
 const HeroSection = () => {
-  const { theme } = useTheme();
-  const isLightTheme = theme === 'light';
+  const { theme, isHydrated } = useTheme();
+  const isLightTheme = !isHydrated || theme === 'light';
   const screenshotRef = useRef<HTMLDivElement>(null);
   const heroContentRef = useRef<HTMLDivElement>(null);
 
