@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mistral } from '@mistralai/mistralai';
 import {
@@ -225,16 +225,10 @@ ${documentation.variables?.map(variable => `### ${variable.name}
     URL.revokeObjectURL(url);
   };
 
-  useEffect(() => {
-    document.documentElement.classList.add('dark')
-  }, [])
-
   return (
     <div className="min-h-screen w-full bg-black text-white relative overflow-hidden">
-      <div
-        className="absolute inset-0 h-full w-full bg-black bg-[linear-gradient(to_right,#161616_1px,transparent_1px),linear-gradient(to_bottom,#161616_1px,transparent_1px)] bg-[size:4rem_4rem]"
-      ></div>
-      <div className="absolute inset-0 h-full w-full bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+      <div className="absolute inset-0 h-full w-full theme-grid-overlay"></div>
+      <div className="absolute inset-0 h-full w-full theme-grid-fade"></div>
       <div className="relative z-10 p-4 sm:p-6 lg:p-8">
         <header className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">

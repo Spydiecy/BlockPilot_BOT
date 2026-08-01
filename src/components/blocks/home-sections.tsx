@@ -97,7 +97,7 @@ const HowItWorks = () => {
     <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
       {/* Background Elements */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0),rgba(0,0,0,0.8)_70%)]" />
+        <div className="absolute inset-0 theme-section-spotlight" />
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
       </div>
       
@@ -162,7 +162,7 @@ const ChainsSupported = () => {
     <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
       {/* Background Elements */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0),rgba(0,0,0,0.8)_70%)]" />
+        <div className="absolute inset-0 theme-section-spotlight-top" />
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
       </div>
 
@@ -311,7 +311,7 @@ const Audits = () => {
     <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
       {/* Background Elements */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0),rgba(0,0,0,0.8)_70%)]" />
+        <div className="absolute inset-0 theme-section-spotlight" />
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
       </div>
 
@@ -542,7 +542,8 @@ export function HomeSections() {
 
   return (
     <section className="relative pt-24 overflow-hidden">
-      <div className="absolute inset-0 bg-black" />
+      <div className="absolute inset-0 theme-grid-overlay" />
+      <div className="absolute inset-0 theme-grid-fade" />
       <div className="relative z-10">
         {/* Features Header */}
         <div id="features" className="relative text-center mb-16">
@@ -565,7 +566,7 @@ export function HomeSections() {
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
             {/* Background Elements */}
             <div className="absolute inset-0">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0),rgba(0,0,0,0.8)_70%)]" />
+              <div className="absolute inset-0 theme-section-spotlight" />
               <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
             </div>
 
@@ -628,7 +629,7 @@ export function HomeSections() {
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
             {/* Background Elements */}
             <div className="absolute inset-0">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0),rgba(0,0,0,0.8)_70%)]" />
+              <div className="absolute inset-0 theme-section-spotlight" />
               <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
             </div>
 
@@ -718,7 +719,7 @@ export function HomeSections() {
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
             {/* Background Elements */}
             <div className="absolute inset-0">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0),rgba(0,0,0,0.8)_70%)]" />
+              <div className="absolute inset-0 theme-section-spotlight" />
               <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
             </div>
 
