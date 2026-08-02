@@ -71,6 +71,18 @@ Every audit becomes **permanent blockchain evidence**:
 - Live deployment monitoring 
 - Network status at a glance
 
+### **Downloadable Audit PDFs (New)**
+- One-click `Download PDF` directly from the audit report panel
+- Professional A4 report layout with security score, severity counts, vulnerabilities, recommendations, and gas optimizations
+- Includes contract snippet (first 25 lines) when code is available
+- Includes on-chain verification section (transaction hash + PolygonScan URL) when audit registration hash exists
+
+### **Dark / Light Theme System (New)**
+- Full app theming with accessible dark and light color palettes
+- Theme switch is available globally via the hanging bulb toggle
+- Toggle interaction supports both click on bulb and pull-down rope gesture
+- Theme preference persists across pages and sessions
+
 ---
 
 ## ⚡ Get Started in 60 Seconds
@@ -81,6 +93,16 @@ Every audit becomes **permanent blockchain evidence**:
 ✅ Polygon Amoy Testnet access
 ✅ POL tokens for deployment
 ```
+
+### **Export an Audit PDF**
+1. Open the **Audit** page and run a contract analysis.
+2. In the report panel, click **Download PDF**.
+3. The PDF includes score, findings, recommendations, gas optimizations, and on-chain proof when a tx hash is available.
+
+### **Use Dark / Light Theme**
+1. Use the hanging bulb toggle shown across pages.
+2. Click the bulb to switch theme instantly.
+3. You can also pull down the rope to trigger the same toggle action.
 
 ---
 
@@ -93,6 +115,7 @@ Every audit becomes **permanent blockchain evidence**:
 | **Next.js 14** | **Mistral AI** | **ethers.js** | **Framer Motion** |
 | **Tailwind CSS** | **Large Language Model** | **Polygon Network** | **Phosphor Icons** |
 | **Shadcn UI** | **Pattern Recognition** | **Web3 Integration** | **Zod Validation** |
+| **jsPDF (Audit Export)** | **Security Prompting** | **PolygonScan Verification** | **ThemeContext + CSS Variables** |
 
 </div>
 
