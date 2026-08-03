@@ -115,7 +115,7 @@ function HeroContent({ isLightTheme }: { isLightTheme: boolean }) {
         </p>
         <div className="flex pointer-events-auto flex-col sm:flex-row items-start space-y-3 sm:space-y-0 sm:space-x-4">
             <a
-              href="/dashboard"
+              href="/audit"
               className={`font-medium py-3 px-8 rounded-full transition duration-300 flex items-center justify-center w-full sm:w-auto text-sm ${
                 isLightTheme
                   ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/30'
