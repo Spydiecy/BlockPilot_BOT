@@ -53,8 +53,8 @@ next-env.d.ts
 # Scripts (development only)
 verify-storage.sh
 
-# Archive (0G Compute attempt - keep in repo for reference but ignore changes)
-# archive/
+# Archive (0G Compute attempt - local reference only)
+archive/
 
 # Logs
 *.log
