@@ -26,7 +26,13 @@
       "@/*": [
         "./src/*"
       ]
-    }
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ],
+    "allowImportingTsExtensions": false,
+    "customConditions": ["types"]
   },
   "include": [
     "next-env.d.ts",
@@ -36,6 +42,7 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "BlockPilot_Hashkey"
   ]
 }

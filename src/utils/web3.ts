@@ -44,17 +44,17 @@ declare global {
 }
 
 export const CHAIN_CONFIG: Record<string, ChainConfig> = {
-  polygonAmoy: {
-    chainId: '0x13882', // 80002 in hex
-    chainName: 'Polygon Amoy Testnet',
+  zeroGTestnet: {
+    chainId: '0x40DA', // 16602 in hex
+    chainName: '0G Galileo Testnet',
     nativeCurrency: {
-      name: 'POL',
-      symbol: 'POL',
+      name: '0G',
+      symbol: '0G',
       decimals: 18
     },
-    rpcUrls: ['https://rpc-amoy.polygon.technology'],
-    blockExplorerUrls: ['https://amoy.polygonscan.com'],
-    iconPath: '/chains/polygon.png'
+    rpcUrls: ['https://evmrpc-testnet.0g.ai'],
+    blockExplorerUrls: ['https://chainscan-galileo.0g.ai'],
+    iconPath: '/chains/0G.png'
   }
 } as const;
 
@@ -128,4 +128,16 @@ export const isSupportedNetwork = (chainId: string): boolean => {
   return Object.values(CHAIN_CONFIG).some(
     chain => chain.chainId.toLowerCase() === chainId.toLowerCase()
   );
+};
+
+// Get explorer URL for a transaction
+export const getExplorerUrl = (txHash: string, chainKey: ChainKey = 'zeroGTestnet'): string => {
+  const chain = CHAIN_CONFIG[chainKey];
+  return `${chain.blockExplorerUrls[0]}/tx/${txHash}`;
+};
+
+// Get explorer URL for an address
+export const getAddressExplorerUrl = (address: string, chainKey: ChainKey = 'zeroGTestnet'): string => {
+  const chain = CHAIN_CONFIG[chainKey];
+  return `${chain.blockExplorerUrls[0]}/address/${address}`;
 };

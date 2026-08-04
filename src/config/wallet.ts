@@ -14,14 +14,14 @@ export interface Chain {
 
 // Supported chains configuration
 export const SUPPORTED_CHAINS = {
-  polygonAmoy: {
-    id: 80002,
-    key: 'polygonAmoy',
-    name: 'Polygon Amoy Testnet',
-    rpcUrl: 'https://rpc-amoy.polygon.technology',
-    explorerUrl: 'https://amoy.polygonscan.com',
-    currency: 'POL',
-    iconPath: '/chains/polygon.png',
+  zeroGTestnet: {
+    id: 16602,
+    key: 'zeroGTestnet',
+    name: '0G Galileo Testnet',
+    rpcUrl: 'https://evmrpc-testnet.0g.ai',
+    explorerUrl: 'https://chainscan-galileo.0g.ai',
+    currency: '0G',
+    iconPath: '/chains/0G.png',
     testnet: true,
   },
 } as const;
@@ -30,7 +30,7 @@ export type ChainId = keyof typeof SUPPORTED_CHAINS;
 export type SupportedChain = typeof SUPPORTED_CHAINS[ChainId];
 
 // Default chain to use
-const DEFAULT_CHAIN: ChainId = 'polygonAmoy';
+const DEFAULT_CHAIN: ChainId = 'zeroGTestnet';
 
 // Helper to get chain by ID
 export const getChainById = (chainId: number): SupportedChain | undefined => {

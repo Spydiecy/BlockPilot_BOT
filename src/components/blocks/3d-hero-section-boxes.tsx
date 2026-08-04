@@ -11,6 +11,78 @@ const Spline = dynamic(() => import('@splinetool/react-spline'), {
 });
 
 function HeroSplineBackground({ isLightTheme }: { isLightTheme: boolean }) {
+  useEffect(() => {
+    // Hide Spline watermark/logo with multiple approaches
+    const hideWatermark = () => {
+      // Method 1: CSS injection
+      const style = document.createElement('style');
+      style.textContent = `
+        #spline-watermark,
+        [id*="watermark"],
+        a[href*="spline.design"],
+        a[href*="spline"],
+        div[style*="spline"],
+        .spline-watermark {
+          display: none !important;
+          opacity: 0 !important;
+          visibility: hidden !important;
+          pointer-events: none !important;
+          width: 0 !important;
+          height: 0 !important;
+          position: absolute !important;
+          left: -9999px !important;
+        }
+        /* Target the specific watermark container */
+        canvas + div,
+        canvas ~ div:last-child {
+          display: none !important;
+        }
+      `;
+      style.id = 'hide-spline-logo';
+      if (!document.getElementById('hide-spline-logo')) {
+        document.head.appendChild(style);
+      }
+
+      // Method 2: Direct DOM manipulation
+      const removeWatermarks = () => {
+        const watermarkSelectors = [
+          'a[href*="spline.design"]',
+          'a[href*="spline"]',
+          '[id*="watermark"]',
+          '#spline-watermark'
+        ];
+        
+        watermarkSelectors.forEach(selector => {
+          const elements = document.querySelectorAll(selector);
+          elements.forEach(el => {
+            if (el instanceof HTMLElement) {
+              el.style.display = 'none';
+              el.style.visibility = 'hidden';
+              el.style.opacity = '0';
+              el.remove();
+            }
+          });
+        });
+      };
+
+      // Run immediately and on intervals
+      removeWatermarks();
+      const interval = setInterval(removeWatermarks, 500);
+      
+      return () => clearInterval(interval);
+    };
+
+    const cleanup = hideWatermark();
+    
+    return () => {
+      if (cleanup) cleanup();
+      const existingStyle = document.getElementById('hide-spline-logo');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+    };
+  }, []);
+
   return (
     <div
       style={{
@@ -21,27 +93,14 @@ function HeroSplineBackground({ isLightTheme }: { isLightTheme: boolean }) {
         overflow: 'hidden',
       }}
     >
-      {isLightTheme ? (
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `
-              radial-gradient(circle at 18% 18%, rgba(37, 99, 235, 0.24), transparent 42%),
-              radial-gradient(circle at 82% 24%, rgba(14, 165, 233, 0.2), transparent 40%),
-              linear-gradient(180deg, #f8fbff 0%, #dbeafe 60%, #eff6ff 100%)
-            `,
-          }}
-        />
-      ) : (
-        <Spline
-          style={{
-            width: '100%',
-            height: '100vh',
-            pointerEvents: 'auto',
-          }}
-          scene="https://prod.spline.design/dJqTIQ-tE3ULUPMi/scene.splinecode"
-        />
-      )}
+      <Spline
+        style={{
+          width: '100%',
+          height: '100vh',
+          pointerEvents: 'auto',
+        }}
+        scene="https://prod.spline.design/dJqTIQ-tE3ULUPMi/scene.splinecode"
+      />
       <div
         style={{
           position: 'absolute',
@@ -49,7 +108,9 @@ function HeroSplineBackground({ isLightTheme }: { isLightTheme: boolean }) {
           left: 0,
           width: '100%',
           height: '100vh',
-          background: 'var(--hero-overlay-gradient)',
+          background: isLightTheme 
+            ? 'linear-gradient(180deg, rgba(248, 251, 255, 0.7) 0%, rgba(219, 234, 254, 0.8) 60%, rgba(239, 246, 255, 0.7) 100%)'
+            : 'var(--hero-overlay-gradient)',
           pointerEvents: 'none',
         }}
       />
@@ -102,16 +163,16 @@ function HeroContent({ isLightTheme }: { isLightTheme: boolean }) {
     >
       <div className="w-full lg:w-1/2 pr-0 lg:pr-8 mb-8 lg:mb-0">
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-          Smart Contract<br />Security by <br/>BlockPilot AI
+          Build & Audit<br />Smart Contracts<br/>with BlockPilot
         </h1>
         <div className={`text-sm tracking-wider ${isLightTheme ? 'text-slate-600' : 'text-gray-400'}`}>
-          INTELLIGENT AGENT · REAL-TIME AUDITS · BLOCKCHAIN SECURITY
+          AI-POWERED BUILDER · SECURITY AUDITS · 0G STORAGE
         </div>
       </div>
 
       <div className="w-full lg:w-1/2 pl-0 lg:pl-8 flex flex-col items-start">
          <p className={`text-xl sm:text-2xl mb-8 max-w-xl leading-relaxed ${isLightTheme ? 'text-slate-700' : 'text-gray-300'}`}>
-           Our AI agent continuously monitors and protects your smart contracts with real-time threat detection
+           Create secure smart contracts with our AI builder, get instant security audits, and store reports immutably on 0G Storage
         </p>
         <div className="flex pointer-events-auto flex-col sm:flex-row items-start space-y-3 sm:space-y-0 sm:space-x-4">
             <a
@@ -126,7 +187,7 @@ function HeroContent({ isLightTheme }: { isLightTheme: boolean }) {
                Get Started
             </a>
             <a
-              href="https://twitter.com"
+              href="https://x.com/bloc_pilot"
               target="_blank"
               rel="noopener noreferrer"
               className={`font-medium py-3 px-8 rounded-full transition duration-300 w-full sm:w-auto flex items-center justify-center text-sm ${

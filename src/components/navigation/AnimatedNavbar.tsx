@@ -24,8 +24,8 @@ export function AnimatedNavbar() {
   const navItems: NavItem[] = [
     { name: 'Home', path: '/', icon: <FiHome /> },
     { name: 'Audit', path: '/audit', icon: <FiShield /> },
-    { name: 'Test Cases', path: '/testcase-generator', icon: <FiZap /> },
-    { name: 'Contract Builder', path: '/contract-builder', icon: <FiCode /> },
+    { name: 'Testing', path: '/testcase-generator', icon: <FiZap /> },
+    { name: 'Builder', path: '/contract-builder', icon: <FiCode /> },
     { name: 'Documentator', path: '/documentor', icon: <FiBookOpen /> },
     { name: 'Reports', path: '/reports', icon: <FiFileText /> },
     { name: 'Profile', path: '/profile', icon: <FiUser /> },
@@ -117,11 +117,11 @@ export function AnimatedNavbar() {
                       : 'text-gray-400 hover:text-white'
                 }`}
               >
-                <div className="text-xl transition-transform duration-300 hover:scale-125">
+                <div className="text-xl transition-transform duration-300 hover:scale-125 flex items-center justify-center">
                   {item.icon}
                 </div>
                 <span 
-                  className={`text-xs mt-1 transition-all duration-300 ${
+                  className={`text-xs mt-1 transition-all duration-300 text-center ${
                     isHovered ? 'opacity-100' : 'opacity-0 h-0 mt-0'
                   }`}
                 >

@@ -2,12 +2,12 @@
 
 # 🛡️ BlockPilot - The Future of Smart Contract Security
 
-**Revolutionary AI-Powered Security Auditing for Polygon Network**
+**Revolutionary AI-Powered Security Auditing for 0G Network**
 
 *Transforming smart contract security from weeks to seconds with cutting-edge Mistral AI*
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now-blue?style=for-the-badge)](https://blockpilot.netlify.app/)
-[![Polygon Network](https://img.shields.io/badge/⛓️_Built_for-Polygon-purple?style=for-the-badge)](https://polygon.technology/)
+[![0G Network](https://img.shields.io/badge/⛓️_Built_for-0G_Network-brightgreen?style=for-the-badge)](https://0g.ai/)
 [![MIT License](https://img.shields.io/badge/📄_License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 </div>
@@ -33,19 +33,19 @@ Our Mistral AI doesn't just scan code—it **understands** it. Trained on thousa
 
 <img width="908" height="849" alt="image" src="https://github.com/user-attachments/assets/96095eb9-8acf-4a8b-aabf-7600b6950e75" />
 
-### **Born for Polygon Network**
-- Lightning-fast deployment to Polygon Amoy Testnet
+### **Built for 0G Network**
+- Lightning-fast deployment to 0G Galileo Testnet
 - Network-specific vulnerability detection 
 - Gas optimization that saves you real money
-- Instant verification on PolygonScan
-- Zero false positives with Polygon-tuned algorithms
+- Instant verification on ChainScan
+- Zero false positives with 0G-tuned algorithms
 
 ### **Smart Contract Templates That Just Work**
 Forget fragile dependencies and security nightmares:
 - Battle-tested ERC20/ERC721 implementations
 - AI-generated contracts from your specifications  
 - Security-first architecture built into every template
-- Optimized for Polygon gas efficiency
+- Optimized for 0G gas efficiency
 
 <img width="888" height="329" alt="image" src="https://github.com/user-attachments/assets/a4e63c5d-e9ed-4599-8df0-735cffcbb2da" />
 
@@ -54,13 +54,13 @@ Forget fragile dependencies and security nightmares:
 - Security best practices enforced automatically
 - Complete event transparency for full auditability
 - Military-grade access controls
-- Polygon-optimized performance
+- 0G-optimized performance
 
 ### **Immutable On-Chain Proof**
 Every audit becomes **permanent blockchain evidence**:
-- Audit reports stored forever on Polygon Network
+- Audit reports stored forever on 0G Network
 - Traceable security history for compliance
-- Public verification via PolygonScan  
+- Public verification via ChainScan  
 - Verifiable security scores that build trust
 
 <img width="1863" height="822" alt="image" src="https://github.com/user-attachments/assets/3d146b53-cf29-42fc-bc82-100b9e36ed8a" />
@@ -75,7 +75,7 @@ Every audit becomes **permanent blockchain evidence**:
 - One-click `Download PDF` directly from the audit report panel
 - Professional A4 report layout with security score, severity counts, vulnerabilities, recommendations, and gas optimizations
 - Includes contract snippet (first 25 lines) when code is available
-- Includes on-chain verification section (transaction hash + PolygonScan URL) when audit registration hash exists
+- Includes on-chain verification section (transaction hash + ChainScan URL) when audit registration hash exists
 
 ### **Dark / Light Theme System (New)**
 - Full app theming with accessible dark and light color palettes
@@ -90,8 +90,8 @@ Every audit becomes **permanent blockchain evidence**:
 ### **What You Need:**
 ```bash
 ✅ MetaMask or Web3 wallet
-✅ Polygon Amoy Testnet access
-✅ POL tokens for deployment
+✅ 0G Galileo Testnet access
+✅ 0G tokens for deployment
 ```
 
 ### **Export an Audit PDF**
@@ -113,9 +113,9 @@ Every audit becomes **permanent blockchain evidence**:
 | **Frontend** | **AI Engine** | **Blockchain** | **Experience** |
 |:---:|:---:|:---:|:---:|
 | **Next.js 14** | **Mistral AI** | **ethers.js** | **Framer Motion** |
-| **Tailwind CSS** | **Large Language Model** | **Polygon Network** | **Phosphor Icons** |
+| **Tailwind CSS** | **Large Language Model** | **0G Network** | **Phosphor Icons** |
 | **Shadcn UI** | **Pattern Recognition** | **Web3 Integration** | **Zod Validation** |
-| **jsPDF (Audit Export)** | **Security Prompting** | **PolygonScan Verification** | **ThemeContext + CSS Variables** |
+| **jsPDF (Audit Export)** | **Security Prompting** | **ChainScan Verification** | **ThemeContext + CSS Variables** |
 
 </div>
 
@@ -127,7 +127,7 @@ Every audit becomes **permanent blockchain evidence**:
 
 | **Rating** | **What It Means** | **Deploy Status** |
 |:---:|:---|:---:|
-| ⭐⭐⭐⭐⭐ | **LEGENDARY** - Zero vulnerabilities, Polygon-optimized perfection | ✅ **DEPLOY NOW** |
+| ⭐⭐⭐⭐⭐ | **LEGENDARY** - Zero vulnerabilities, 0G-optimized perfection | ✅ **DEPLOY NOW** |
 | ⭐⭐⭐⭐ | **EXCELLENT** - Minor optimizations needed, production-ready | ✅ **DEPLOY READY** |
 | ⭐⭐⭐ | **GOOD** - High severity issues found, needs fixes | ⚠️ **FIX FIRST** |
 | ⭐⭐ | **RISKY** - Critical vulnerabilities detected | ❌ **DO NOT DEPLOY** |
@@ -159,20 +159,20 @@ Every audit becomes **permanent blockchain evidence**:
 - Real-time vulnerability detection (no waiting weeks)
 - Custom validation against known attack vectors  
 - Gas optimization recommendations that save money
-- Polygon-specific security patterns enforcement
+- 0G-specific security patterns enforcement
 
 ### **Smart Contract Builder**
 > **Why reinvent the wheel when you can get a Tesla?**
 
 - Self-contained templates (no dependency hell)
 - Security-by-design architecture
-- Polygon-optimized for maximum efficiency  
+- 0G-optimized for maximum efficiency  
 - Configurable parameters with built-in validation
 
 ### **One-Click Deployment Pipeline**
 > **From code to blockchain in under 60 seconds**
 
-- One-click deployment to Polygon Amoy Testnet
+- One-click deployment to 0G Galileo Testnet
 - Automatic security verification before going live
 - Real-time monitoring of your transactions  
 - Seamless explorer integration for transparency
@@ -190,22 +190,22 @@ Every audit becomes **permanent blockchain evidence**:
 
 ---
 
-## ⛓️ **Why Polygon Network?**
+## ⛓️ **Why 0G Network?**
 
 <div align="center">
 
-**BlockPilot is exclusively built for Polygon Network - Here's why that matters:**
+**BlockPilot is exclusively built for 0G Network - Here's why that matters:**
 
 </div>
 
 | **Feature** | **Why It's Game-Changing** |
 |:---|:---|
-| **Secure Deployment** | Deploy with confidence knowing your contracts are Polygon-optimized |
-| **Deep Analysis** | Security patterns specifically tuned for Polygon's architecture |
-| **On-Chain Verification** | Every audit permanently recorded on Polygon's immutable ledger |
+| **Secure Deployment** | Deploy with confidence knowing your contracts are 0G-optimized |
+| **Deep Analysis** | Security patterns specifically tuned for 0G's architecture |
+| **On-Chain Verification** | Every audit permanently recorded on 0G's immutable ledger |
 | **Audit Storage** | Your security history lives forever on the blockchain |
-| **Gas Optimization** | Save real money with Polygon-specific efficiency improvements |
-| **Security Patterns** | Protection strategies designed for Polygon's unique features |
+| **Gas Optimization** | Save real money with 0G-specific efficiency improvements |
+| **Security Patterns** | Protection strategies designed for 0G's unique features |
 
 <img width="1848" height="812" alt="image" src="https://github.com/user-attachments/assets/27c8031f-809a-438b-bfee-b3440e9c68dd" />
 
@@ -218,7 +218,7 @@ Every audit becomes **permanent blockchain evidence**:
 ### **Ready to secure the future?**
 
 [![Follow Twitter](https://img.shields.io/badge/🐦_Follow-@BlockPilot__ai-1da1f2?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/BlockPilot_ai)
-[![Visit Polygon](https://img.shields.io/badge/🌐_Learn_More-Polygon.technology-purple?style=for-the-badge)](https://polygon.technology/)
+[![Visit 0G](https://img.shields.io/badge/🌐_Learn_More-0g.ai-brightgreen?style=for-the-badge)](https://0g.ai/)
 
 **Got ideas? Found bugs? Want to contribute?**  
 *We're building the future of smart contract security together!*
@@ -235,7 +235,7 @@ Every audit becomes **permanent blockchain evidence**:
 
 ---
 
-<sub>Made with ❤️ for the Polygon community</sub>
+<sub>Made with ❤️ for the 0G community</sub>
 
 <sub>⭐ **Star this repo if BlockPilot secured your contracts!**</sub>
 

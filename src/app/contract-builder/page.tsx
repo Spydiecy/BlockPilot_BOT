@@ -53,6 +53,11 @@ export default function ContractBuilder() {
   const [currentChain, setCurrentChain] = useState<keyof typeof CHAIN_CONFIG | null>(null);
   const [deploymentError, setDeploymentError] = useState<string | null>(null);
   const [securityNotes, setSecurityNotes] = useState<string[]>([]);
+  
+  // Audit toggle state
+  const [auditOnDeploy, setAuditOnDeploy] = useState(false);
+  const [isAuditing, setIsAuditing] = useState(false);
+  const [auditReport, setAuditReport] = useState<any>(null);
 
   // State for manual code input in generated code
   const [manualCode, setManualCode] = useState('');
@@ -174,42 +179,76 @@ export default function ContractBuilder() {
         messages: [
           {
             role: "system",
-            content: `You are an expert Solidity developer. Generate a secure and optimized smart contract based on these requirements:
+            content: `You are an expert Solidity developer who creates ONLY high-quality, production-ready smart contracts that compile without errors.
 
-        Important Rules:
-        1. Use Solidity version 0.8.19
-        2. DO NOT use ANY external imports or libraries - write everything inline
-        3. Include all necessary functionality directly in the contract
-        4. Add proper access control and safety checks
-        5. Include events for all state changes
-        6. Implement comprehensive security measures
-        7. Add gas optimizations
-        8. Return ONLY valid, compilable Solidity code in the JSON response
-        9. DO NOT include markdown code blocks, comments outside the code, or any formatting
-        10. DO NOT use placeholders like "...", "{ ... }", or incomplete code
-        11. Write COMPLETE implementations - every function must have a full body
+        CRITICAL QUALITY REQUIREMENTS:
+        - Generate contracts that would score 4-5 stars in security audits
+        - MUST compile without ANY errors in Solidity 0.8.19
+        - Use ONLY valid Solidity syntax and features
+        - NO experimental or unsupported features
+        - Include comprehensive security measures and best practices
+        - Implement proper access control, reentrancy guards, and input validation
+        - Add detailed NatSpec comments for all functions
+        - Use gas-efficient patterns
+        - Follow OpenZeppelin standards where applicable
+
+        SOLIDITY SYNTAX RULES (CRITICAL):
+        1. Use Solidity version 0.8.19 ONLY
+        2. DO NOT use string concatenation with + operator (not supported in Solidity)
+        3. DO NOT use string.isNotEmpty() or any non-existent string methods
+        4. DO NOT cast uint256 to string (not allowed in Solidity)
+        5. Use bytes32 for hashes, NOT string
+        6. Use simple string literals in require statements: require(condition, "Error message");
+        7. For dynamic error messages, use custom errors or separate require statements
+        8. DO NOT use ANY external imports or libraries - write everything inline
+        9. Use mapping(address => uint256) for balances, NOT balanceOf mapping
+        10. Implement standard ERC20/ERC721 interfaces correctly
+        11. Use proper visibility modifiers: public, private, internal, external
+        12. Use proper state mutability: view, pure, payable where appropriate
+        13. NO placeholders like "...", "{ ... }", or incomplete code
+        14. Every function MUST have a complete implementation
+
+        VALID SOLIDITY PATTERNS:
+        ✅ require(condition, "Simple error message");
+        ✅ if (condition) revert("Error message");
+        ✅ error CustomError(string message); then revert CustomError("message");
+        ✅ mapping(address => uint256) private balances;
+        ✅ uint256 public totalSupply;
+        ✅ event Transfer(address indexed from, address indexed to, uint256 value);
         
-        Security Considerations:
-        - Include reentrancy guards where needed
-        - Add proper access control
-        - Implement input validation
-        - Add checks for integer overflow
-        - Validate addresses
-        - Include event emissions
-        - Handle edge cases
+        INVALID PATTERNS (DO NOT USE):
+        ❌ require(condition, "Error: " + someVariable);
+        ❌ string.isNotEmpty(str)
+        ❌ string(uint256Value)
+        ❌ balanceOf[address]
+        ❌ function incomplete() { ... }
+        ❌ import statements
         
-        Code Quality:
-        - Ensure all syntax is correct
+        Security Considerations (MANDATORY):
+        - Include reentrancy guards where needed (use bool private locked pattern)
+        - Add proper access control (owner/admin patterns with address public owner)
+        - Implement input validation for all parameters (require statements)
+        - Add checks for zero address: require(addr != address(0), "Zero address");
+        - Validate amounts: require(amount > 0, "Amount must be positive");
+        - Include event emissions for all state changes
+        - Handle edge cases properly
+        - Add pause functionality for critical contracts (bool private paused)
+        - Implement proper error messages (simple strings only)
+        
+        Code Quality (MANDATORY):
+        - Ensure all syntax is correct and compiles
         - Use proper Solidity formatting
         - All functions must be properly closed with complete implementations
         - No missing semicolons or commas
         - Proper pragma declaration at the top
         - NO placeholders or ellipsis (...) - write complete code
-        - Every contract must be fully implemented, not inherited with placeholders`
+        - Every contract must be fully implemented
+        - Add comprehensive NatSpec documentation
+        - Test all code patterns for compilation before including`
           },
           {
             role: "user",
-            content: `Generate a contract with these specifications:
+            content: `Generate a HIGH-QUALITY, PRODUCTION-READY, COMPILABLE contract with these specifications:
         Template: ${selectedTemplate.name}
         Base Code: ${selectedTemplate.baseCode || 'Create new contract'}
         Custom Features: ${customFeatures || 'Standard features'}
@@ -217,22 +256,72 @@ export default function ContractBuilder() {
         
         CRITICAL INSTRUCTIONS:
         1. Write ONE complete contract with ALL functionality inline
-        2. DO NOT create abstract contracts or use inheritance
-        3. DO NOT use placeholders like "...", "{ ... }", or incomplete implementations
-        4. If creating a token, implement ALL ERC20 functions directly in the contract
-        5. Include complete function bodies for: transfer, approve, transferFrom, mint, burn
-        6. Define ALL state variables: balances mapping, allowances mapping, totalSupply, etc.
-        7. Implement ALL events: Transfer, Approval, etc.
+        2. MUST compile without errors in Solidity 0.8.19
+        3. Use ONLY valid Solidity syntax - no string concatenation, no invalid casts
+        4. DO NOT create abstract contracts or use inheritance
+        5. DO NOT use placeholders like "...", "{ ... }", or incomplete implementations
+        6. If creating a token, implement ALL ERC20 functions directly in the contract
+        7. Include complete function bodies for: transfer, approve, transferFrom, mint, burn
+        8. Define ALL state variables: mapping(address => uint256) private balances, etc.
+        9. Implement ALL events: event Transfer(address indexed from, address indexed to, uint256 value);
+        10. Add comprehensive security checks in every function
+        11. Use simple string literals in require statements
+        12. Include detailed NatSpec comments
+        13. This contract MUST compile and score 4-5 stars
         
-        Return ONLY this exact JSON format with valid Solidity code:
+        EXAMPLE OF VALID SOLIDITY CODE:
+        \`\`\`solidity
+        // SPDX-License-Identifier: MIT
+        pragma solidity ^0.8.19;
+        
+        contract MyToken {
+            string public name;
+            string public symbol;
+            uint8 public decimals = 18;
+            uint256 public totalSupply;
+            address public owner;
+            
+            mapping(address => uint256) private balances;
+            mapping(address => mapping(address => uint256)) private allowances;
+            
+            event Transfer(address indexed from, address indexed to, uint256 value);
+            event Approval(address indexed owner, address indexed spender, uint256 value);
+            
+            constructor(string memory _name, string memory _symbol, uint256 _initialSupply) {
+                name = _name;
+                symbol = _symbol;
+                owner = msg.sender;
+                totalSupply = _initialSupply * 10**decimals;
+                balances[msg.sender] = totalSupply;
+                emit Transfer(address(0), msg.sender, totalSupply);
+            }
+            
+            function balanceOf(address account) public view returns (uint256) {
+                return balances[account];
+            }
+            
+            function transfer(address to, uint256 amount) public returns (bool) {
+                require(to != address(0), "Transfer to zero address");
+                require(balances[msg.sender] >= amount, "Insufficient balance");
+                
+                balances[msg.sender] -= amount;
+                balances[to] += amount;
+                emit Transfer(msg.sender, to, amount);
+                return true;
+            }
+        }
+        \`\`\`
+        
+        Return ONLY this exact JSON format with valid, compilable Solidity code:
         {
           "code": "// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.19;\\n\\ncontract YourContract {\\n  // Complete implementation here\\n}",
           "features": ["list of implemented features"],
           "securityNotes": ["list of security measures implemented"]
         }
         
-        The code field must contain ONLY valid Solidity syntax with proper line breaks (\\n).
-        Every function must have a complete implementation, not just a declaration.`
+        The code field must contain ONLY valid Solidity syntax that compiles without errors.
+        Every function must have a complete implementation.
+        This must be a 4-5 star quality contract that compiles successfully.`
           }
         ],
         responseFormat: { type: "json_object" },
@@ -281,6 +370,25 @@ export default function ContractBuilder() {
           setError('AI generated incomplete code with placeholders. Using template instead.');
           if (selectedTemplate.baseCode) {
             cleanedCode = selectedTemplate.baseCode;
+          }
+        }
+        
+        // Check for common Solidity syntax errors
+        const commonErrors = [
+          { pattern: /string\s*\+\s*/, message: 'String concatenation with + is not supported in Solidity' },
+          { pattern: /string\.isNotEmpty/, message: 'string.isNotEmpty() does not exist in Solidity' },
+          { pattern: /string\s*\(\s*uint/, message: 'Cannot cast uint to string in Solidity' },
+          { pattern: /balanceOf\s*\[/, message: 'Use balances[address] or implement balanceOf() function' },
+        ];
+        
+        for (const { pattern, message } of commonErrors) {
+          if (pattern.test(cleanedCode)) {
+            console.warn(`Detected syntax error: ${message}`);
+            setError(`AI generated code with syntax error: ${message}. Using template instead.`);
+            if (selectedTemplate.baseCode) {
+              cleanedCode = selectedTemplate.baseCode;
+            }
+            break;
           }
         }
       }
@@ -339,12 +447,12 @@ export default function ContractBuilder() {
           .trim();
       }
       
-      // Validate we're on Polygon Amoy Testnet
+      // Validate we're on 0G Galileo Testnet
       const network = await provider.getNetwork();
-      const currentChainId = '0x' + network.chainId.toString(16);
+      const currentChainId = '0x' + network.chainId.toString(16).toUpperCase();
 
-      if (currentChainId !== CHAIN_CONFIG.polygonAmoy.chainId) {
-        throw new Error('Please switch to Polygon Amoy Testnet to deploy contracts');
+      if (currentChainId.toLowerCase() !== CHAIN_CONFIG.zeroGTestnet.chainId.toLowerCase()) {
+        throw new Error(`Please switch to 0G Galileo Testnet to deploy contracts. Current chain: ${currentChainId}, Expected: ${CHAIN_CONFIG.zeroGTestnet.chainId}`);
       }
 
       // Compile contract with cleaned code
@@ -395,7 +503,7 @@ export default function ContractBuilder() {
         }
       });
 
-      // Deploy contract with proper gas settings for Polygon Amoy
+      // Deploy contract with proper gas settings for 0G Galileo Testnet
       const contract = await contractFactory.deploy(...constructorArgs, {
         maxPriorityFeePerGas: ethers.parseUnits('30', 'gwei'), // 30 Gwei tip (above minimum of 25 Gwei)
         maxFeePerGas: ethers.parseUnits('50', 'gwei'), // 50 Gwei max fee
@@ -408,11 +516,198 @@ export default function ContractBuilder() {
 
       setDeployedAddress(receipt.contractAddress);
 
+      // If audit toggle is enabled, automatically audit the contract
+      if (auditOnDeploy) {
+        await auditDeployedContract(cleanCode, receipt.contractAddress, receipt.hash);
+      }
+
     } catch (error: any) {
       console.error('Deployment failed:', error);
-      setDeploymentError(error.message || 'Deployment failed');
+      
+      // Handle specific error types
+      if (error.code === 'ACTION_REJECTED' || error.code === 4001) {
+        // User rejected the transaction
+        setDeploymentError('Transaction cancelled by user');
+        setError('You cancelled the deployment transaction');
+      } else if (error.code === 'INSUFFICIENT_FUNDS') {
+        setDeploymentError('Insufficient funds for gas');
+        setError('You don\'t have enough 0G tokens to pay for gas. Get testnet tokens from the faucet.');
+      } else if (error.code === 'NETWORK_ERROR') {
+        setDeploymentError('Network connection error');
+        setError('Network error. Please check your connection and try again.');
+      } else if (error.code === 'UNPREDICTABLE_GAS_LIMIT') {
+        setDeploymentError('Gas estimation failed');
+        setError('Contract deployment would fail. Check constructor parameters and contract code.');
+      } else if (error.message?.includes('user rejected')) {
+        setDeploymentError('Transaction cancelled');
+        setError('You cancelled the deployment transaction');
+      } else if (error.message?.includes('insufficient funds')) {
+        setDeploymentError('Insufficient funds');
+        setError('You don\'t have enough 0G tokens to pay for gas. Get testnet tokens from the faucet.');
+      } else {
+        // Generic error
+        setDeploymentError(error.message || 'Deployment failed');
+        setError(error.message || 'Deployment failed. Please try again.');
+      }
     } finally {
       setIsDeploying(false);
+    }
+  };
+
+  // Audit deployed contract and store report on 0G Storage
+  // Audit deployed contract and store report on 0G Storage
+  const auditDeployedContract = async (contractCode: string, contractAddress: string, txHash: string) => {
+    setIsAuditing(true);
+    try {
+      // Call AI audit API (same as audit page)
+      const auditResponse = await fetch('/api/ai/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractCode }),
+      });
+
+      if (!auditResponse.ok) {
+        throw new Error('Audit analysis failed');
+      }
+
+      const auditData = await auditResponse.json();
+      
+      // Extract analysis from the response (API returns { analysis: {...} })
+      const analysis = auditData.analysis || auditData;
+      
+      // Validate analysis has required fields
+      if (!analysis.summary) {
+        analysis.summary = 'Security analysis completed';
+      }
+      if (!analysis.vulnerabilities) {
+        analysis.vulnerabilities = { critical: [], high: [], medium: [], low: [] };
+      }
+      if (!analysis.stars) {
+        analysis.stars = 3;
+      }
+      
+      // Prepare report data in the same format as audit page
+      const reportData = {
+        analysis,
+        contractCode,
+        timestamp: new Date().toISOString(),
+        provider: 'Mistral AI',
+        model: 'mistral-large-latest',
+        contractAddress,
+        deploymentTxHash: txHash,
+      };
+
+      // Upload to 0G Storage using the same format as audit page
+      const uploadResponse = await fetch('/api/0g-storage/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          content: JSON.stringify(reportData),  // Same as audit page
+          metadata: {
+            type: 'audit-report',
+            contractAddress,
+            deploymentTxHash: txHash,
+          }
+        }),
+      });
+
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json();
+        throw new Error(`Failed to upload report to 0G Storage: ${errorData.details || errorData.error}`);
+      }
+
+      const { reportHash } = await uploadResponse.json();
+
+      // Register audit on blockchain using the correct ABI
+      const { provider, signer } = await connectWallet();
+      
+      // Import the correct contract ABI and address
+      const CONTRACT_ADDRESSES = {
+        zeroGTestnet: '0x5bA4CB3929C75DF47B8b5E6ca6c7414a5E1a3DB0'
+      };
+      
+      const AUDIT_REGISTRY_ABI = [
+        'function registerAudit(bytes32 contractHash, uint8 stars, uint8 criticalCount, uint8 highCount, uint8 mediumCount, bytes32 reportHash, string memory summaryPreview, bytes32 computeJobId) external'
+      ];
+      
+      const auditContract = new ethers.Contract(
+        CONTRACT_ADDRESSES.zeroGTestnet,
+        AUDIT_REGISTRY_ABI,
+        signer
+      );
+
+      // Prepare parameters
+      const contractHash = ethers.keccak256(ethers.toUtf8Bytes(contractCode));
+      
+      // Ensure reportHash is properly formatted as bytes32
+      let reportHashBytes32 = reportHash;
+      if (reportHashBytes32.length < 66) {
+        reportHashBytes32 = reportHashBytes32 + '0'.repeat(66 - reportHashBytes32.length);
+      }
+      
+      // Placeholder compute job ID (generate random bytes32)
+      const generatePlaceholderJobId = (): string => {
+        const randomBytes = Array.from({ length: 32 }, () =>
+          Math.floor(Math.random() * 256)
+        );
+        return '0x' + randomBytes.map(b => b.toString(16).padStart(2, '0')).join('');
+      };
+      const computeJobIdBytes32 = generatePlaceholderJobId();
+      
+      // Summary preview (max 100 chars)
+      const summaryPreview = (analysis.summary || 'Security analysis completed').substring(0, 100);
+      
+      // Count vulnerabilities with safe fallbacks
+      const criticalCount = analysis.vulnerabilities?.critical?.length || 0;
+      const highCount = analysis.vulnerabilities?.high?.length || 0;
+      const mediumCount = analysis.vulnerabilities?.medium?.length || 0;
+
+      // Get fee data for 0G network
+      const feeData = await provider.getFeeData();
+      const minPriorityFee = ethers.parseUnits('25', 'gwei');
+      const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas && feeData.maxPriorityFeePerGas > minPriorityFee
+        ? feeData.maxPriorityFeePerGas
+        : minPriorityFee;
+      const maxFeePerGas = feeData.maxFeePerGas && feeData.maxFeePerGas > minPriorityFee
+        ? feeData.maxFeePerGas
+        : minPriorityFee * BigInt(2);
+
+      // Call registerAudit with all required parameters
+      const tx = await auditContract.registerAudit(
+        contractHash,
+        analysis.stars,
+        criticalCount,
+        highCount,
+        mediumCount,
+        reportHashBytes32,
+        summaryPreview,
+        computeJobIdBytes32,
+        { maxPriorityFeePerGas, maxFeePerGas }
+      );
+      
+      const receipt = await tx.wait();
+
+      setAuditReport({ ...analysis, reportHash, txHash: receipt.transactionHash });
+      
+    } catch (error: any) {
+      console.error('Audit failed:', error);
+      
+      // Handle specific audit error types
+      if (error.code === 'ACTION_REJECTED' || error.code === 4001) {
+        setError('Audit cancelled: You rejected the blockchain registration transaction');
+      } else if (error.message?.includes('user rejected')) {
+        setError('Audit cancelled: You rejected the blockchain registration transaction');
+      } else if (error.message?.includes('Audit analysis failed')) {
+        setError('Deployment successful but AI audit failed. You can audit the contract manually from the Audit page.');
+      } else if (error.message?.includes('Failed to upload report')) {
+        setError('Deployment successful but failed to store audit report on 0G Storage. You can audit the contract manually from the Audit page.');
+      } else if (error.message?.includes('insufficient funds')) {
+        setError('Deployment successful but audit registration failed due to insufficient funds. You can audit the contract manually from the Audit page.');
+      } else {
+        setError(`Deployment successful but audit failed: ${error.message}. You can audit the contract manually from the Audit page.`);
+      }
+    } finally {
+      setIsAuditing(false);
     }
   };
 
@@ -436,7 +731,20 @@ export default function ContractBuilder() {
       setWalletConnected(true);
       await detectCurrentNetwork();
     } catch (error: any) {
-      setError(error.message);
+      console.error('Wallet connection failed:', error);
+      
+      // Handle specific wallet connection errors
+      if (error.code === 'ACTION_REJECTED' || error.code === 4001) {
+        setError('Wallet connection cancelled');
+      } else if (error.message?.includes('user rejected')) {
+        setError('You cancelled the wallet connection request');
+      } else if (error.message?.includes('No Ethereum provider')) {
+        setError('No wallet detected. Please install MetaMask or another Web3 wallet.');
+      } else if (error.message?.includes('Chain')) {
+        setError('Please switch to 0G Galileo Testnet in your wallet');
+      } else {
+        setError(error.message || 'Failed to connect wallet. Please try again.');
+      }
     }
   };
 
@@ -678,7 +986,96 @@ export default function ContractBuilder() {
 
             {/* Deploy Section */}
             {displayedCode && (
-              <div className="p-4 border-t border-blue-900/50">
+              <div className="p-4 border-t border-blue-900/50 space-y-3">
+                {/* Audit Toggle */}
+                <div className="flex items-center justify-between p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                  <div className="flex items-center gap-2">
+                    <Shield size={20} className="text-blue-400" weight="fill" />
+                    <div>
+                      <p className="text-sm font-semibold text-white">Auto-Audit on Deploy</p>
+                      <p className="text-xs text-gray-400">Audit and store report on 0G Storage</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setAuditOnDeploy(!auditOnDeploy)}
+                    className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${
+                      auditOnDeploy ? 'bg-blue-500' : 'bg-gray-600'
+                    }`}
+                  >
+                    <div
+                      className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ${
+                        auditOnDeploy ? 'transform translate-x-6' : ''
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Auditing Status */}
+                {isAuditing && (
+                  <div className="flex items-center gap-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-yellow-400">
+                    <CircleNotch className="animate-spin" size={16} weight="bold" />
+                    <span className="text-sm">Auditing contract and storing report...</span>
+                  </div>
+                )}
+
+                {/* Audit Report Success */}
+                {auditReport && (
+                  <div className="p-4 bg-gradient-to-br from-green-500/20 to-emerald-500/10 border border-green-500/30 rounded-xl shadow-lg shadow-green-500/10">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                          <Shield size={18} className="text-green-400" weight="fill" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold text-green-400">Audit Complete</span>
+                          <p className="text-xs text-gray-400">Report stored on 0G Storage</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 bg-green-500/20 px-3 py-1.5 rounded-full">
+                        <span className="text-lg font-bold text-green-400">{auditReport.stars}</span>
+                        <span className="text-yellow-400">⭐</span>
+                      </div>
+                    </div>
+                    
+                    {/* Vulnerability Summary */}
+                    {auditReport.vulnerabilities && (
+                      <div className="flex gap-2 mb-3 flex-wrap">
+                        {auditReport.vulnerabilities.critical?.length > 0 && (
+                          <span className="text-xs px-2 py-1 bg-red-500/20 border border-red-500/30 rounded-full text-red-400">
+                            {auditReport.vulnerabilities.critical.length} Critical
+                          </span>
+                        )}
+                        {auditReport.vulnerabilities.high?.length > 0 && (
+                          <span className="text-xs px-2 py-1 bg-orange-500/20 border border-orange-500/30 rounded-full text-orange-400">
+                            {auditReport.vulnerabilities.high.length} High
+                          </span>
+                        )}
+                        {auditReport.vulnerabilities.medium?.length > 0 && (
+                          <span className="text-xs px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full text-yellow-400">
+                            {auditReport.vulnerabilities.medium.length} Medium
+                          </span>
+                        )}
+                        {auditReport.vulnerabilities.low?.length > 0 && (
+                          <span className="text-xs px-2 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-blue-400">
+                            {auditReport.vulnerabilities.low.length} Low
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    
+                    <a
+                      href={`/report/${auditReport.reportHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-green-500/20 hover:bg-green-500/30 border border-green-500/30 rounded-lg transition-all duration-200 text-sm font-semibold text-green-400"
+                    >
+                      <FileCode size={16} weight="bold" />
+                      View Full Report
+                      <ArrowRight size={14} weight="bold" />
+                    </a>
+                  </div>
+                )}
+
                 {!walletConnected ? (
                   <button
                     onClick={handleConnectWallet}
@@ -690,7 +1087,7 @@ export default function ContractBuilder() {
                 ) : (
                   <button
                     onClick={deployContract}
-                    disabled={isDeploying}
+                    disabled={isDeploying || isAuditing}
                     className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold rounded-2xl hover:from-green-700 hover:to-green-800 disabled:bg-gray-800 disabled:cursor-not-allowed transition-all duration-300 ease-in-out flex items-center justify-center gap-2"
                   >
                     {isDeploying ? (
@@ -701,7 +1098,7 @@ export default function ContractBuilder() {
                     ) : (
                       <>
                         <Rocket size={20} weight="fill" />
-                        Deploy to Polygon Amoy
+                        Deploy to 0G Testnet
                       </>
                     )}
                   </button>

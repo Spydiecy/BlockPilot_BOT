@@ -83,7 +83,7 @@ const workflowSteps: Step[] = [
 ];
 
 const supportedChains: Chain[] = [
-  { id: 1, name: "Polygon Amoy Testnet", icon: "/chains/polygon.png" },
+  { id: 1, name: "0G Galileo Testnet", icon: "/chains/0G.png" },
 ];
 
 const latestAudits: Audit[] = [
@@ -173,7 +173,7 @@ const ChainsSupported = () => {
           <span className="text-blue-400">NETWORKS</span>
         </h2>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-          Currently supporting Polygon Amoy Testnet for development and testing
+          Currently supporting 0G Galileo Testnet for development and testing
         </p>
         <div className="mt-4 inline-flex items-center px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm">
           🚀 Mainnet coming soon!
@@ -195,7 +195,7 @@ const ChainsSupported = () => {
 
             {/* Content Container */}
             <div className="relative h-full flex flex-col items-center justify-center text-center">
-              {/* Polygon Logo */}
+              {/* 0G Logo */}
               <div className="w-20 h-20 bg-neutral-800 rounded-xl mb-6 flex items-center justify-center overflow-hidden">
                 {chain.icon ? (
                   <Image
@@ -224,7 +224,7 @@ const ChainsSupported = () => {
               
               {/* Description */}
               <p className="text-gray-400 text-sm leading-relaxed">
-                Secure smart contract auditing and deployment on Polygon's scalable and developer-friendly network
+                Secure smart contract auditing and deployment on 0G's high-performance and developer-friendly network
               </p>
             </div>
 
@@ -515,9 +515,9 @@ export function HomeSections() {
       icon: <IconShieldLock className="w-6 h-6" />,
     },
     {
-      title: "Polygon Network Optimized",
+      title: "0G Network Optimized",
       description: 
-        "Specialized security coverage and optimization specifically designed for Polygon Network architecture.",
+        "Specialized security coverage and optimization specifically designed for 0G Network architecture.",
       icon: <IconBolt className="w-6 h-6" />,
     },
     {
@@ -560,6 +560,182 @@ export function HomeSections() {
           {features.map((feature, index) => (
             <Feature key={feature.title} {...feature} index={index} />
           ))}
+        </div>
+
+        {/* 0G Ecosystem Section */}
+        <div id="0g-ecosystem" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          {/* Background Elements */}
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 theme-section-spotlight" />
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+          </div>
+
+          {/* Section Header */}
+          <div className="relative text-center mb-20">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold mb-4 leading-tight text-white">
+              BUILT FOR<br />
+              <span className="text-blue-400">0G ECOSYSTEM</span>
+            </h2>
+            <div className="text-xs text-gray-400 tracking-wider mb-6">
+              DECENTRALIZED · SCALABLE · SECURE · REVOLUTIONARY
+            </div>
+          </div>
+
+          {/* 0G Features Grid */}
+          <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-neutral-800/30">
+            {/* 0G Storage Card */}
+            <div className="relative group bg-black">
+              {/* Hover Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-neutral-800/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              {/* Content */}
+              <div className="relative p-8 border-neutral-800 group-hover:border-blue-500/20 transition-colors duration-300">
+                {/* Icon */}
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-blue-500/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="relative h-12 w-12 flex items-center justify-center bg-neutral-900 rounded-lg text-blue-400 group-hover:text-blue-300 transition-all duration-300">
+                    <IconCloudComputing className="w-8 h-8" />
+                  </div>
+                </div>
+                
+                {/* Text Content */}
+                <div className="mt-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors duration-300">
+                      0G Storage
+                    </h3>
+                    <div className="inline-flex items-center px-2 py-0.5 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-xs">
+                      ✓ Live
+                    </div>
+                  </div>
+                  <p className="text-neutral-400 group-hover:text-neutral-300 transition-colors duration-300 mb-4">
+                    All audit reports permanently stored on 0G Storage Network with immutability, transparency, and decentralized access.
+                  </p>
+                  <ul className="space-y-2 text-sm text-neutral-500">
+                    <li className="flex items-start">
+                      <span className="text-blue-400 mr-2">•</span>
+                      <span>Cryptographic verification</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-400 mr-2">•</span>
+                      <span>Lightning-fast retrieval</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-400 mr-2">•</span>
+                      <span>Multi-node distribution</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                {/* Left Border Accent */}
+                <div className="absolute left-0 top-8 h-8 w-0.5 bg-neutral-800 group-hover:bg-blue-500 group-hover:h-16 transition-all duration-300" />
+              </div>
+            </div>
+
+            {/* 0G Compute Card */}
+            <div className="relative group bg-black">
+              {/* Hover Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-neutral-800/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              {/* Content */}
+              <div className="relative p-8 border-neutral-800 group-hover:border-purple-500/20 transition-colors duration-300">
+                {/* Icon */}
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-purple-500/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="relative h-12 w-12 flex items-center justify-center bg-neutral-900 rounded-lg text-purple-400 group-hover:text-purple-300 transition-all duration-300">
+                    <IconBrain className="w-8 h-8" />
+                  </div>
+                </div>
+                
+                {/* Text Content */}
+                <div className="mt-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors duration-300">
+                      0G Compute
+                    </h3>
+                    <div className="inline-flex items-center px-2 py-0.5 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-400 text-xs">
+                      Soon
+                    </div>
+                  </div>
+                  <p className="text-neutral-400 group-hover:text-neutral-300 transition-colors duration-300 mb-4">
+                    Next-gen AI analysis powered by 0G Compute. Demo ready, final testing in progress for unprecedented speed and accuracy.
+                  </p>
+                  <ul className="space-y-2 text-sm text-neutral-500">
+                    <li className="flex items-start">
+                      <span className="text-purple-400 mr-2">•</span>
+                      <span>Distributed AI processing</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-400 mr-2">•</span>
+                      <span>Real-time vulnerability detection</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-400 mr-2">•</span>
+                      <span>Demo ready & testing</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                {/* Left Border Accent */}
+                <div className="absolute left-0 top-8 h-8 w-0.5 bg-neutral-800 group-hover:bg-purple-500 group-hover:h-16 transition-all duration-300" />
+              </div>
+            </div>
+
+            {/* 0G Network Card */}
+            <div className="relative group bg-black">
+              {/* Hover Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-neutral-800/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              {/* Content */}
+              <div className="relative p-8 border-neutral-800 group-hover:border-blue-500/20 transition-colors duration-300">
+                {/* Icon */}
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-blue-500/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="relative h-12 w-12 flex items-center justify-center bg-neutral-900 rounded-lg overflow-hidden">
+                    <Image
+                      src="/chains/0G.png"
+                      alt="0G Network"
+                      width={32}
+                      height={32}
+                      className="w-8 h-8 object-contain group-hover:scale-110 transition-transform duration-300"
+                    />
+                  </div>
+                </div>
+                
+                {/* Text Content */}
+                <div className="mt-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors duration-300">
+                      0G Galileo Testnet
+                    </h3>
+                    <div className="inline-flex items-center px-2 py-0.5 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-xs">
+                      ✓ Active
+                    </div>
+                  </div>
+                  <p className="text-neutral-400 group-hover:text-neutral-300 transition-colors duration-300 mb-4">
+                    Secure smart contract auditing on 0G's scalable and developer-friendly testnet infrastructure.
+                  </p>
+                  <ul className="space-y-2 text-sm text-neutral-500">
+                    <li className="flex items-start">
+                      <span className="text-blue-400 mr-2">•</span>
+                      <span>On-chain audit registry</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-400 mr-2">•</span>
+                      <span>Transparent verification</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-400 mr-2">•</span>
+                      <span>Mainnet coming Q2 2026</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                {/* Left Border Accent */}
+                <div className="absolute left-0 top-8 h-8 w-0.5 bg-neutral-800 group-hover:bg-blue-500 group-hover:h-16 transition-all duration-300" />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div id="how-it-works">
@@ -621,96 +797,6 @@ export function HomeSections() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        </div>
-
-        <div id="chains">
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-            {/* Background Elements */}
-            <div className="absolute inset-0">
-              <div className="absolute inset-0 theme-section-spotlight" />
-              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-            </div>
-
-            {/* Section Header */}
-            <div className="relative text-center mb-20">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold mb-4 leading-tight text-white">
-                NETWORKS<br />
-                <span className="text-blue-400">SUPPORTED</span>
-              </h2>
-              <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-4">
-                Currently supporting Polygon Amoy Testnet for development and testing
-              </p>
-              <div className="text-xs text-gray-400 tracking-wider mb-6">
-                SECURE · SCALABLE · REVOLUTIONARY · RELIABLE
-              </div>
-              <div className="inline-flex items-center px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm">
-                🚀 Mainnet coming soon!
-              </div>
-            </div>
-
-            {/* Chains Grid */}
-            <div className="relative flex justify-center">
-              {supportedChains.map((chain) => (
-                <div
-                  key={chain.id}
-                  className="group relative bg-black/50 backdrop-blur-sm rounded-2xl p-8 hover:bg-black/70 transition-all duration-300 border border-neutral-800/50 hover:border-blue-500/50 max-w-sm"
-                >
-                  {/* Card Background with Gradient */}
-                  <div className="absolute inset-0 bg-neutral-900/50 backdrop-blur-sm rounded-2xl border border-neutral-800/50 transition-all duration-300 group-hover:border-blue-500/50">
-                    {/* Hover Gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-2xl" />
-                  </div>
-
-                  {/* Content Container */}
-                  <div className="relative h-full flex flex-col items-center justify-center text-center">
-                    {/* Polygon Logo */}
-                    <div className="w-20 h-20 bg-neutral-800 rounded-xl mb-6 flex items-center justify-center overflow-hidden">
-                      {chain.icon ? (
-                        <Image
-                          src={chain.icon}
-                          alt={chain.name || 'Network icon'}
-                          width={48}
-                          height={48}
-                          className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="text-blue-400 group-hover:text-blue-300 transition-colors duration-300 text-xl font-bold">
-                          SM
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Network Name */}
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors duration-300">
-                      {chain.name}
-                    </h3>
-                    
-                    {/* Status Badge */}
-                    <div className="inline-flex items-center px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-sm mb-4">
-                      🟢 Live & Active
-                    </div>
-                    
-                    {/* Description */}
-                    <p className="text-gray-400 text-sm leading-relaxed">
-                      Secure smart contract auditing and deployment on Polygon's scalable and developer-friendly network
-                    </p>
-                  </div>
-
-                  {/* Glowing Effect */}
-                  <div className="absolute -inset-0.5 bg-blue-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-all duration-300" />
-                </div>
-              ))}
-            </div>
-
-            {/* Coming Soon Section */}
-            <div className="mt-16 text-center">
-              <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-full">
-                <span className="text-blue-400 font-mono text-sm">MAINNET</span>
-                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                <span className="text-gray-300 text-sm">Coming Q2 2026</span>
-              </div>
             </div>
           </div>
         </div>

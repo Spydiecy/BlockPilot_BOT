@@ -2,6 +2,7 @@ import { AnimatedNavbar } from '@/components/navigation/AnimatedNavbar';
 import { HangingThemeToggle } from '@/components/theme/HangingThemeToggle';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { WalletProvider } from '@/contexts/WalletContext';
+import Script from 'next/script';
 
 import '@/app/globals.css';
 
@@ -12,8 +13,11 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
+      <head />
+      <body className="min-h-screen">
+        <Script
+          id="theme-script"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               (function () {
@@ -29,8 +33,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
             `,
           }}
         />
-      </head>
-      <body className="min-h-screen">
         <ThemeProvider>
           <WalletProvider>
             <HangingThemeToggle />

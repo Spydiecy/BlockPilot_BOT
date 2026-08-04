@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "node scripts/patch-spline.js"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -22,6 +23,7 @@
     "eslint-config-next": "15.1.0",
     "framer-motion": "^11.18.2",
     "next": "^16.1.6",
+    "patch-package": "^8.0.1",
     "postcss": "^8.4.49",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -30,12 +32,16 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "@0gfoundation/0g-storage-ts-sdk": "^1.2.9",
+    "@0glabs/0g-serving-broker": "^2.0.0",
     "@mistralai/mistralai": "^1.7.5",
     "@openzeppelin/contracts": "^5.1.0",
     "@splinetool/react-spline": "^4.1.0",
     "@splinetool/runtime": "^1.12.61",
     "@tabler/icons-react": "^3.34.1",
-    "ethers": "^6.13.4",
+    "@types/crypto-js": "^4.2.2",
+    "crypto-js": "^4.2.0",
+    "ethers": "6.13.1",
     "jspdf": "^4.2.0",
     "phosphor-react": "^1.4.1",
     "react-dropzone": "^14.3.8",

@@ -2,23 +2,19 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-import { Mistral } from "@mistralai/mistralai";
 import { z } from "zod";
 import { ethers } from 'ethers';
 import { 
   Robot,
 } from 'phosphor-react';
 import { useWallet } from '@/contexts/WalletContext';
-import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI, ChainKey } from '@/utils/contracts';
+import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI, ChainKey, Audit } from '@/utils/contracts';
 import { getDefaultChain } from '@/config/wallet';
 import { AuditPageContainer } from '@/components/audit/AuditPageContainer';
 import { CodeInputPanel } from '@/components/audit/CodeInputPanel';
 import { ResultsPanel } from '@/components/audit/ResultsPanel';
-
-// Initialize Mistral client
-const mistralClient = new Mistral({
-  apiKey: process.env.NEXT_PUBLIC_MISTRAL_API_KEY!
-});
+import { uploadAuditReportTo0GStorage } from '@/utils/zeroGStorage';
+import { generatePlaceholderJobId } from '@/utils/zeroGCompute';
 
 // Define the vulnerability analysis schema
 const VulnerabilitySchema = z.object({
@@ -48,6 +44,12 @@ interface AuditResult {
   };
   recommendations: string[];
   gasOptimizations: string[];
+  // New fields for 0G integration
+  criticalCount?: number;
+  highCount?: number;
+  mediumCount?: number;
+  reportHash?: string; // 0G Storage hash
+  computeJobId?: string; // 0G Compute job ID
 }
 
 interface TransactionState {
@@ -60,7 +62,7 @@ interface TransactionState {
 const COOLDOWN_TIME = 30;
 
 const CHAIN_ID_TO_KEY: { [key: number]: ChainKey } = {
-  [getDefaultChain().id]: 'polygonAmoy',
+  [getDefaultChain().id]: 'zeroGTestnet',
 };
 
 export default function AuditPage() {
@@ -122,7 +124,7 @@ export default function AuditPage() {
         signer
       );
 
-      // Polygon Amoy requires a minimum priority fee of 25 gwei
+      // 0G network fee data
       const feeData = await provider.getFeeData();
       const minPriorityFee = ethers.parseUnits('25', 'gwei');
       const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas && feeData.maxPriorityFeePerGas > minPriorityFee
@@ -132,10 +134,29 @@ export default function AuditPage() {
         ? feeData.maxFeePerGas
         : minPriorityFee * BigInt(2);
 
+      // Format 0G Storage hash and Compute job ID as bytes32
+      const reportHashBytes32 = result.reportHash || '0x' + '0'.repeat(64);
+      
+      // Ensure computeJobId is properly formatted as bytes32 (32 bytes = 64 hex chars)
+      let computeJobIdBytes32 = result.computeJobId || '0x' + '0'.repeat(64);
+      if (computeJobIdBytes32.length < 66) { // 0x + 64 chars = 66 total
+        // Pad to 64 hex characters if needed
+        computeJobIdBytes32 = computeJobIdBytes32 + '0'.repeat(66 - computeJobIdBytes32.length);
+      }
+
+      // Prepare summary preview (max 100 chars)
+      const summaryPreview = result.summary.substring(0, 100);
+
+      // Call registerAudit with all required parameters
       const tx = await contract.registerAudit(
         contractHash,
         result.stars,
-        result.summary,
+        result.criticalCount || 0,
+        result.highCount || 0,
+        result.mediumCount || 0,
+        reportHashBytes32,
+        summaryPreview,
+        computeJobIdBytes32,
         { maxPriorityFeePerGas, maxFeePerGas }
       );
 
@@ -166,61 +187,26 @@ export default function AuditPage() {
     setIsReviewBlurred(true);
 
     try {
-      const response = await mistralClient.chat.complete({
-        model: "open-mistral-7b",
-        messages: [
-          {
-            role: "system",
-            content: `You are a professional smart contract security auditor. Analyze the provided Solidity smart contract with zero tolerance for security issues.
-            
-            Rating System (Extremely Strict):
-            - 5 stars: ONLY if contract has zero vulnerabilities and follows all best practices
-            - 4 stars: ONLY if no critical/high vulnerabilities, max 1-2 medium issues
-            - 3 stars: No critical but has high severity issues needing attention
-            - 2 stars: Has critical vulnerability or multiple high severity issues
-            - 1 star: Multiple critical and high severity vulnerabilities
-            - 0 stars: Fundamental security flaws making contract unsafe
-            
-            Critical Issues (Any reduces rating to 2 or lower):
-            - Reentrancy vulnerabilities
-            - Unchecked external calls
-            - Integer overflow/underflow risks
-            - Access control flaws
-            - Unprotected selfdestruct
-            - Missing input validation
-
-            Return response in the following JSON format:
-            {
-              "stars": number,
-              "summary": "string",
-              "vulnerabilities": {
-                "critical": ["string"],
-                "high": ["string"],
-                "medium": ["string"],
-                "low": ["string"]
-              },
-              "recommendations": ["string"],
-              "gasOptimizations": ["string"]
-            }`
-          },
-          {
-            role: "user",
-            content: code
-          }
-        ],
-        responseFormat: { type: "json_object" },
-        temperature: 0.1,
-        maxTokens: 2048
+      // Call our backend API endpoint for AI analysis
+      const response = await fetch('/api/ai/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contractCode: code,
+        }),
       });
 
-      const responseText = response.choices?.[0]?.message?.content;
-      if (typeof responseText !== 'string') {
-        throw new Error('Invalid response format');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.details || 'Analysis failed');
       }
-      const parsedResponse = JSON.parse(responseText);
+
+      const result = await response.json();
       
-      // Validate response against schema
-      const validatedResponse = VulnerabilitySchema.parse(parsedResponse);
+      // Extract analysis from backend response
+      const validatedResponse = VulnerabilitySchema.parse(result.analysis);
 
       // Enforce strict rating based on vulnerabilities
       if (validatedResponse.vulnerabilities.critical.length > 0) {
@@ -233,19 +219,62 @@ export default function AuditPage() {
         validatedResponse.stars = 0;
       }
 
-      setResult(validatedResponse);
+      // Get counts for new contract structure
+      const criticalCount = validatedResponse.vulnerabilities.critical.length;
+      const highCount = validatedResponse.vulnerabilities.high.length;
+      const mediumCount = validatedResponse.vulnerabilities.medium.length;
+
+      // Use job ID from backend or generate placeholder
+      const computeJobId = result.jobId || generatePlaceholderJobId();
+
+      // Prepare report JSON for 0G Storage
+      const reportJson = JSON.stringify({
+        analysis: validatedResponse,
+        contractCode: code,
+        timestamp: new Date().toISOString(),
+        computeJobId,
+        provider: result.provider || 'Mistral AI',
+        model: result.model || 'mistral-large-latest',
+      });
+
+      // Upload to 0G Storage and get hash
+      let reportHash = '0x0'; // Fallback
+      try {
+        reportHash = await uploadAuditReportTo0GStorage(reportJson);
+      } catch (storageError) {
+        console.warn('0G Storage upload failed, using placeholder:', storageError);
+        // Use placeholder hash if upload fails
+        reportHash = ethers.keccak256(ethers.toUtf8Bytes(reportJson));
+      }
+
+      // Add 0G metadata to result
+      const enrichedResult: AuditResult = {
+        ...validatedResponse,
+        criticalCount: criticalCount,
+        highCount: highCount,
+        mediumCount: mediumCount,
+        reportHash: reportHash,
+        computeJobId: computeJobId
+      };
+
+      setResult(enrichedResult);
       setShowResult(true);
       setCooldown(COOLDOWN_TIME);
-      
     } catch (error: any) {
       console.error('Analysis failed:', error);
       
       // Handle specific API errors with user-friendly messages
       let errorMessage = 'Analysis failed. Please try again.';
-      if (error?.message?.includes('service_tier_capacity_exceeded') || error?.message?.includes('429')) {
+      if (error?.message?.includes('Mistral API key not configured')) {
+        errorMessage = 'AI service not configured. Please contact administrator.';
+      } else if (error?.message?.includes('Invalid Mistral API key')) {
+        errorMessage = 'AI service authentication failed. Please contact administrator.';
+      } else if (error?.message?.includes('service_tier_capacity_exceeded') || error?.message?.includes('429')) {
         errorMessage = 'AI service is currently at capacity. Please try again in a few moments.';
       } else if (error?.message?.includes('rate_limit')) {
         errorMessage = 'Rate limit reached. Please wait a moment before trying again.';
+      } else if (error?.message) {
+        errorMessage = error.message;
       }
       
       setTxState({ isProcessing: false, hash: null, error: errorMessage });

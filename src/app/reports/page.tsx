@@ -7,7 +7,6 @@ import {
   MagnifyingGlass, 
   Star, 
   ArrowSquareOut,
-  X,
   FunnelSimple,
   Download,
   FileText,
@@ -18,15 +17,22 @@ import {
 import Image from 'next/image';
 import { SUPPORTED_CHAINS, ChainId } from '@/config/wallet';
 import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI, ChainKey } from '@/utils/contracts';
+import { generateAuditPDF } from '@/utils/generatePDF';
 
 interface AuditReport {
   contractHash: string;
-  transactionHash: string;
+  transactionHash: string; // Transaction hash from blockchain event
   stars: number;
   summary: string;
   auditor: string;
   timestamp: number;
   chain: ChainKey;
+  // New fields from updated contract
+  criticalIssues?: number;
+  highIssues?: number;
+  mediumIssues?: number;
+  reportHash?: string; // 0G Storage hash
+  computeJobId?: string; // 0G Compute job ID
 }
 
 interface FilterState {
@@ -39,7 +45,6 @@ interface FilterState {
 export default function ReportsPage() {
   const [reports, setReports] = useState<AuditReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedReport, setSelectedReport] = useState<AuditReport | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     search: '',
@@ -55,7 +60,7 @@ export default function ReportsPage() {
       const allAudits: AuditReport[] = [];
       
       try {
-        console.log('Fetching audit reports from Polygon Amoy Testnet...');
+        console.log('Fetching audit reports from 0G Galileo Testnet...');
         
         // First get the total number of contracts
         const totalResponse = await fetch('/api/blockchain', {
@@ -75,7 +80,7 @@ export default function ReportsPage() {
         
         const totalData = await totalResponse.json();
         const totalContracts = totalData.result;
-        console.log(`Found ${totalContracts} contracts on Polygon Amoy Testnet`);
+        console.log(`Found ${totalContracts} contracts on 0G Galileo Testnet`);
         
         // Fetch in batches to respect rate limits
         const BATCH_SIZE = 10; 
@@ -106,13 +111,19 @@ export default function ReportsPage() {
             console.log(`Fetched batch ${processed}-${processed + BATCH_SIZE}, found ${data.result.length} audits`);
             
             const batchAudits = data.result.map((audit: any) => ({
-              contractHash: audit.contractHash,
-              transactionHash: audit.transactionHash || "0x",
+              contractHash: audit.contractHash || audit.contractHashes?.[0],
+              transactionHash: audit.transactionHash || '0x',
               stars: Number(audit.stars),
-              summary: audit.summary,
-              auditor: audit.auditor,
-              timestamp: Number(audit.timestamp),
-              chain: 'polygonAmoy' as ChainKey
+              summary: audit.summary || audit.summaryPreview || "",
+              auditor: audit.auditor || audit.auditors?.[0],
+              timestamp: Number(audit.timestamp || audit.timestamps?.[0]),
+              chain: 'zeroGTestnet' as ChainKey,
+              // New fields from updated contract
+              criticalIssues: Number(audit.criticalIssues || 0),
+              highIssues: Number(audit.highIssues || 0),
+              mediumIssues: Number(audit.mediumIssues || 0),
+              reportHash: audit.reportHash || audit.reportHashes?.[0],
+              computeJobId: audit.computeJobId || audit.computeJobIds?.[0]
             }));
             
             allAudits.push(...batchAudits);
@@ -130,7 +141,7 @@ export default function ReportsPage() {
         
         console.log(`Total audits fetched: ${allAudits.length}`);
       } catch (error) {
-        console.error('Error fetching Polygon Amoy Testnet audits:', error);
+        console.error('Error fetching 0G Galileo Testnet audits:', error);
       }
       
       setReports(allAudits);
@@ -190,41 +201,43 @@ export default function ReportsPage() {
     return filtered.sort((a, b) => b.timestamp - a.timestamp);
   };
 
-  const exportReport = (report: AuditReport) => {
-    // Convert BigInt values and format data for export
-    const formattedReport = {
-      contractHash: report.contractHash,
-      stars: Number(report.stars),
-      summary: report.summary,
-      auditor: report.auditor,
-      timestamp: Number(report.timestamp),
-      chain: report.chain,
-      chainName: SUPPORTED_CHAINS[report.chain as ChainId].name,
-      exportDate: new Date().toISOString(),
-      network: {
-        name: SUPPORTED_CHAINS[report.chain as ChainId].name,
-        id: SUPPORTED_CHAINS[report.chain as ChainId].id,
-        contractAddress: CONTRACT_ADDRESSES[report.chain],
-      },
-      auditDate: new Date(Number(report.timestamp) * 1000).toLocaleString(),
-    };
-  
-    // Create and download the file
-    try {
-      const blob = new Blob([JSON.stringify(formattedReport, null, 2)], { 
-        type: 'application/json' 
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `audit-${report.contractHash.slice(0, 8)}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error exporting report:', error);
+  const exportReport = async (report: AuditReport) => {
+    // Fetch full report from 0G Storage if available
+    if (report.reportHash && report.reportHash !== '0x' + '0'.repeat(64)) {
+      try {
+        const response = await fetch('/api/0g-storage/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reportHash: report.reportHash }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // Generate PDF with full report data
+          generateAuditPDF(
+            data.report.analysis,
+            data.report.contractCode,
+            report.transactionHash !== '0x' ? report.transactionHash : null
+          );
+          return;
+        }
+      } catch (error) {
+        console.error('Error fetching full report:', error);
+      }
     }
+
+    // Fallback: Generate PDF with basic info if full report not available
+    generateAuditPDF(
+      {
+        stars: report.stars,
+        summary: report.summary || 'No summary available',
+        vulnerabilities: { critical: [], high: [], medium: [], low: [] },
+        recommendations: [],
+        gasOptimizations: [],
+      },
+      undefined,
+      report.transactionHash !== '0x' ? report.transactionHash : null
+    );
   };
 
   const filteredReports = getFilteredReports();
@@ -337,6 +350,7 @@ export default function ReportsPage() {
               <thead>
                 <tr className="border-b border-blue-900/50">
                   <th className="py-4 px-6 text-left text-sm font-mono text-blue-400">CONTRACT HASH</th>
+                  <th className="py-4 px-6 text-left text-sm font-mono text-blue-400">TX HASH</th>
                   <th className="py-4 px-6 text-left text-sm font-mono text-blue-400">CHAIN</th>
                   <th className="py-4 px-6 text-left text-sm font-mono text-blue-400">RATING</th>
                   <th className="py-4 px-6 text-left text-sm font-mono text-blue-400">AUDITOR</th>
@@ -369,6 +383,28 @@ export default function ReportsPage() {
                           >
                             <Copy size={14} weight="bold" className="text-blue-400" />
                           </button>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-4 px-6 font-mono text-white">
+                      <div className="flex items-center gap-2">
+                        {report.transactionHash && report.transactionHash !== '0x' ? (
+                          <>
+                            <span className="text-blue-400">
+                              {`${report.transactionHash.slice(0, 10)}...${report.transactionHash.slice(-8)}`}
+                            </span>
+                            <a
+                              href={`${SUPPORTED_CHAINS[report.chain].explorerUrl}/tx/${report.transactionHash}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1 hover:bg-blue-500/20 rounded transition-colors duration-200"
+                              title="View on Explorer"
+                            >
+                              <ArrowSquareOut size={14} weight="bold" className="text-blue-400" />
+                            </a>
+                          </>
+                        ) : (
+                          <span className="text-gray-500">Pending...</span>
                         )}
                       </div>
                     </td>
@@ -407,19 +443,26 @@ export default function ReportsPage() {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => setSelectedReport(report)}
-                          className="p-2 hover:bg-blue-500/20 rounded-2xl transition-colors duration-200"
-                          title="View Details"
-                        >
-                          <ArrowSquareOut size={20} className="text-blue-400" weight="bold" />
-                        </button>
+                        {report.reportHash && report.reportHash !== '0x' + '0'.repeat(64) ? (
+                          <button
+                            onClick={() => window.location.href = `/report/${report.reportHash}`}
+                            className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-lg transition-colors duration-200 text-blue-400 text-xs font-medium flex items-center gap-1.5"
+                            title="View Full Report"
+                          >
+                            <FileText size={14} weight="bold" />
+                            View Report
+                          </button>
+                        ) : (
+                          <span className="px-3 py-1.5 bg-gray-500/5 border border-gray-500/20 rounded-lg text-gray-500 text-xs">
+                            No Report
+                          </span>
+                        )}
                         <button
                           onClick={() => exportReport(report)}
-                          className="p-2 hover:bg-blue-500/20 rounded-2xl transition-colors duration-200"
-                          title="Export Report"
+                          className="p-1.5 hover:bg-blue-500/20 rounded-lg transition-colors duration-200"
+                          title="Export PDF"
                         >
-                          <Download size={20} className="text-blue-400" weight="bold" />
+                          <Download size={18} className="text-blue-400" weight="bold" />
                         </button>
                       </div>
                     </td>
@@ -447,163 +490,6 @@ export default function ReportsPage() {
             </div>
           )}
         </div>
-
-        {/* Report Detail Modal */}
-        {selectedReport && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-black/90 border border-blue-900/50 rounded-2xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto shadow-xl shadow-blue-900/10 backdrop-blur-sm"
-            >
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <div className="inline-block mb-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/20">
-                      <span className="text-blue-400 text-xs font-medium">Audit Details</span>
-                    </div>
-                    <h3 className="text-xl font-bold text-white">Contract Security Report</h3>
-                  </div>
-                  <button
-                    onClick={() => setSelectedReport(null)}
-                    className="p-1 hover:bg-blue-800/50 rounded-2xl transition-colors duration-200 hover:text-blue-400 text-white"
-                  >
-                    <X size={20} weight="bold" />
-                  </button>
-                </div>
-
-                <div className="space-y-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
-                  <div>
-                    <label className="block text-sm text-blue-400 mb-1">Contract Hash</label>
-                    <div className="font-mono bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40 flex items-center justify-between text-white">
-                      <span className="truncate">
-                        {selectedReport.contractHash || 'N/A'}
-                      </span>
-                      {selectedReport.contractHash && (
-                        <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(selectedReport.contractHash);
-                          }}
-                          className="ml-2 p-1.5 hover:bg-blue-500/30 rounded-md transition-colors duration-200"
-                          title="Copy contract hash"
-                        >
-                          <Copy size={18} weight="bold" className="text-blue-400" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-blue-400 mb-1">Transaction Hash</label>
-                    <div className="font-mono bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40 flex items-center justify-between text-white">
-                      <span className="truncate">
-                        {selectedReport.transactionHash && selectedReport.transactionHash !== "0x" ? (
-                          `${selectedReport.transactionHash.slice(0, 28)}...${selectedReport.transactionHash.slice(-24)}`
-                        ) : (
-                          'N/A'
-                        )}
-                      </span>
-                      {selectedReport.transactionHash && selectedReport.transactionHash !== "0x" && (
-                        <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(selectedReport.transactionHash);
-                          }}
-                          className="ml-2 p-1.5 hover:bg-blue-500/30 rounded-md transition-colors duration-200"
-                          title="Copy transaction hash"
-                        >
-                          <Copy size={18} weight="bold" className="text-blue-400" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-blue-400 mb-1">Chain</label>
-                    <div className="flex items-center gap-2 bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-[2px]"></div>
-                        <Image
-                          src={SUPPORTED_CHAINS[selectedReport.chain].iconPath}
-                          alt={SUPPORTED_CHAINS[selectedReport.chain].name}
-                          width={20}
-                          height={20}
-                          className="rounded-full relative z-10"
-                        />
-                      </div>
-                      <span className="text-white">{SUPPORTED_CHAINS[selectedReport.chain].name}</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-blue-400 mb-1">Security Rating</label>
-                    <div className="flex gap-1 bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          weight={i < selectedReport.stars ? "fill" : "regular"}
-                          className={i < selectedReport.stars ? "text-blue-400" : "text-blue-600"}
-                          size={20}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-blue-400 mb-1">Summary</label>
-                    <div className="bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40 text-white">
-                      {selectedReport.summary || 'No summary available'}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-blue-400 mb-1">Auditor</label>
-                    <div className="font-mono bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40 flex items-center justify-between text-white">
-                      <span>{selectedReport.auditor || 'N/A'}</span>
-                      {selectedReport.auditor && (
-                        <a
-                          href={`${SUPPORTED_CHAINS[selectedReport.chain].explorerUrl}/address/${selectedReport.auditor}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors duration-200"
-                        >
-                          View on Explorer <ArrowSquareOut size={16} weight="bold" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-blue-400 mb-1">Timestamp</label>
-                    <div className="bg-black/50 px-3 py-2 rounded-2xl border border-blue-900/40 text-white">
-                      {selectedReport.timestamp ? new Date(selectedReport.timestamp * 1000).toLocaleString() : 'N/A'}
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end gap-4 pt-4 border-t border-blue-900/50">
-                    <button
-                      onClick={() => exportReport(selectedReport)}
-                      className="px-4 py-2 bg-blue-500/20 text-blue-400 rounded-2xl hover:bg-blue-500/30 transition-colors duration-200 flex items-center gap-2"
-                    >
-                      <Download size={20} weight="bold" />
-                      Export Report
-                    </button>
-                    {selectedReport.transactionHash && selectedReport.transactionHash !== "0x" && (
-                      <a
-                        href={`${SUPPORTED_CHAINS[selectedReport.chain].explorerUrl}/tx/${selectedReport.transactionHash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-4 py-2 bg-blue-800/50 rounded-2xl hover:bg-blue-900/40 transition-colors duration-200 flex items-center gap-2 text-white"
-                      >
-                        View on Explorer
-                        <ArrowSquareOut size={20} weight="bold" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -88,9 +88,9 @@ export const HangingThemeToggle = memo(function HangingThemeToggle() {
         onClick={toggleTheme}
         className={`hanging-theme-toggle__bulb ${isLightTheme ? 'is-on' : ''}`}
         aria-label={`Switch to ${nextThemeLabel} theme`}
-        aria-pressed={isLightTheme}
+        aria-pressed={isHydrated ? isLightTheme : undefined}
       >
-        <LightbulbFilament size={26} weight={isLightTheme ? 'fill' : 'regular'} />
+        {isHydrated && <LightbulbFilament size={26} weight={isLightTheme ? 'fill' : 'regular'} />}
         <span className="sr-only">
           {isHydrated ? `Current theme: ${theme}` : 'Loading theme'}
         </span>
