@@ -28,10 +28,17 @@ interface AuditStats {
 
 interface UserAudit {
   contractHash: string;
+  transactionHash: string; // Transaction hash from blockchain event
   stars: number;
   summary: string;
   timestamp: number;
   chain: ChainId;
+  // New fields from updated contract
+  criticalIssues?: number;
+  highIssues?: number;
+  mediumIssues?: number;
+  reportHash?: string; // 0G Storage hash
+  computeJobId?: string; // 0G Compute job ID
 }
 
 const StatCard = ({ icon, label, value, unit, className }: { icon: React.ReactNode, label: string, value: string | number, unit?: string, className?: string }) => (
@@ -96,10 +103,17 @@ export default function ProfilePage() {
           for (const audit of userAudits) {
             allAudits.push({
               contractHash: hash,
+              transactionHash: audit.transactionHash || '0x',
               stars: Number(audit.stars),
-              summary: audit.summary,
+              summary: audit.summary || audit.summaryPreview || '',
               timestamp: Number(audit.timestamp),
-              chain: chainKey
+              chain: chainKey,
+              // New fields from updated contract
+              criticalIssues: Number(audit.criticalIssues || 0),
+              highIssues: Number(audit.highIssues || 0),
+              mediumIssues: Number(audit.mediumIssues || 0),
+              reportHash: audit.reportHash,
+              computeJobId: audit.computeJobId
             });
 
             chainCounts[chainKey] = (chainCounts[chainKey] || 0) + 1;
@@ -282,15 +296,26 @@ export default function ProfilePage() {
                       className="bg-gray-900/70 border border-gray-700/80 rounded-xl p-4 transition-all duration-300 hover:bg-gray-800/80 hover:border-gray-700 hover:shadow-lg hover:shadow-black/20"
                     >
                       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-2 mb-3">
-                        <a 
-                          href={`${defaultChain.explorerUrl}/address/${audit.contractHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 font-mono text-sm text-gray-400 break-all pr-4 hover:text-blue-400 transition-colors"
-                        >
-                          {audit.contractHash}
-                          <ArrowSquareOut size={14} weight="bold" />
-                        </a>
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">Contract:</span>
+                            <span className="font-mono text-sm text-gray-400 break-all">
+                              {audit.contractHash.slice(0, 10)}...{audit.contractHash.slice(-8)}
+                            </span>
+                          </div>
+                          {audit.transactionHash && audit.transactionHash !== '0x' && (
+                            <a 
+                              href={`${defaultChain.explorerUrl}/tx/${audit.transactionHash}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 font-mono text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                            >
+                              <span className="text-xs text-gray-500">Tx:</span>
+                              {audit.transactionHash.slice(0, 10)}...{audit.transactionHash.slice(-8)}
+                              <ArrowSquareOut size={14} weight="bold" />
+                            </a>
+                          )}
+                        </div>
                         <div className="flex items-center gap-1 text-gray-200 flex-shrink-0 bg-gray-700/50 px-2 py-1 rounded-full border border-gray-600/50">
                           <span className="font-bold text-white text-sm">{audit.stars.toFixed(1)}</span>
                           <Star weight="fill" size={14} />
@@ -308,9 +333,21 @@ export default function ProfilePage() {
                           />
                           <span className="text-gray-400">{getSupportedChains().find(c => c.key === audit.chain)?.name}</span>
                         </div>
-                        <span className="text-xs text-gray-500">
-                          {new Date(audit.timestamp * 1000).toLocaleDateString()}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500">
+                            {new Date(audit.timestamp * 1000).toLocaleDateString()}
+                          </span>
+                          {audit.reportHash && audit.reportHash !== '0x' + '0'.repeat(64) && (
+                            <button
+                              onClick={() => window.location.href = `/report/${audit.reportHash}`}
+                              className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-lg transition-colors duration-200 text-blue-400 text-xs font-medium flex items-center gap-1.5"
+                              title="View Full Report"
+                            >
+                              <FileSearch size={14} weight="bold" />
+                              View Report
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))
