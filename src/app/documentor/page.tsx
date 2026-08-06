@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,8 +15,14 @@ import {
   DownloadSimple,
   Lightning,
   Article,
-  BookOpen
+  BookOpen,
+  FilePdf,
+  Users,
+  Briefcase,
+  GraduationCap,
+  ShareNetwork
 } from 'phosphor-react';
+import { generateDocumentationPDF } from '@/utils/generateDocsPDF';
 
 const mistralClient = new Mistral({
   apiKey: process.env.NEXT_PUBLIC_MISTRAL_API_KEY!
@@ -59,6 +65,45 @@ interface Documentation {
   variables?: Variable[];
 }
 
+const PURPOSE_OPTIONS = [
+  {
+    id: 'team',
+    label: 'Team Collaboration',
+    description: 'Share with development team members',
+    icon: <Users size={20} weight="duotone" />
+  },
+  {
+    id: 'client',
+    label: 'Client Presentation',
+    description: 'Present to clients or stakeholders',
+    icon: <Briefcase size={20} weight="duotone" />
+  },
+  {
+    id: 'audit',
+    label: 'Security Audit',
+    description: 'Submit for security review',
+    icon: <FileText size={20} weight="duotone" />
+  },
+  {
+    id: 'education',
+    label: 'Educational Purpose',
+    description: 'Teaching or learning material',
+    icon: <GraduationCap size={20} weight="duotone" />
+  },
+  {
+    id: 'public',
+    label: 'Public Documentation',
+    description: 'Open source or public sharing',
+    icon: <ShareNetwork size={20} weight="duotone" />
+  },
+  {
+    id: 'custom',
+    label: 'Custom Purpose',
+    description: 'Specify your own purpose',
+    icon: <Article size={20} weight="duotone" />
+  }
+];
+
 const ContractDocsGenerator = () => {
   const [contractCode, setContractCode] = useState<string>('');
   const [documentation, setDocumentation] = useState<Documentation | null>(null);
@@ -66,14 +111,50 @@ const ContractDocsGenerator = () => {
   const [error, setError] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState<boolean>(false);
   const [downloadSuccess, setDownloadSuccess] = useState<boolean>(false);
+  
+  // New states for purpose selection - NOW ASKED BEFORE GENERATION
+  const [selectedPurpose, setSelectedPurpose] = useState<string>('team');
+  const [customPurpose, setCustomPurpose] = useState<string>('');
+  const [recipientInfo, setRecipientInfo] = useState<string>('');
+  const [technicalLevel, setTechnicalLevel] = useState<string>('intermediate');
+  const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
+  const [showExportModal, setShowExportModal] = useState<boolean>(false);
+  const [exportFormat, setExportFormat] = useState<'pdf' | 'markdown'>('pdf');
+
+  // Get purpose text helper
+  const getPurposeText = () => {
+    if (selectedPurpose === 'custom') {
+      return customPurpose || 'Custom documentation purpose';
+    }
+    const purpose = PURPOSE_OPTIONS.find(p => p.id === selectedPurpose);
+    return purpose ? purpose.description : 'General documentation';
+  };
 
   const generateDocs = async () => {
     if (!contractCode.trim()) return;
     setIsGenerating(true);
     setError(null);
+    setShowConfigModal(false);
 
     try {
+      const purposeText = getPurposeText();
+      
+      // Enhanced prompt that considers purpose, recipient, and technical level
       const prompt = `You are an expert Solidity smart contract analyzer. Analyze this smart contract and provide a structured documentation object.
+      
+      DOCUMENTATION CONTEXT:
+      - Purpose: ${purposeText}
+      - Intended for: ${recipientInfo || 'General audience'}
+      - Technical Level: ${technicalLevel}
+      
+      INSTRUCTIONS:
+      - Tailor descriptions to the ${technicalLevel} technical level
+      - Focus on aspects relevant to: ${purposeText}
+      - Use appropriate terminology for the intended audience
+      - For "beginner" level: Use simple language, explain concepts
+      - For "intermediate" level: Balance technical detail with clarity
+      - For "advanced" level: Use precise technical terminology, include implementation details
+      
       The response should be ONLY a valid JSON object with the following structure:
       {
         "name": "contract name",
@@ -180,49 +261,87 @@ const ContractDocsGenerator = () => {
 
   const downloadDocs = () => {
     if (!documentation) return;
-    setDownloadSuccess(true);
-    setTimeout(() => setDownloadSuccess(false), 2000);
+    
+    const purposeText = getPurposeText();
 
-    // Generate markdown content
-    const markdownContent = `# ${documentation.name}
+    if (exportFormat === 'pdf') {
+      // Generate PDF with purpose and recipient info
+      generateDocumentationPDF(documentation, purposeText, recipientInfo);
+    } else {
+      // Generate enhanced markdown with purpose and recipient info
+      const markdownContent = `# ${documentation.name}
 
 ${documentation.description}
 
-**Version:** ${documentation.version}
-**License:** ${documentation.license}
+---
+
+## Document Information
+
+**Version:** ${documentation.version}  
+**License:** ${documentation.license}  
+**Purpose:** ${purposeText}  
+${recipientInfo ? `**For:** ${recipientInfo}  ` : ''}
+**Generated:** ${new Date().toLocaleString()}  
+**Generated by:** BlockPilot - Smart Contract Security Platform
+
+---
 
 ## Functions
 
-${documentation.functions?.map(func => `### ${func.name}
-* **Visibility:** ${func.visibility}
-* **Description:** ${func.description}
-${func.params.length ? `* **Parameters:**
-${func.params.map(param => `  * \`${param.name}\` (${param.type}) - ${param.description}`).join('\n')}` : ''}`).join('\n\n')}
+${documentation.functions?.map(func => `### \`${func.name}\`
+
+**Visibility:** \`${func.visibility}\`
+
+${func.description}
+
+${func.params.length ? `**Parameters:**
+
+${func.params.map(param => `- **\`${param.name}\`** (\`${param.type}\`) - ${param.description || 'No description'}`).join('\n')}` : '*No parameters*'}
+
+---`).join('\n\n')}
 
 ## Events
 
-${documentation.events?.map(event => `### ${event.name}
-* **Description:** ${event.description}
-${event.params.length ? `* **Parameters:**
-${event.params.map(param => `  * \`${param.name}\` (${param.type})${param.indexed ? ' - indexed' : ''}`).join('\n')}` : ''}`).join('\n\n')}
+${documentation.events?.map(event => `### \`${event.name}\`
+
+${event.description}
+
+${event.params.length ? `**Parameters:**
+
+${event.params.map(param => `- **\`${param.name}\`** (\`${param.type}\`)${param.indexed ? ' - *indexed*' : ''}`).join('\n')}` : '*No parameters*'}
+
+---`).join('\n\n')}
 
 ## State Variables
 
-${documentation.variables?.map(variable => `### ${variable.name}
-* **Type:** ${variable.type}
-* **Visibility:** ${variable.visibility}
-* **Description:** ${variable.description}`).join('\n\n')}`;
+${documentation.variables?.map(variable => `### \`${variable.name}\`
 
-    // Create blob and download
-    const blob = new Blob([markdownContent], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${documentation.name.toLowerCase()}-documentation.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+**Type:** \`${variable.type}\`  
+**Visibility:** \`${variable.visibility}\`
+
+${variable.description}
+
+---`).join('\n\n')}
+
+---
+
+*This documentation was generated by BlockPilot for ${purposeText.toLowerCase()}${recipientInfo ? ` and prepared for ${recipientInfo}` : ''}.*`;
+
+      // Create blob and download
+      const blob = new Blob([markdownContent], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${documentation.name.toLowerCase().replace(/\s+/g, '-')}-documentation.md`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    setShowExportModal(false);
+    setDownloadSuccess(true);
+    setTimeout(() => setDownloadSuccess(false), 2000);
   };
 
   return (
@@ -269,7 +388,7 @@ ${documentation.variables?.map(variable => `### ${variable.name}
             </div>
             <div className="pt-4 border-t border-blue-900/50">
               <button
-                onClick={generateDocs}
+                onClick={() => setShowConfigModal(true)}
                 disabled={!contractCode || isGenerating}
                 className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl hover:from-blue-700 hover:to-blue-800 disabled:bg-blue-950 disabled:cursor-not-allowed transition-all duration-300 ease-in-out flex items-center justify-center gap-2"
               >
@@ -305,11 +424,11 @@ ${documentation.variables?.map(variable => `### ${variable.name}
                     {copySuccess ? 'Copied!' : 'Copy JSON'}
                   </button>
                   <button
-                    onClick={downloadDocs}
-                    className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1 transition-colors duration-200 px-2 py-1 rounded-md hover:bg-blue-500/10"
+                    onClick={() => setShowExportModal(true)}
+                    className="text-white bg-blue-600 hover:bg-blue-700 text-sm flex items-center gap-1 transition-colors duration-200 px-3 py-1.5 rounded-lg font-medium"
                   >
-                    {downloadSuccess ? <Check size={16} weight="bold" /> : <DownloadSimple size={16} weight="bold" />}
-                    {downloadSuccess ? 'Downloaded!' : 'Download MD'}
+                    <DownloadSimple size={16} weight="bold" />
+                    Export Documentation
                   </button>
                 </div>
               )}
@@ -442,7 +561,281 @@ ${documentation.variables?.map(variable => `### ${variable.name}
             </div>
           </div>
         </div>
-      </div>
+        </div>
+
+        {/* Configuration Modal - BEFORE Generation */}
+        <AnimatePresence>
+          {showConfigModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setShowConfigModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-gray-900 border border-blue-500/30 rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-500/10 border border-blue-500/20 rounded-full flex items-center justify-center">
+                      <Article size={24} className="text-blue-400" weight="fill" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white">Configure Documentation</h2>
+                  </div>
+                  <button
+                    onClick={() => setShowConfigModal(false)}
+                    className="text-gray-400 hover:text-white transition-colors text-2xl"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Purpose Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-blue-400 mb-3">
+                      What is this documentation for? *
+                    </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {PURPOSE_OPTIONS.map((purpose) => (
+                        <button
+                          key={purpose.id}
+                          onClick={() => setSelectedPurpose(purpose.id)}
+                          className={`p-4 rounded-xl border transition-all duration-200 text-left ${
+                            selectedPurpose === purpose.id
+                              ? 'border-blue-500 bg-blue-500/20 shadow-lg shadow-blue-500/10'
+                              : 'border-blue-900/50 bg-black/30 hover:border-blue-500/50'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="text-blue-400">{purpose.icon}</div>
+                            <span className="font-semibold text-white">{purpose.label}</span>
+                          </div>
+                          <p className="text-sm text-gray-400">{purpose.description}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Custom Purpose Input */}
+                  {selectedPurpose === 'custom' && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                    >
+                      <label className="block text-sm font-medium text-blue-400 mb-2">
+                        Specify your purpose *
+                      </label>
+                      <textarea
+                        value={customPurpose}
+                        onChange={(e) => setCustomPurpose(e.target.value)}
+                        placeholder="e.g., Internal code review for Q4 2024 release"
+                        className="w-full px-4 py-3 bg-black/50 border border-blue-900/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 resize-none"
+                        rows={3}
+                      />
+                    </motion.div>
+                  )}
+
+                  {/* Recipient Information */}
+                  <div>
+                    <label className="block text-sm font-medium text-blue-400 mb-2">
+                      For whom? (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={recipientInfo}
+                      onChange={(e) => setRecipientInfo(e.target.value)}
+                      placeholder="e.g., Development Team, John Doe, Security Auditors"
+                      className="w-full px-4 py-3 bg-black/50 border border-blue-900/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20"
+                    />
+                  </div>
+
+                  {/* Technical Level */}
+                  <div>
+                    <label className="block text-sm font-medium text-blue-400 mb-3">
+                      Technical Level of Audience *
+                    </label>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { id: 'beginner', label: 'Beginner', desc: 'Simple explanations' },
+                        { id: 'intermediate', label: 'Intermediate', desc: 'Balanced detail' },
+                        { id: 'advanced', label: 'Advanced', desc: 'Technical depth' }
+                      ].map((level) => (
+                        <button
+                          key={level.id}
+                          onClick={() => setTechnicalLevel(level.id)}
+                          className={`p-3 rounded-xl border transition-all duration-200 text-center ${
+                            technicalLevel === level.id
+                              ? 'border-blue-500 bg-blue-500/20 shadow-lg shadow-blue-500/10'
+                              : 'border-blue-900/50 bg-black/30 hover:border-blue-500/50'
+                          }`}
+                        >
+                          <div className="font-semibold text-white text-sm mb-1">{level.label}</div>
+                          <p className="text-xs text-gray-400">{level.desc}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Info Box */}
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                      <Article size={20} className="text-blue-400 flex-shrink-0 mt-0.5" weight="duotone" />
+                      <div className="flex-1">
+                        <h3 className="text-sm font-semibold text-white mb-1">
+                          Documentation will be tailored to:
+                        </h3>
+                        <ul className="text-sm text-gray-300 space-y-1">
+                          <li>• Purpose: {getPurposeText()}</li>
+                          <li>• Audience: {recipientInfo || 'General audience'}</li>
+                          <li>• Technical Level: {technicalLevel.charAt(0).toUpperCase() + technicalLevel.slice(1)}</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      onClick={() => setShowConfigModal(false)}
+                      className="flex-1 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-xl transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={generateDocs}
+                      disabled={selectedPurpose === 'custom' && !customPurpose.trim()}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      <Article size={20} weight="fill" />
+                      Generate Documentation
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Export Modal - AFTER Generation */}
+        <AnimatePresence>
+          {showExportModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setShowExportModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-gray-900 border border-blue-500/30 rounded-2xl p-6 max-w-xl w-full"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-500/10 border border-blue-500/20 rounded-full flex items-center justify-center">
+                      <DownloadSimple size={24} className="text-blue-400" weight="fill" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white">Export Documentation</h2>
+                  </div>
+                  <button
+                    onClick={() => setShowExportModal(false)}
+                    className="text-gray-400 hover:text-white transition-colors text-2xl"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Format Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-blue-400 mb-3">
+                      Export Format
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => setExportFormat('pdf')}
+                        className={`p-4 rounded-xl border transition-all duration-200 ${
+                          exportFormat === 'pdf'
+                            ? 'border-blue-500 bg-blue-500/20 shadow-lg shadow-blue-500/10'
+                            : 'border-blue-900/50 bg-black/30 hover:border-blue-500/50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <FilePdf size={24} className="text-blue-400" weight="duotone" />
+                          <span className="font-semibold text-white">PDF</span>
+                        </div>
+                        <p className="text-sm text-gray-400">Professional formatted document</p>
+                      </button>
+                      <button
+                        onClick={() => setExportFormat('markdown')}
+                        className={`p-4 rounded-xl border transition-all duration-200 ${
+                          exportFormat === 'markdown'
+                            ? 'border-blue-500 bg-blue-500/20 shadow-lg shadow-blue-500/10'
+                            : 'border-blue-900/50 bg-black/30 hover:border-blue-500/50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <FileText size={24} className="text-blue-400" weight="duotone" />
+                          <span className="font-semibold text-white">Markdown</span>
+                        </div>
+                        <p className="text-sm text-gray-400">Developer-friendly format</p>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Preview Info */}
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                      {exportFormat === 'pdf' ? (
+                        <FilePdf size={20} className="text-blue-400 flex-shrink-0 mt-0.5" weight="duotone" />
+                      ) : (
+                        <FileText size={20} className="text-blue-400 flex-shrink-0 mt-0.5" weight="duotone" />
+                      )}
+                      <div className="flex-1">
+                        <h3 className="text-sm font-semibold text-white mb-1">
+                          {exportFormat === 'pdf' ? 'PDF will include:' : 'Markdown will include:'}
+                        </h3>
+                        <ul className="text-sm text-gray-300 space-y-1">
+                          <li>• Complete contract documentation</li>
+                          <li>• Purpose and recipient information</li>
+                          <li>• Functions, events, and state variables</li>
+                          <li>• {exportFormat === 'pdf' ? 'Professional formatting with BlockPilot branding' : 'Clean markdown formatting'}</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      onClick={() => setShowExportModal(false)}
+                      className="flex-1 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-xl transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={downloadDocs}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                    >
+                      <DownloadSimple size={20} weight="fill" />
+                      Download {exportFormat === 'pdf' ? 'PDF' : 'Markdown'}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
