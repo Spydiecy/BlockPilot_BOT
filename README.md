@@ -2,7 +2,7 @@
 
 **AI-Powered Smart Contract Security for 0G Network**
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-blockpilot.netlify.app-blue?style=for-the-badge)](https://blockpilot.netlify.app/)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-blockpilot--0g.vercel.app-blue?style=for-the-badge)](https://blockpilot-0g.vercel.app/)
 [![0G Network](https://img.shields.io/badge/⛓️_Built_on-0G_Network-brightgreen?style=for-the-badge)](https://0g.ai/)
 [![MIT License](https://img.shields.io/badge/📄_License-MIT-yellow?style=for-the-badge)](LICENSE)
 
@@ -136,7 +136,7 @@ Network details:
 
 ## Live Demo
 
-Try BlockPilot now: **[blockpilot.netlify.app](https://blockpilot.netlify.app/)**
+Try BlockPilot now: **[blockpilot-0g.vercel.app](https://blockpilot-0g.vercel.app/)**
 
 Connect your wallet to 0G Galileo Testnet and start auditing contracts instantly.
 
