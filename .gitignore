@@ -40,9 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# 0G Storage (local file-based storage for hackathon)
-.0g-storage/
-
 # IDE
 .vscode/
 .idea/
@@ -53,7 +50,6 @@ next-env.d.ts
 # Scripts (development only)
 verify-storage.sh
 
-# Archive (0G Compute attempt - local reference only)
 archive/
 
 # Logs

@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mistral } from '@mistralai/mistralai';
 import {
   FileText,
   Copy,
@@ -21,10 +20,6 @@ import {
   ShareNetwork
 } from 'phosphor-react';
 import { generateDocumentationPDF } from '@/utils/generateDocsPDF';
-
-const mistralClient = new Mistral({
-  apiKey: process.env.NEXT_PUBLIC_MISTRAL_API_KEY!
-});
 
 interface Parameter {
   name: string;
@@ -136,107 +131,30 @@ const ContractDocsGenerator = () => {
 
     try {
       const purposeText = getPurposeText();
-      
-      // Enhanced prompt that considers purpose, recipient, and technical level
-      const prompt = `You are an expert Solidity smart contract analyzer. Analyze this smart contract and provide a structured documentation object.
-      
-      DOCUMENTATION CONTEXT:
-      - Purpose: ${purposeText}
-      - Intended for: ${recipientInfo || 'General audience'}
-      - Technical Level: ${technicalLevel}
-      
-      INSTRUCTIONS:
-      - Tailor descriptions to the ${technicalLevel} technical level
-      - Focus on aspects relevant to: ${purposeText}
-      - Use appropriate terminology for the intended audience
-      - For "beginner" level: Use simple language, explain concepts
-      - For "intermediate" level: Balance technical detail with clarity
-      - For "advanced" level: Use precise technical terminology, include implementation details
-      
-      The response should be ONLY a valid JSON object with the following structure:
-      {
-        "name": "contract name",
-        "description": "brief description of what the contract does",
-        "version": "solidity version",
-        "license": "license type",
-        "functions": [
-          {
-            "name": "function name",
-            "description": "what the function does",
-            "params": [
-              {
-                "name": "parameter name",
-                "type": "parameter type",
-                "description": "parameter description"
-              }
-            ],
-            "visibility": "public/private/internal/external"
-          }
-        ],
-        "events": [
-          {
-            "name": "event name",
-            "description": "what the event represents",
-            "params": [
-              {
-                "name": "parameter name",
-                "type": "parameter type",
-                "indexed": boolean
-              }
-            ]
-          }
-        ],
-        "variables": [
-          {
-            "name": "variable name",
-            "type": "variable type",
-            "visibility": "public/private/internal",
-            "description": "what the variable represents"
-          }
-        ]
-      }
 
-      Contract code to analyze:
-      ${contractCode}
-
-      Important:
-      1. Return ONLY the JSON object, no additional text or backticks
-      2. Include all public and external functions
-      3. Document all events
-      4. Include all public state variables
-      5. Keep descriptions concise but informative
-      6. Ensure the JSON is valid and properly formatted
-      `;
-
-      const response = await mistralClient.chat.complete({
-        model: "mistral-large-latest",
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0.1,
-        maxTokens: 4096,
+      const response = await fetch('/api/ai/document', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contractCode,
+          purpose: purposeText,
+          recipientInfo,
+          technicalLevel,
+        }),
       });
 
-      let jsonString = response.choices?.[0]?.message?.content || '';
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Documentation generation failed');
+      }
 
-      if (typeof jsonString === 'string') {
-        jsonString = jsonString.trim();
-      }
-        if (typeof jsonString === 'string' && jsonString.startsWith('```json')) {
-        jsonString = jsonString.substring(7).trimStart();
-      }
-        if (typeof jsonString === 'string' && jsonString.endsWith('```')) {
-        jsonString = jsonString.slice(0, -3).trimEnd();
-      }
+      const data = await response.json();
 
       try {
-        const parsedDocs = JSON.parse(typeof jsonString === 'string' ? jsonString : '') as Documentation;
+        const parsedDocs = data.documentation as Documentation;
         setDocumentation(parsedDocs);
       } catch (parseError) {
-        console.error('Failed to parse Mistral response:', parseError, jsonString);
+        console.error('Failed to parse documentation response:', parseError);
         setError('Failed to parse contract documentation. Ensure the smart contract is valid. Please try again.');
       }
     } catch (err) {

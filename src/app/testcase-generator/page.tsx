@@ -3,7 +3,6 @@
 
 import React, { JSX, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mistral } from '@mistralai/mistralai';
 import {
   FileCode,
   Robot,
@@ -14,10 +13,6 @@ import {
   Code,
   Lightning
 } from 'phosphor-react';
-
-const mistralClient = new Mistral({
-  apiKey: process.env.NEXT_PUBLIC_MISTRAL_API_KEY!
-});
 
 type TestFramework = 'hardhat' | 'foundry' | 'remix';
 
@@ -143,45 +138,26 @@ Return a structured list of testing steps without any extra text.`
     setIsGenerating(true);
     setError(null);
     try {
-      const response = await mistralClient.chat.complete({
-        model: "open-mistral-7b",
-        messages: [
-          {
-            role: "user",
-            content: getPromptForFramework(contractCode, selectedFramework),
-          },
-        ],
-        temperature: 0.1,
-        maxTokens: 4096,
+      const response = await fetch('/api/ai/testcases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractCode, framework: selectedFramework }),
       });
 
-      const generatedText = response.choices?.[0]?.message?.content || '';
-
-      let cleanCode = '';
-      if (typeof generatedText === 'string') {
-        // Remove any markdown-style code blocks (```)
-        cleanCode = generatedText
-          .replace(/```[a-z]*\n/g, '')
-          .replace(/```/g, '')
-          .replace(/\*/g, '')
-          .trim();
-      } else {
-        setGeneratedTests('');
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || 'Test generation failed');
       }
 
-      setGeneratedTests(cleanCode);
+      const data = await response.json();
+      setGeneratedTests(data.testCode || '');
 
     } catch (error: any) {
       console.error('Test generation failed:', error);
-      
-      // Handle specific API errors with user-friendly messages
       let errorMessage = 'Failed to generate test cases. Please try again.';
-      if (error?.message?.includes('service_tier_capacity_exceeded') || error?.message?.includes('429')) {
+      if (error?.message?.includes('429') || error?.message?.includes('capacity')) {
         errorMessage = 'AI service is currently at capacity. Please try again in a few moments.';
-      } else if (error?.message?.includes('rate_limit')) {
-        errorMessage = 'Rate limit reached. Please wait a moment before trying again.';
       }
-      
       setError(errorMessage);
     } finally {
       setIsGenerating(false);

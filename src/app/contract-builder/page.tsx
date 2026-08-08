@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mistral } from "@mistralai/mistralai";
 import { z } from "zod";
 import { ethers } from 'ethers';
 import {
@@ -24,10 +23,7 @@ import { connectWallet, CHAIN_CONFIG } from '@/utils/web3';
 import { generatePlaceholderJobId, unpinIPFSReport } from '@/utils/ipfsStorage';
 import React from 'react';
 
-// Initialize Mistral client
-const mistralClient = new Mistral({
-  apiKey: process.env.NEXT_PUBLIC_MISTRAL_API_KEY!
-});
+// Initialize Mistral client removed — now uses /api/ai/generate-contract server route
 
 // Define response schema
 const ContractSchema = z.object({
@@ -175,163 +171,43 @@ export default function ContractBuilder() {
     setError(null);
 
     try {
-      const response = await mistralClient.chat.complete({
-        model: "open-mistral-7b",
-        messages: [
-          {
-            role: "system",
-            content: `You are an expert Solidity developer who creates ONLY high-quality, production-ready smart contracts that compile without errors.
+      const systemPrompt = `You are an expert Solidity developer who creates ONLY high-quality, production-ready smart contracts that compile without errors.
 
-        CRITICAL QUALITY REQUIREMENTS:
-        - Generate contracts that would score 4-5 stars in security audits
-        - MUST compile without ANY errors in Solidity 0.8.19
-        - Use ONLY valid Solidity syntax and features
-        - NO experimental or unsupported features
-        - Include comprehensive security measures and best practices
-        - Implement proper access control, reentrancy guards, and input validation
-        - Add detailed NatSpec comments for all functions
-        - Use gas-efficient patterns
-        - Follow OpenZeppelin standards where applicable
+CRITICAL QUALITY REQUIREMENTS:
+- Generate contracts that would score 4-5 stars in security audits
+- MUST compile without ANY errors in Solidity 0.8.19
+- Use ONLY valid Solidity syntax and features
+- NO experimental or unsupported features
+- Include comprehensive security measures and best practices
+- DO NOT use ANY external imports or libraries - write everything inline
+- NO placeholders like "...", "{ ... }", or incomplete code
+- Every function MUST have a complete implementation`;
 
-        SOLIDITY SYNTAX RULES (CRITICAL):
-        1. Use Solidity version 0.8.19 ONLY
-        2. DO NOT use string concatenation with + operator (not supported in Solidity)
-        3. DO NOT use string.isNotEmpty() or any non-existent string methods
-        4. DO NOT cast uint256 to string (not allowed in Solidity)
-        5. Use bytes32 for hashes, NOT string
-        6. Use simple string literals in require statements: require(condition, "Error message");
-        7. For dynamic error messages, use custom errors or separate require statements
-        8. DO NOT use ANY external imports or libraries - write everything inline
-        9. Use mapping(address => uint256) for balances, NOT balanceOf mapping
-        10. Implement standard ERC20/ERC721 interfaces correctly
-        11. Use proper visibility modifiers: public, private, internal, external
-        12. Use proper state mutability: view, pure, payable where appropriate
-        13. NO placeholders like "...", "{ ... }", or incomplete code
-        14. Every function MUST have a complete implementation
+      const userPrompt = `Generate a HIGH-QUALITY, PRODUCTION-READY, COMPILABLE contract with these specifications:
+Template: ${selectedTemplate.name}
+Base Code: ${selectedTemplate.baseCode || 'Create new contract'}
+Custom Features: ${customFeatures || 'Standard features'}
+Parameters: ${JSON.stringify(contractParams)}
 
-        VALID SOLIDITY PATTERNS:
-        ✅ require(condition, "Simple error message");
-        ✅ if (condition) revert("Error message");
-        ✅ error CustomError(string message); then revert CustomError("message");
-        ✅ mapping(address => uint256) private balances;
-        ✅ uint256 public totalSupply;
-        ✅ event Transfer(address indexed from, address indexed to, uint256 value);
-        
-        INVALID PATTERNS (DO NOT USE):
-        ❌ require(condition, "Error: " + someVariable);
-        ❌ string.isNotEmpty(str)
-        ❌ string(uint256Value)
-        ❌ balanceOf[address]
-        ❌ function incomplete() { ... }
-        ❌ import statements
-        
-        Security Considerations (MANDATORY):
-        - Include reentrancy guards where needed (use bool private locked pattern)
-        - Add proper access control (owner/admin patterns with address public owner)
-        - Implement input validation for all parameters (require statements)
-        - Add checks for zero address: require(addr != address(0), "Zero address");
-        - Validate amounts: require(amount > 0, "Amount must be positive");
-        - Include event emissions for all state changes
-        - Handle edge cases properly
-        - Add pause functionality for critical contracts (bool private paused)
-        - Implement proper error messages (simple strings only)
-        
-        Code Quality (MANDATORY):
-        - Ensure all syntax is correct and compiles
-        - Use proper Solidity formatting
-        - All functions must be properly closed with complete implementations
-        - No missing semicolons or commas
-        - Proper pragma declaration at the top
-        - NO placeholders or ellipsis (...) - write complete code
-        - Every contract must be fully implemented
-        - Add comprehensive NatSpec documentation
-        - Test all code patterns for compilation before including`
-          },
-          {
-            role: "user",
-            content: `Generate a HIGH-QUALITY, PRODUCTION-READY, COMPILABLE contract with these specifications:
-        Template: ${selectedTemplate.name}
-        Base Code: ${selectedTemplate.baseCode || 'Create new contract'}
-        Custom Features: ${customFeatures || 'Standard features'}
-        Parameters: ${JSON.stringify(contractParams)}
-        
-        CRITICAL INSTRUCTIONS:
-        1. Write ONE complete contract with ALL functionality inline
-        2. MUST compile without errors in Solidity 0.8.19
-        3. Use ONLY valid Solidity syntax - no string concatenation, no invalid casts
-        4. DO NOT create abstract contracts or use inheritance
-        5. DO NOT use placeholders like "...", "{ ... }", or incomplete implementations
-        6. If creating a token, implement ALL ERC20 functions directly in the contract
-        7. Include complete function bodies for: transfer, approve, transferFrom, mint, burn
-        8. Define ALL state variables: mapping(address => uint256) private balances, etc.
-        9. Implement ALL events: event Transfer(address indexed from, address indexed to, uint256 value);
-        10. Add comprehensive security checks in every function
-        11. Use simple string literals in require statements
-        12. Include detailed NatSpec comments
-        13. This contract MUST compile and score 4-5 stars
-        
-        EXAMPLE OF VALID SOLIDITY CODE:
-        \`\`\`solidity
-        // SPDX-License-Identifier: MIT
-        pragma solidity ^0.8.19;
-        
-        contract MyToken {
-            string public name;
-            string public symbol;
-            uint8 public decimals = 18;
-            uint256 public totalSupply;
-            address public owner;
-            
-            mapping(address => uint256) private balances;
-            mapping(address => mapping(address => uint256)) private allowances;
-            
-            event Transfer(address indexed from, address indexed to, uint256 value);
-            event Approval(address indexed owner, address indexed spender, uint256 value);
-            
-            constructor(string memory _name, string memory _symbol, uint256 _initialSupply) {
-                name = _name;
-                symbol = _symbol;
-                owner = msg.sender;
-                totalSupply = _initialSupply * 10**decimals;
-                balances[msg.sender] = totalSupply;
-                emit Transfer(address(0), msg.sender, totalSupply);
-            }
-            
-            function balanceOf(address account) public view returns (uint256) {
-                return balances[account];
-            }
-            
-            function transfer(address to, uint256 amount) public returns (bool) {
-                require(to != address(0), "Transfer to zero address");
-                require(balances[msg.sender] >= amount, "Insufficient balance");
-                
-                balances[msg.sender] -= amount;
-                balances[to] += amount;
-                emit Transfer(msg.sender, to, amount);
-                return true;
-            }
-        }
-        \`\`\`
-        
-        Return ONLY this exact JSON format with valid, compilable Solidity code:
-        {
-          "code": "// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.19;\\n\\ncontract YourContract {\\n  // Complete implementation here\\n}",
-          "features": ["list of implemented features"],
-          "securityNotes": ["list of security measures implemented"]
-        }
-        
-        The code field must contain ONLY valid Solidity syntax that compiles without errors.
-        Every function must have a complete implementation.
-        This must be a 4-5 star quality contract that compiles successfully.`
-          }
-        ],
-        responseFormat: { type: "json_object" },
-        temperature: 0.1,
-        maxTokens: 4096
+Return ONLY this exact JSON format with valid, compilable Solidity code:
+{
+  "code": "// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.19;\\n\\ncontract YourContract {\\n  // Complete implementation\\n}",
+  "features": ["list of implemented features"],
+  "securityNotes": ["list of security measures implemented"]
+}`;
+
+      const apiResponse = await fetch('/api/ai/generate-contract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ systemPrompt, userPrompt }),
       });
 
-      const responseText = response.choices?.[0]?.message?.content || '';
-      const parsedResponse = JSON.parse(typeof responseText === 'string' ? responseText : '');
+      if (!apiResponse.ok) {
+        const errData = await apiResponse.json();
+        throw new Error(errData.error || 'Contract generation failed');
+      }
+
+      const parsedResponse = await apiResponse.json();
 
       // Validate response against schema
       const validatedResponse = ContractSchema.parse(parsedResponse);
