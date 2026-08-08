@@ -14,14 +14,14 @@ export interface Chain {
 
 // Supported chains configuration
 export const SUPPORTED_CHAINS = {
-  zeroGTestnet: {
-    id: 16602,
-    key: 'zeroGTestnet',
-    name: '0G Galileo Testnet',
-    rpcUrl: 'https://evmrpc-testnet.0g.ai',
-    explorerUrl: 'https://chainscan-galileo.0g.ai',
-    currency: '0G',
-    iconPath: '/chains/0G.png',
+  qieTestnet: {
+    id: 1983,
+    key: 'qieTestnet',
+    name: 'QIE Testnet',
+    rpcUrl: 'https://rpc1testnet.qie.digital',
+    explorerUrl: 'https://testnet.qie.digital',
+    currency: 'QIE',
+    iconPath: '/chains/QIE.png',
     testnet: true,
   },
 } as const;
@@ -30,7 +30,7 @@ export type ChainId = keyof typeof SUPPORTED_CHAINS;
 export type SupportedChain = typeof SUPPORTED_CHAINS[ChainId];
 
 // Default chain to use
-const DEFAULT_CHAIN: ChainId = 'zeroGTestnet';
+const DEFAULT_CHAIN: ChainId = 'qieTestnet';
 
 // Helper to get chain by ID
 export const getChainById = (chainId: number): SupportedChain | undefined => {
@@ -55,12 +55,10 @@ export const formatBalance = (balance: string | number | undefined, decimals = 4
   if (balance === undefined || balance === null) return '0.0000';
 
   try {
-    // ethers.formatEther can handle BigInt, hex strings, and numbers representing wei
     const formatted = ethers.formatEther(balance);
     const num = parseFloat(formatted);
     return num.toFixed(decimals);
   } catch (error) {
-    // If formatEther fails, it's likely because the value is already a decimal string like "79.9694"
     const balanceAsNumber = parseFloat(balance.toString());
     if (!isNaN(balanceAsNumber)) {
       return balanceAsNumber.toFixed(decimals);

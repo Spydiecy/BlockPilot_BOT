@@ -1,7 +1,8 @@
 /**
- * 0G Storage Upload Endpoint
- * 
- * Uploads audit reports to 0G Storage network using the official SDK.
+ * IPFS Upload Endpoint
+ *
+ * Uploads audit reports to IPFS via Pinata.
+ * Returns the IPFS CID for on-chain verification.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -19,35 +20,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Prepare the full report data
+    // Wrap content with metadata before uploading
     const reportData = JSON.stringify({
       content,
       metadata: metadata || {},
       uploadedAt: Date.now(),
     });
 
-    // Upload to 0G Storage network
-    console.log('Uploading report to 0G Storage network...');
-    const rootHash = await saveReport(reportData);
+    console.log('Uploading report to IPFS via Pinata...');
+    const cid = await saveReport(reportData);
 
-    console.log(`Report uploaded successfully. Root hash: ${rootHash}`);
+    console.log(`Report uploaded successfully. CID: ${cid}`);
 
     return NextResponse.json({
       success: true,
-      reportHash: rootHash,
+      cid,
       timestamp: Date.now(),
       size: reportData.length,
-      network: '0G Storage Network',
-      indexer: 'https://indexer-storage-testnet-turbo.0g.ai',
-      message: 'Report stored successfully on 0G Storage network',
+      network: 'IPFS via Pinata',
+      message: 'Report stored successfully on IPFS',
     });
   } catch (error) {
-    console.error('Error uploading to 0G Storage:', error);
+    console.error('Error uploading to IPFS:', error);
     return NextResponse.json(
-      { 
-        error: 'Upload failed', 
+      {
+        error: 'Upload failed',
         details: error instanceof Error ? error.message : String(error),
-        hint: 'Check that OG_PRIVATE_KEY is set in .env.local and wallet has testnet tokens'
+        hint: 'Check that PINATA_JWT is set in .env.local',
       },
       { status: 500 }
     );

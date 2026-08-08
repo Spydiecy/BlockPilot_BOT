@@ -36,29 +36,25 @@ interface ChainConfig {
   iconPath: string;
 }
 
-// Extend Window interface properly
-declare global {
-  interface Window {
-    ethereum?: EthereumProvider;
-  }
-}
+// Note: Window.ethereum is declared in WalletContext.tsx
 
 export const CHAIN_CONFIG: Record<string, ChainConfig> = {
-  zeroGTestnet: {
-    chainId: '0x40DA', // 16602 in hex
-    chainName: '0G Galileo Testnet',
+  qieTestnet: {
+    chainId: '0x7bf', // 1983 in hex
+    chainName: 'QIE Testnet',
     nativeCurrency: {
-      name: '0G',
-      symbol: '0G',
+      name: 'QIE',
+      symbol: 'QIE',
       decimals: 18
     },
-    rpcUrls: ['https://evmrpc-testnet.0g.ai'],
-    blockExplorerUrls: ['https://chainscan-galileo.0g.ai'],
-    iconPath: '/chains/0G.png'
+    rpcUrls: ['https://rpc1testnet.qie.digital'],
+    blockExplorerUrls: ['https://testnet.qie.digital'],
+    iconPath: '/chains/QIE.png'
   }
 } as const;
 
 export type ChainKey = keyof typeof CHAIN_CONFIG;
+
 interface WalletConnection {
   provider: ethers.BrowserProvider;
   signer: ethers.JsonRpcSigner;
@@ -100,7 +96,6 @@ export const switchNetwork = async (chainKey: ChainKey): Promise<void> => {
     });
   } catch (error) {
     const switchError = error as EthereumError;
-    // This error code means the chain has not been added to MetaMask
     if (switchError.code === 4902) {
       try {
         await window.ethereum.request({
@@ -131,13 +126,13 @@ export const isSupportedNetwork = (chainId: string): boolean => {
 };
 
 // Get explorer URL for a transaction
-export const getExplorerUrl = (txHash: string, chainKey: ChainKey = 'zeroGTestnet'): string => {
+export const getExplorerUrl = (txHash: string, chainKey: ChainKey = 'qieTestnet'): string => {
   const chain = CHAIN_CONFIG[chainKey];
   return `${chain.blockExplorerUrls[0]}/tx/${txHash}`;
 };
 
 // Get explorer URL for an address
-export const getAddressExplorerUrl = (address: string, chainKey: ChainKey = 'zeroGTestnet'): string => {
+export const getAddressExplorerUrl = (address: string, chainKey: ChainKey = 'qieTestnet'): string => {
   const chain = CHAIN_CONFIG[chainKey];
   return `${chain.blockExplorerUrls[0]}/address/${address}`;
 };

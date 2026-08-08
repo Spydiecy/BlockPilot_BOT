@@ -96,10 +96,11 @@ function WalletPageContent() {
   // Check if current network is testnet
   useEffect(() => {
     if (!chainId) return;
-    const isTestnetChain = [5, 80001, 11155111].includes(chainId);
+    // QIE Testnet chain ID is 1983
+    const isTestnetChain = currentChain?.testnet === true;
     setIsTestnet(isTestnetChain);
     setShowTestnetWarning(isTestnetChain);
-  }, [chainId]);
+  }, [chainId, currentChain]);
 
   // Show backup reminder if account is new
   useEffect(() => {

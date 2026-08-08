@@ -21,6 +21,7 @@ import {
 } from 'phosphor-react';
 import { CONTRACT_TEMPLATES, ContractTemplate } from './templates';
 import { connectWallet, CHAIN_CONFIG } from '@/utils/web3';
+import { generatePlaceholderJobId, unpinIPFSReport } from '@/utils/ipfsStorage';
 import React from 'react';
 
 // Initialize Mistral client
@@ -447,12 +448,12 @@ export default function ContractBuilder() {
           .trim();
       }
       
-      // Validate we're on 0G Galileo Testnet
+      // Validate we're on QIE Testnet
       const network = await provider.getNetwork();
       const currentChainId = '0x' + network.chainId.toString(16).toUpperCase();
 
-      if (currentChainId.toLowerCase() !== CHAIN_CONFIG.zeroGTestnet.chainId.toLowerCase()) {
-        throw new Error(`Please switch to 0G Galileo Testnet to deploy contracts. Current chain: ${currentChainId}, Expected: ${CHAIN_CONFIG.zeroGTestnet.chainId}`);
+      if (currentChainId.toLowerCase() !== CHAIN_CONFIG.qieTestnet.chainId.toLowerCase()) {
+        throw new Error(`Please switch to QIE Testnet to deploy contracts. Current chain: ${currentChainId}, Expected: ${CHAIN_CONFIG.qieTestnet.chainId}`);
       }
 
       // Compile contract with cleaned code
@@ -503,7 +504,7 @@ export default function ContractBuilder() {
         }
       });
 
-      // Deploy contract with proper gas settings for 0G Galileo Testnet
+      // Deploy contract with proper gas settings for QIE Testnet
       const contract = await contractFactory.deploy(...constructorArgs, {
         maxPriorityFeePerGas: ethers.parseUnits('30', 'gwei'), // 30 Gwei tip (above minimum of 25 Gwei)
         maxFeePerGas: ethers.parseUnits('50', 'gwei'), // 50 Gwei max fee
@@ -531,7 +532,7 @@ export default function ContractBuilder() {
         setError('You cancelled the deployment transaction');
       } else if (error.code === 'INSUFFICIENT_FUNDS') {
         setDeploymentError('Insufficient funds for gas');
-        setError('You don\'t have enough 0G tokens to pay for gas. Get testnet tokens from the faucet.');
+        setError('You don\'t have enough QIE tokens to pay for gas. Get testnet tokens from the faucet.');
       } else if (error.code === 'NETWORK_ERROR') {
         setDeploymentError('Network connection error');
         setError('Network error. Please check your connection and try again.');
@@ -543,7 +544,7 @@ export default function ContractBuilder() {
         setError('You cancelled the deployment transaction');
       } else if (error.message?.includes('insufficient funds')) {
         setDeploymentError('Insufficient funds');
-        setError('You don\'t have enough 0G tokens to pay for gas. Get testnet tokens from the faucet.');
+        setError('You don\'t have enough QIE tokens to pay for gas. Get testnet tokens from the faucet.');
       } else {
         // Generic error
         setDeploymentError(error.message || 'Deployment failed');
@@ -554,12 +555,11 @@ export default function ContractBuilder() {
     }
   };
 
-  // Audit deployed contract and store report on 0G Storage
-  // Audit deployed contract and store report on 0G Storage
   const auditDeployedContract = async (contractCode: string, contractAddress: string, txHash: string) => {
     setIsAuditing(true);
+    let uploadedCid = ''; // track CID so we can unpin on failure
     try {
-      // Call AI audit API (same as audit page)
+      // Call AI audit API
       const auditResponse = await fetch('/api/ai/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -571,22 +571,12 @@ export default function ContractBuilder() {
       }
 
       const auditData = await auditResponse.json();
-      
-      // Extract analysis from the response (API returns { analysis: {...} })
       const analysis = auditData.analysis || auditData;
       
-      // Validate analysis has required fields
-      if (!analysis.summary) {
-        analysis.summary = 'Security analysis completed';
-      }
-      if (!analysis.vulnerabilities) {
-        analysis.vulnerabilities = { critical: [], high: [], medium: [], low: [] };
-      }
-      if (!analysis.stars) {
-        analysis.stars = 3;
-      }
+      if (!analysis.summary) analysis.summary = 'Security analysis completed';
+      if (!analysis.vulnerabilities) analysis.vulnerabilities = { critical: [], high: [], medium: [], low: [] };
+      if (!analysis.stars) analysis.stars = 3;
       
-      // Prepare report data in the same format as audit page
       const reportData = {
         analysis,
         contractCode,
@@ -597,110 +587,74 @@ export default function ContractBuilder() {
         deploymentTxHash: txHash,
       };
 
-      // Upload to 0G Storage using the same format as audit page
-      const uploadResponse = await fetch('/api/0g-storage/upload', {
+      // Upload to IPFS
+      const uploadResponse = await fetch('/api/ipfs/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          content: JSON.stringify(reportData),  // Same as audit page
-          metadata: {
-            type: 'audit-report',
-            contractAddress,
-            deploymentTxHash: txHash,
-          }
+          content: JSON.stringify(reportData),
+          metadata: { type: 'audit-report', contractAddress, deploymentTxHash: txHash }
         }),
       });
 
       if (!uploadResponse.ok) {
         const errorData = await uploadResponse.json();
-        throw new Error(`Failed to upload report to 0G Storage: ${errorData.details || errorData.error}`);
+        throw new Error(`Failed to upload report to IPFS: ${errorData.details || errorData.error}`);
       }
 
-      const { reportHash } = await uploadResponse.json();
+      const { cid } = await uploadResponse.json();
+      uploadedCid = cid; // save so we can unpin if chain registration fails
 
-      // Register audit on blockchain using the correct ABI
+      // Register on blockchain
       const { provider, signer } = await connectWallet();
       
-      // Import the correct contract ABI and address
-      const CONTRACT_ADDRESSES = {
-        zeroGTestnet: '0x5bA4CB3929C75DF47B8b5E6ca6c7414a5E1a3DB0'
-      };
-      
+      const CONTRACT_ADDRESSES = { qieTestnet: '0xc60E29FDdf01b9E15CDa524B48991B33bFa0E0FD' };
       const AUDIT_REGISTRY_ABI = [
-        'function registerAudit(bytes32 contractHash, uint8 stars, uint8 criticalCount, uint8 highCount, uint8 mediumCount, bytes32 reportHash, string memory summaryPreview, bytes32 computeJobId) external'
+        'function registerAudit(bytes32 contractHash, uint8 stars, uint8 criticalCount, uint8 highCount, uint8 mediumCount, string calldata reportCID, string calldata summaryPreview, bytes32 analysisJobId) external'
       ];
       
-      const auditContract = new ethers.Contract(
-        CONTRACT_ADDRESSES.zeroGTestnet,
-        AUDIT_REGISTRY_ABI,
-        signer
-      );
+      const auditContract = new ethers.Contract(CONTRACT_ADDRESSES.qieTestnet, AUDIT_REGISTRY_ABI, signer);
 
-      // Prepare parameters
       const contractHash = ethers.keccak256(ethers.toUtf8Bytes(contractCode));
-      
-      // Ensure reportHash is properly formatted as bytes32
-      let reportHashBytes32 = reportHash;
-      if (reportHashBytes32.length < 66) {
-        reportHashBytes32 = reportHashBytes32 + '0'.repeat(66 - reportHashBytes32.length);
-      }
-      
-      // Placeholder compute job ID (generate random bytes32)
-      const generatePlaceholderJobId = (): string => {
-        const randomBytes = Array.from({ length: 32 }, () =>
-          Math.floor(Math.random() * 256)
-        );
-        return '0x' + randomBytes.map(b => b.toString(16).padStart(2, '0')).join('');
-      };
-      const computeJobIdBytes32 = generatePlaceholderJobId();
-      
-      // Summary preview (max 100 chars)
+      const analysisJobIdBytes32 = generatePlaceholderJobId();
       const summaryPreview = (analysis.summary || 'Security analysis completed').substring(0, 100);
-      
-      // Count vulnerabilities with safe fallbacks
       const criticalCount = analysis.vulnerabilities?.critical?.length || 0;
       const highCount = analysis.vulnerabilities?.high?.length || 0;
       const mediumCount = analysis.vulnerabilities?.medium?.length || 0;
 
-      // Get fee data for 0G network
       const feeData = await provider.getFeeData();
       const minPriorityFee = ethers.parseUnits('25', 'gwei');
       const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas && feeData.maxPriorityFeePerGas > minPriorityFee
-        ? feeData.maxPriorityFeePerGas
-        : minPriorityFee;
+        ? feeData.maxPriorityFeePerGas : minPriorityFee;
       const maxFeePerGas = feeData.maxFeePerGas && feeData.maxFeePerGas > minPriorityFee
-        ? feeData.maxFeePerGas
-        : minPriorityFee * BigInt(2);
+        ? feeData.maxFeePerGas : minPriorityFee * BigInt(2);
 
-      // Call registerAudit with all required parameters
       const tx = await auditContract.registerAudit(
-        contractHash,
-        analysis.stars,
-        criticalCount,
-        highCount,
-        mediumCount,
-        reportHashBytes32,
-        summaryPreview,
-        computeJobIdBytes32,
+        contractHash, analysis.stars, criticalCount, highCount, mediumCount,
+        cid, summaryPreview, analysisJobIdBytes32,
         { maxPriorityFeePerGas, maxFeePerGas }
       );
       
       const receipt = await tx.wait();
-
-      setAuditReport({ ...analysis, reportHash, txHash: receipt.transactionHash });
+      // Success — CID is now anchored on-chain
+      setAuditReport({ ...analysis, reportCID: cid, txHash: receipt.hash });
       
     } catch (error: any) {
       console.error('Audit failed:', error);
-      
-      // Handle specific audit error types
-      if (error.code === 'ACTION_REJECTED' || error.code === 4001) {
-        setError('Audit cancelled: You rejected the blockchain registration transaction');
-      } else if (error.message?.includes('user rejected')) {
+
+      // On-chain registration failed or was rejected after IPFS upload succeeded
+      // → unpin the orphaned IPFS file
+      if (uploadedCid) {
+        console.log('Cleaning up orphaned IPFS report:', uploadedCid);
+        unpinIPFSReport(uploadedCid);
+      }
+
+      if (error.code === 'ACTION_REJECTED' || error.code === 4001 || error.message?.includes('user rejected')) {
         setError('Audit cancelled: You rejected the blockchain registration transaction');
       } else if (error.message?.includes('Audit analysis failed')) {
         setError('Deployment successful but AI audit failed. You can audit the contract manually from the Audit page.');
       } else if (error.message?.includes('Failed to upload report')) {
-        setError('Deployment successful but failed to store audit report on 0G Storage. You can audit the contract manually from the Audit page.');
+        setError('Deployment successful but failed to store audit report on IPFS. You can audit the contract manually from the Audit page.');
       } else if (error.message?.includes('insufficient funds')) {
         setError('Deployment successful but audit registration failed due to insufficient funds. You can audit the contract manually from the Audit page.');
       } else {
@@ -740,8 +694,8 @@ export default function ContractBuilder() {
         setError('You cancelled the wallet connection request');
       } else if (error.message?.includes('No Ethereum provider')) {
         setError('No wallet detected. Please install MetaMask or another Web3 wallet.');
-      } else if (error.message?.includes('Chain')) {
-        setError('Please switch to 0G Galileo Testnet in your wallet');
+      } else if (error.message?.includes('Please switch to QIE Testnet')) {
+        setError('Please switch to QIE Testnet in your wallet');
       } else {
         setError(error.message || 'Failed to connect wallet. Please try again.');
       }
@@ -993,7 +947,7 @@ export default function ContractBuilder() {
                     <Shield size={20} className="text-blue-400" weight="fill" />
                     <div>
                       <p className="text-sm font-semibold text-white">Auto-Audit on Deploy</p>
-                      <p className="text-xs text-gray-400">Audit and store report on 0G Storage</p>
+                      <p className="text-xs text-gray-400">Audit and store report on IPFS</p>
                     </div>
                   </div>
                   <button
@@ -1028,7 +982,7 @@ export default function ContractBuilder() {
                         </div>
                         <div>
                           <span className="text-sm font-bold text-green-400">Audit Complete</span>
-                          <p className="text-xs text-gray-400">Report stored on 0G Storage</p>
+                          <p className="text-xs text-gray-400">Report stored on IPFS</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1 bg-green-500/20 px-3 py-1.5 rounded-full">
@@ -1064,7 +1018,7 @@ export default function ContractBuilder() {
                     )}
                     
                     <a
-                      href={`/report/${auditReport.reportHash}`}
+                      href={`/report/${auditReport.reportCID}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-green-500/20 hover:bg-green-500/30 border border-green-500/30 rounded-lg transition-all duration-200 text-sm font-semibold text-green-400"
@@ -1098,7 +1052,7 @@ export default function ContractBuilder() {
                     ) : (
                       <>
                         <Rocket size={20} weight="fill" />
-                        Deploy to 0G Testnet
+                        Deploy to QIE Testnet
                       </>
                     )}
                   </button>

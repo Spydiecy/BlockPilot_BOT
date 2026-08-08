@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ethers } from 'ethers';
 import { 
   Star,
   ArrowSquareOut,
@@ -17,7 +16,7 @@ import {
 import Image from 'next/image';
 import { useWallet } from '@/contexts/WalletContext';
 import { getSupportedChains, getDefaultChain, ChainId } from '@/config/wallet';
-import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI, ChainKey } from '@/utils/contracts';
+import { ChainKey } from '@/utils/contracts';
 
 interface AuditStats {
   totalAudits: number;
@@ -37,8 +36,8 @@ interface UserAudit {
   criticalIssues?: number;
   highIssues?: number;
   mediumIssues?: number;
-  reportHash?: string; // 0G Storage hash
-  computeJobId?: string; // 0G Compute job ID
+  reportCID?: string;  // IPFS CID
+  analysisJobId?: string;
 }
 
 const StatCard = ({ icon, label, value, unit, className }: { icon: React.ReactNode, label: string, value: string | number, unit?: string, className?: string }) => (
@@ -80,47 +79,40 @@ export default function ProfilePage() {
   const fetchUserStats = useCallback(async (userAddress: string) => {
     setIsLoading(true);
     try {
-      const allAudits: UserAudit[] = [];
       const chainCounts: Record<string, number> = {};
       let totalStars = 0;
 
-      const chainKey: ChainKey = 'zeroGTestnet';
-      const contractAddress = CONTRACT_ADDRESSES[chainKey];
-      const defaultChain = getDefaultChain();
+      const chainKey: ChainKey = 'qieTestnet';
 
-      if (contractAddress) {
-        const readProvider = new ethers.JsonRpcProvider(defaultChain.rpcUrl);
-        const contract = new ethers.Contract(contractAddress, AUDIT_REGISTRY_ABI, readProvider);
-        
-        const history = await contract.getAuditorHistory(userAddress);
+      // Use the blockchain API which handles the 10k block limit
+      // and fetches real tx hashes from events
+      const response = await fetch('/api/blockchain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'getAuditorAudits',
+          params: [userAddress],
+        }),
+      });
 
-        for (const hash of history) {
-          const contractAudits = await contract.getContractAudits(hash);
-          const userAudits = contractAudits.filter((audit: any) => 
-            audit.auditor.toLowerCase() === userAddress.toLowerCase()
-          );
-
-          for (const audit of userAudits) {
-            allAudits.push({
-              contractHash: hash,
-              transactionHash: audit.transactionHash || '0x',
-              stars: Number(audit.stars),
-              summary: audit.summary || audit.summaryPreview || '',
-              timestamp: Number(audit.timestamp),
-              chain: chainKey,
-              // New fields from updated contract
-              criticalIssues: Number(audit.criticalIssues || 0),
-              highIssues: Number(audit.highIssues || 0),
-              mediumIssues: Number(audit.mediumIssues || 0),
-              reportHash: audit.reportHash,
-              computeJobId: audit.computeJobId
-            });
-
-            chainCounts[chainKey] = (chainCounts[chainKey] || 0) + 1;
-            totalStars += Number(audit.stars);
-          }
-        }
-      }
+      const data = await response.json();
+      const allAudits: UserAudit[] = (data.result || []).map((audit: any) => {
+        chainCounts[chainKey] = (chainCounts[chainKey] || 0) + 1;
+        totalStars += Number(audit.stars);
+        return {
+          contractHash: audit.contractHash,
+          transactionHash: audit.transactionHash || '0x',
+          stars: Number(audit.stars),
+          summary: audit.summaryPreview || '',
+          timestamp: Number(audit.timestamp),
+          chain: chainKey,
+          criticalIssues: Number(audit.criticalIssues || 0),
+          highIssues: Number(audit.highIssues || 0),
+          mediumIssues: Number(audit.mediumIssues || 0),
+          reportCID: audit.reportCID,
+          analysisJobId: audit.analysisJobId,
+        };
+      });
 
       const totalAudits = allAudits.length;
 
@@ -177,7 +169,7 @@ export default function ProfilePage() {
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tighter">Connect Your Wallet</h1>
             <p className="text-gray-400 mb-8 max-w-sm mx-auto">
-              Connect your wallet to view your personalized audit history and statistics on the 0G Galileo Testnet.
+              Connect your wallet to view your personalized audit history and statistics on QIE Testnet.
             </p>
             <button 
               onClick={connectWallet}
@@ -337,9 +329,9 @@ export default function ProfilePage() {
                           <span className="text-xs text-gray-500">
                             {new Date(audit.timestamp * 1000).toLocaleDateString()}
                           </span>
-                          {audit.reportHash && audit.reportHash !== '0x' + '0'.repeat(64) && (
+                          {audit.reportCID && (
                             <button
-                              onClick={() => window.location.href = `/report/${audit.reportHash}`}
+                              onClick={() => window.location.href = `/report/${audit.reportCID}`}
                               className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-lg transition-colors duration-200 text-blue-400 text-xs font-medium flex items-center gap-1.5"
                               title="View Full Report"
                             >
@@ -355,7 +347,7 @@ export default function ProfilePage() {
                   <div className="text-center py-16 text-gray-500 border-2 border-dashed border-gray-800 rounded-xl">
                     <FileSearch size={48} className="mx-auto mb-4 text-gray-600" weight="duotone" />
                     <p className="font-bold text-lg text-gray-400">No Audits Found</p>
-                    <p className="text-sm">You haven't performed any audits on the 0G Galileo Testnet yet.</p>
+                    <p className="text-sm">You haven't performed any audits on QIE Testnet yet.</p>
                   </div>
                 )}
               </div>

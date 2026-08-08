@@ -165,14 +165,14 @@ function HeroContent({ isLightTheme }: { isLightTheme: boolean }) {
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
           Build & Audit<br />Smart Contracts<br/>with BlockPilot
         </h1>
-        <div className={`text-sm tracking-wider ${isLightTheme ? 'text-slate-600' : 'text-gray-400'}`}>
-          AI-POWERED BUILDER · SECURITY AUDITS · 0G STORAGE
-        </div>
+        <div className="text-xs text-gray-400 tracking-wider mb-6">
+            AI-POWERED BUILDER · SECURITY AUDITS · IPFS STORAGE
+          </div>
       </div>
 
       <div className="w-full lg:w-1/2 pl-0 lg:pl-8 flex flex-col items-start">
          <p className={`text-xl sm:text-2xl mb-8 max-w-xl leading-relaxed ${isLightTheme ? 'text-slate-700' : 'text-gray-300'}`}>
-           Create secure smart contracts with our AI builder, get instant security audits, and store reports immutably on 0G Storage
+           Create secure smart contracts with our AI builder, get instant security audits, and store reports permanently on IPFS
         </p>
         <div className="flex pointer-events-auto flex-col sm:flex-row items-start space-y-3 sm:space-y-0 sm:space-x-4">
             <a

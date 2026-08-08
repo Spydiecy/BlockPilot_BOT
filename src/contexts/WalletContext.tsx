@@ -5,9 +5,17 @@ import { ethers } from 'ethers';
 import { useRouter } from 'next/navigation';
 import { formatBalance, getChain, getDefaultChain, getSupportedChains, type SupportedChain } from '@/config/wallet';
 import type { EthereumProvider } from '@/types/ethereum';
-import { setWalletConnected } from '@/utils/walletUtils';
 
-// Type guard for Ethereum provider
+const setWalletConnected = (connected: boolean) => {
+  if (typeof document !== 'undefined') {
+    if (connected) {
+      document.cookie = 'wallet-connected=true; path=/; max-age=86400; samesite=lax';
+    } else {
+      document.cookie = 'wallet-connected=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=lax';
+    }
+  }
+};
+
 const isEthereumProvider = (provider: unknown): provider is EthereumProvider => {
   const ethereum = provider as EthereumProvider;
   return (
@@ -18,7 +26,6 @@ const isEthereumProvider = (provider: unknown): provider is EthereumProvider => 
   );
 };
 
-// Safe way to get ethereum provider
 const getEthereum = (): EthereumProvider | undefined => {
   if (typeof window === 'undefined') return undefined;
   const provider = window.ethereum;
@@ -51,236 +58,162 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const [signer, setSigner] = useState<ethers.Signer | null>(null);
   const [currentChain, setCurrentChain] = useState<SupportedChain | undefined>();
-  
+
   const router = useRouter();
 
-  // Check if wallet is connected on mount and set up listeners
-  useEffect(() => {
-    const checkConnection = async () => {
-      const ethereum = getEthereum();
-      if (!ethereum) return;
+  // ─── Parse and set chain from hex string ──────────────────────────────────
+  const applyChainId = useCallback((chainIdHex: string) => {
+    const parsed = chainIdHex.startsWith('0x')
+      ? parseInt(chainIdHex, 16)
+      : parseInt(chainIdHex, 10);
 
-      try {
-        const accounts = (await ethereum.request({ method: 'eth_accounts' })) as string[];
-        if (accounts?.length) {
-          await handleAccountsChanged(accounts);
-          
-          // Get current chain ID
-          const chainId = await ethereum.request({ method: 'eth_chainId' }) as string;
-          handleChainChanged(chainId);
-        }
-      } catch (error) {
-        console.error('Error checking connection:', error);
-      }
-    };
+    setChainId(parsed);
 
-    // Set up event listeners
-    const ethereum = getEthereum();
-    if (!ethereum) return;
-    
-    // Type-safe event listeners
-    const handleAccountsChangedEvent = (accounts: unknown) => {
-      handleAccountsChanged(Array.isArray(accounts) ? accounts : []);
-    };
-    
-    const handleChainChangedEvent = (chainId: unknown) => {
-      handleChainChanged(String(chainId));
-    };
-    
-    ethereum.on('accountsChanged', handleAccountsChangedEvent);
-    ethereum.on('chainChanged', handleChainChangedEvent);
-    
-    // Initial check
-    checkConnection();
-    // After checking connection, if connected, set the cookie
-    (async () => {
-      const ethereum = getEthereum();
-      if (ethereum) {
-        try {
-          const accounts = (await ethereum.request({ method: 'eth_accounts' })) as string[];
-          if (accounts?.length) {
-            setWalletConnected(true);
-          } else {
-            setWalletConnected(false);
-          }
-        } catch {}
-      }
-    })();
-    
-    // Cleanup
-    return () => {
-      if (ethereum) {
-        ethereum.removeListener('accountsChanged', handleAccountsChangedEvent);
-        ethereum.removeListener('chainChanged', handleChainChangedEvent);
-      }
-    };
+    const match = getSupportedChains().find(c => c.id === parsed);
+    setCurrentChain(match ?? undefined);
+    if (!match) console.warn('Unsupported chain ID:', parsed);
   }, []);
 
-  // Handle account changes
-  const handleAccountsChanged = useCallback(async (accounts: string[]) => {
-    const validAccounts = Array.isArray(accounts) 
-      ? accounts.filter(account => typeof account === 'string' && account.length > 0)
-      : [];
-      
-    if (validAccounts.length === 0) {
-      // Disconnected
+  // ─── Handle account list change ───────────────────────────────────────────
+  const applyAccounts = useCallback(async (accounts: string[]) => {
+    const valid = accounts.filter(a => typeof a === 'string' && a.length > 0);
+
+    if (valid.length === 0) {
       setAddress(null);
       setBalance(null);
       setIsAuthenticated(false);
       setCurrentChain(undefined);
-      setWalletConnected(false); // clear cookie on disconnect
+      setWalletConnected(false);
       router.push('/');
     } else {
-      // Connected or switched account
-      const account = validAccounts[0];
-      setAddress(account);
+      setAddress(valid[0]);
       setIsAuthenticated(true);
-      setWalletConnected(true); // set cookie on connect
-      // Update balance
-      const ethereum = getEthereum();
-      if (ethereum) {
-        await updateBalance(account);
-      }
+      setWalletConnected(true);
     }
   }, [router]);
 
-  // Handle chain changes
-  const handleChainChanged = useCallback((chainIdHex: string) => {
-    const chainId = parseInt(chainIdHex.startsWith('0x') ? chainIdHex : `0x${chainIdHex}`, 16);
-    setChainId(chainId);
-    
-    const supportedChain = getSupportedChains().find(c => c.id === chainId);
-    if (supportedChain) {
-      setCurrentChain(supportedChain);
-    } else {
-      console.warn('Unsupported chain ID:', chainId);
-      setCurrentChain(undefined);
-    }
-  }, []);
+  // ─── On mount: read current chain + accounts without asking permission ─────
+  useEffect(() => {
+    const ethereum = getEthereum();
+    if (!ethereum) return;
 
-  // Update balance for an account
-  const updateBalance = useCallback(async (account: string) => {
-    if (!provider) return;
-    
-    try {
-      const balance = await provider.getBalance(account);
-      setBalance(formatBalance(balance.toString()));
-    } catch (error) {
-      console.error('Error fetching balance:', error);
-      setBalance(null);
-    }
-  }, [provider]);
+    const init = async () => {
+      try {
+        // Always read chain first — no permission required
+        const chainHex = await ethereum.request({ method: 'eth_chainId' }) as string;
+        applyChainId(chainHex);
 
-  // Connect wallet
+        // Read accounts silently (no popup)
+        const accounts = await ethereum.request({ method: 'eth_accounts' }) as string[];
+        await applyAccounts(accounts);
+        setWalletConnected(accounts.length > 0);
+      } catch (err) {
+        console.error('Wallet init error:', err);
+      }
+    };
+
+    const onAccountsChanged = (accounts: unknown) =>
+      applyAccounts(Array.isArray(accounts) ? accounts : []);
+
+    const onChainChanged = (chainId: unknown) =>
+      applyChainId(String(chainId));
+
+    ethereum.on('accountsChanged', onAccountsChanged);
+    ethereum.on('chainChanged', onChainChanged);
+    init();
+
+    return () => {
+      ethereum.removeListener('accountsChanged', onAccountsChanged);
+      ethereum.removeListener('chainChanged', onChainChanged);
+    };
+  }, [applyChainId, applyAccounts]);
+
+  // ─── Provider + signer whenever address changes ───────────────────────────
+  useEffect(() => {
+    const ethereum = getEthereum();
+    if (!ethereum) return;
+
+    const web3Provider = new ethers.BrowserProvider(ethereum as any);
+    setProvider(web3Provider);
+
+    if (address) {
+      web3Provider.getSigner().then(setSigner).catch(console.error);
+      web3Provider.getBalance(address)
+        .then(b => setBalance(formatBalance(b.toString())))
+        .catch(() => setBalance(null));
+    }
+  }, [address]);
+
+  // ─── Connect (requests permission) ───────────────────────────────────────
   const connect = async () => {
     const ethereum = getEthereum();
-    if (!ethereum) {
-      throw new Error('No Ethereum provider found. Please install MetaMask or another Web3 wallet.');
-    }
-    
-    try {
-      setIsConnecting(true);
-      const accounts = (await ethereum.request({ 
-        method: 'eth_requestAccounts' 
-      })) as string[];
-      
-      if (accounts?.length) {
-        const account = accounts[0];
-        setAddress(account);
-        setIsAuthenticated(true);
-        setWalletConnected(true); // Set cookie on connect
-        
-        // Check and switch network if necessary
-        const defaultChain = getDefaultChain();
-        const currentChainId = parseInt(await ethereum.request({ method: 'eth_chainId' }) as string, 16);
+    if (!ethereum) throw new Error('No Ethereum provider found. Please install MetaMask.');
 
-        if (currentChain?.id !== defaultChain.id) {
-          await switchChain(defaultChain.id);
-          // After the switch attempt, the chainChanged event will trigger a state update.
-          // We don't need to check the return value here.
-        }
-        await updateBalance(account);
+    setIsConnecting(true);
+    try {
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' }) as string[];
+      if (!accounts?.length) return;
+
+      const chainHex = await ethereum.request({ method: 'eth_chainId' }) as string;
+      const currentId = parseInt(chainHex, 16);
+      const defaultChain = getDefaultChain();
+
+      applyChainId(chainHex);
+      await applyAccounts(accounts);
+
+      if (currentId !== defaultChain.id) {
+        await switchChain(defaultChain.id);
       }
-    } catch (error) {
-      console.error('Error connecting wallet:', error);
-      throw error;
+    } catch (err) {
+      console.error('Error connecting wallet:', err);
+      throw err;
     } finally {
       setIsConnecting(false);
     }
   };
 
-  // Disconnect wallet
+  // ─── Disconnect ───────────────────────────────────────────────────────────
   const disconnect = async () => {
-    // Note: Most wallets don't have a disconnect method, we just clear the state
     setAddress(null);
     setBalance(null);
     setChainId(null);
     setCurrentChain(undefined);
     setIsAuthenticated(false);
-    setWalletConnected(false); // Clear cookie on disconnect
+    setWalletConnected(false);
     router.push('/wallet');
   };
 
-  // Switch to a different chain
+  // ─── Switch chain ─────────────────────────────────────────────────────────
   const switchChain = async (targetChainId: number): Promise<void> => {
-    if (typeof window === 'undefined' || !window.ethereum) {
-      throw new Error('No Ethereum provider found');
-    }
-    
+    const ethereum = getEthereum();
+    if (!ethereum) throw new Error('No Ethereum provider found');
+
     try {
-      await window.ethereum.request({
+      await ethereum.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: `0x${targetChainId.toString(16)}` }],
       });
     } catch (switchError: any) {
-      // This error code indicates that the chain has not been added to MetaMask
       if (switchError.code === 4902) {
-        try {
-          const chain = getChain(targetChainId);
-          if (!chain) throw new Error('Unsupported chain');
-          
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: `0x${targetChainId.toString(16)}`,
-              chainName: chain.name,
-              nativeCurrency: {
-                name: chain.currency,
-                symbol: chain.currency,
-                decimals: 18,
-              },
-              rpcUrls: [chain.rpcUrl],
-              blockExplorerUrls: [chain.explorerUrl],
-            }],
-          });
-        } catch (addError) {
-          console.error('Target chain configuration not found');
-          return;
-        }
+        const chain = getChain(targetChainId);
+        if (!chain) throw new Error('Chain config not found');
+        await ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: `0x${targetChainId.toString(16)}`,
+            chainName: chain.name,
+            nativeCurrency: { name: chain.currency, symbol: chain.currency, decimals: 18 },
+            rpcUrls: [chain.rpcUrl],
+            blockExplorerUrls: [chain.explorerUrl],
+          }],
+        });
       } else {
-        console.error('Error switching chain:', switchError);
         throw switchError;
       }
     }
   };
 
-  useEffect(() => {
-    const ethereum = getEthereum();
-    if (ethereum) {
-      const web3Provider = new ethers.BrowserProvider(ethereum as any);
-      setProvider(web3Provider);
-      if (address) {
-        const getSigner = async () => {
-          const web3Signer = await web3Provider.getSigner();
-          setSigner(web3Signer);
-        }
-        getSigner();
-      }
-    }
-  }, [address]);
-
-  // Expose the wallet context
-  const value = {
+  const value: WalletContextType = {
     isConnected: isAuthenticated,
     isConnecting,
     address,

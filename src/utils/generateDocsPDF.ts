@@ -99,7 +99,7 @@ export const generateDocumentationPDF = async (
     doc.setFontSize(7);
     doc.setTextColor(90, 110, 150);
     doc.text(
-      'BlockPilot  ·  0G Network  ·  Smart Contract Documentation',
+      'BlockPilot  ·  QIE Testnet  ·  Smart Contract Documentation',
       ML, PH - 7
     );
     doc.text(`Page ${pg}`, PW - MR, PH - 7, { align: 'right' });
@@ -173,7 +173,7 @@ export const generateDocumentationPDF = async (
   doc.setFontSize(8);
   doc.setTextColor(120, 140, 175);
   doc.text(dateStr, PW - MR, 36, { align: 'right' });
-  doc.text('0G Galileo Testnet', PW - MR, 50, { align: 'right' });
+  doc.text('QIE Testnet', PW - MR, 50, { align: 'right' });
 
   // Bottom separator
   doc.setDrawColor(99, 102, 241);

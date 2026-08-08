@@ -86,29 +86,33 @@ export function ReportDisplay({
 }: ReportDisplayProps) {
   return (
     <div className="h-full bg-black/50 rounded-2xl border border-blue-900/50 p-6 overflow-y-auto custom-scrollbar relative">
-      <div className="absolute top-4 right-4 flex items-center gap-2">
-        {!isReviewBlurred && (
-          <button
-            onClick={() => generateAuditPDF(result, code, txState.hash)}
-            className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full text-xs font-mono flex items-center gap-2 hover:bg-blue-500/20 transition-colors border border-blue-500/20"
-          >
-            <DownloadSimple size={14} weight="bold" />
-            Download PDF
-          </button>
-        )}
-        {txState.hash && (
-          <a
-            href={`${defaultChain.explorerUrl}/tx/${txState.hash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-xs font-mono flex items-center gap-2 hover:bg-green-500/20 transition-colors"
-          >
-            <ArrowSquareOut size={14} />
-            View Transaction
-          </a>
-        )}
-      </div>
       <div className={`transition-all duration-500 ${isReviewBlurred ? 'blur-sm' : ''}`}>
+        {/* Action buttons — top right, in flow */}
+        {(!isReviewBlurred || txState.hash) && (
+          <div className="flex justify-end items-center gap-2 mb-4">
+            {!isReviewBlurred && (
+              <button
+                onClick={() => generateAuditPDF(result, code, txState.hash)}
+                className="bg-blue-500/10 text-blue-400 px-3 py-1.5 rounded-full text-xs font-mono flex items-center gap-2 hover:bg-blue-500/20 transition-colors border border-blue-500/20"
+              >
+                <DownloadSimple size={14} weight="bold" />
+                Download PDF
+              </button>
+            )}
+            {txState.hash && (
+              <a
+                href={`${defaultChain.explorerUrl}/tx/${txState.hash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-green-500/10 text-green-400 px-3 py-1.5 rounded-full text-xs font-mono flex items-center gap-2 hover:bg-green-500/20 transition-colors border border-green-500/20"
+              >
+                <ArrowSquareOut size={14} />
+                View Transaction
+              </a>
+            )}
+          </div>
+        )}
+
         <div className="text-center mb-6">
           <div className="flex justify-center items-center gap-1 mb-2">
             {[...Array(5)].map((_, i) => (
@@ -163,7 +167,7 @@ export function ReportDisplay({
         <div className="absolute inset-0 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center text-center p-8 rounded-2xl">
           <h3 className="text-2xl font-bold text-white mb-4">Unlock Full Report</h3>
           <p className="text-gray-400 mb-6 max-w-sm">
-            Register this audit on the 0G Galileo Testnet to permanently store the results and receive a verifiable proof-of-audit.
+            Register this audit on QIE Testnet to permanently store the results and receive a verifiable proof-of-audit.
           </p>
           <div className="w-full max-w-xs">
             <button 
@@ -186,7 +190,7 @@ export function ReportDisplay({
             
             {!isCorrectNetwork && isConnected && (
               <div className="mt-4 text-yellow-400 text-sm">
-                Please switch to 0G Galileo Testnet to register.
+                Please switch to QIE Testnet to register.
               </div>
             )}
           </div>

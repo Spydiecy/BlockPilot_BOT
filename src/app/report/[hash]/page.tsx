@@ -33,7 +33,7 @@ interface ReportData {
   };
   contractCode?: string;
   timestamp: string;
-  computeJobId?: string;
+  computeJobId?: string;  // kept for backwards compat with old reports
   provider: string;
   model: string;
 }
@@ -67,11 +67,11 @@ export default function ReportDetailPage() {
     try {
       setIsLoading(true);
       
-      // Fetch report from 0G Storage
-      const response = await fetch('/api/0g-storage/download', {
+      // Fetch report from IPFS
+      const response = await fetch('/api/ipfs/download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reportHash }),
+        body: JSON.stringify({ cid: reportHash }),
       });
 
       if (!response.ok) {
@@ -163,7 +163,7 @@ export default function ReportDetailPage() {
       <div className="min-h-screen w-full bg-black text-white flex items-center justify-center">
         <div className="text-center">
           <CircleNotch className="animate-spin mx-auto mb-4" size={48} weight="bold" />
-          <p className="text-blue-400">Loading report from 0G Storage...</p>
+          <p className="text-blue-400">Loading report from IPFS...</p>
         </div>
       </div>
     );
@@ -217,7 +217,7 @@ export default function ReportDetailPage() {
                   Security Audit Report
                 </h1>
                 <p className="text-gray-400 text-sm mt-1">
-                  Stored on 0G Storage Network
+                  Stored on IPFS via Pinata
                 </p>
               </div>
             </div>
@@ -240,12 +240,12 @@ export default function ReportDetailPage() {
         >
           <div className="flex items-center gap-2 mb-4">
             <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-            <h2 className="text-lg font-semibold text-blue-400">0G Storage Information</h2>
+            <h2 className="text-lg font-semibold text-blue-400">Report Information</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-gray-400 mb-2">Report Hash (0G Storage Root Hash)</label>
+              <label className="block text-xs text-gray-400 mb-2">Report CID (IPFS)</label>
               <div className="flex items-center gap-2 bg-black/50 border border-blue-900/40 rounded-xl p-3">
                 <code className="text-sm text-white flex-1 truncate">{reportHash}</code>
                 <button
@@ -302,7 +302,7 @@ export default function ReportDetailPage() {
                         )}
                       </button>
                       <a
-                        href={`https://chainscan-galileo.0g.ai/tx/${auditInfo.transactionHash}`}
+                        href={`https://testnet.qie.digital/tx/${auditInfo.transactionHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-2 hover:bg-blue-500/20 rounded-lg transition-colors"
@@ -321,7 +321,7 @@ export default function ReportDetailPage() {
                       {auditInfo.auditor}
                     </code>
                     <a
-                      href={`https://chainscan-galileo.0g.ai/address/${auditInfo.auditor}`}
+                      href={`https://testnet.qie.digital/address/${auditInfo.auditor}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-2 hover:bg-blue-500/20 rounded-lg transition-colors"

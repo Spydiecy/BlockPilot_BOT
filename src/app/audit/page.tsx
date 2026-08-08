@@ -13,8 +13,7 @@ import { getDefaultChain } from '@/config/wallet';
 import { AuditPageContainer } from '@/components/audit/AuditPageContainer';
 import { CodeInputPanel } from '@/components/audit/CodeInputPanel';
 import { ResultsPanel } from '@/components/audit/ResultsPanel';
-import { uploadAuditReportTo0GStorage } from '@/utils/zeroGStorage';
-import { generatePlaceholderJobId } from '@/utils/zeroGCompute';
+import { uploadAuditReportToIPFS, generatePlaceholderJobId, unpinIPFSReport } from '@/utils/ipfsStorage';
 
 // Define the vulnerability analysis schema
 const VulnerabilitySchema = z.object({
@@ -44,12 +43,12 @@ interface AuditResult {
   };
   recommendations: string[];
   gasOptimizations: string[];
-  // New fields for 0G integration
+  // New fields for IPFS integration
   criticalCount?: number;
   highCount?: number;
   mediumCount?: number;
-  reportHash?: string; // 0G Storage hash
-  computeJobId?: string; // 0G Compute job ID
+  reportCID?: string;    // IPFS CID
+  analysisJobId?: string;
 }
 
 interface TransactionState {
@@ -62,11 +61,11 @@ interface TransactionState {
 const COOLDOWN_TIME = 30;
 
 const CHAIN_ID_TO_KEY: { [key: number]: ChainKey } = {
-  [getDefaultChain().id]: 'zeroGTestnet',
+  [getDefaultChain().id]: 'qieTestnet',
 };
 
 export default function AuditPage() {
-  const { chainId, isConnected, provider, signer } = useWallet();
+  const { chainId, isConnected, provider, signer, currentChain } = useWallet();
   const [code, setCode] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AuditResult | null>(null);
@@ -76,7 +75,49 @@ export default function AuditPage() {
   const [txState, setTxState] = useState<TransactionState>({ isProcessing: false, hash: null, error: null });
 
   const defaultChain = getDefaultChain();
-  const isCorrectNetwork = chainId === defaultChain.id;
+  // Consider correct network if:
+  // 1. chainId from context matches, OR
+  // 2. currentChain is set and matches (context populated via different path), OR
+  // 3. chainId is null (context not yet hydrated) AND we're connected — give benefit of the doubt
+  const isCorrectNetwork = 
+    chainId === defaultChain.id || 
+    currentChain?.id === defaultChain.id;
+
+  const PENDING_CID_KEY = 'blockpilot_pending_cid';
+
+  // On mount: check if a previous session left an unregistered CID (from refresh/crash)
+  // If yes, unpin it immediately — it was never anchored on-chain
+  useEffect(() => {
+    const orphanedCid = sessionStorage.getItem(PENDING_CID_KEY);
+    if (orphanedCid) {
+      sessionStorage.removeItem(PENDING_CID_KEY);
+      console.log('Found orphaned IPFS report from previous session, cleaning up:', orphanedCid);
+      unpinIPFSReport(orphanedCid);
+    }
+  }, []);
+
+  // Whenever we have an unregistered CID in state, persist it to sessionStorage
+  // so refresh/crash can clean it up on next load
+  useEffect(() => {
+    if (result?.reportCID && !txState.hash) {
+      // Report uploaded but not yet registered — save CID so we can clean up on reload
+      sessionStorage.setItem(PENDING_CID_KEY, result.reportCID);
+    } else {
+      // Either registered (txHash exists) or no report — clear the pending key
+      sessionStorage.removeItem(PENDING_CID_KEY);
+    }
+  }, [result?.reportCID, txState.hash]);
+
+  // Also fire on tab close/navigate away (best-effort with sendBeacon)
+  useEffect(() => {
+    const handleUnload = () => {
+      if (result?.reportCID && !txState.hash) {
+        navigator.sendBeacon('/api/ipfs/unpin', JSON.stringify({ cid: result.reportCID }));
+      }
+    };
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, [result?.reportCID, txState.hash]);
 
   // Cooldown timer effect
   useEffect(() => {
@@ -124,7 +165,7 @@ export default function AuditPage() {
         signer
       );
 
-      // 0G network fee data
+      // QIE network fee data
       const feeData = await provider.getFeeData();
       const minPriorityFee = ethers.parseUnits('25', 'gwei');
       const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas && feeData.maxPriorityFeePerGas > minPriorityFee
@@ -134,39 +175,49 @@ export default function AuditPage() {
         ? feeData.maxFeePerGas
         : minPriorityFee * BigInt(2);
 
-      // Format 0G Storage hash and Compute job ID as bytes32
-      const reportHashBytes32 = result.reportHash || '0x' + '0'.repeat(64);
+      // Format IPFS CID and analysis job ID as bytes32
+      const reportCID = result.reportCID || '';
       
-      // Ensure computeJobId is properly formatted as bytes32 (32 bytes = 64 hex chars)
-      let computeJobIdBytes32 = result.computeJobId || '0x' + '0'.repeat(64);
-      if (computeJobIdBytes32.length < 66) { // 0x + 64 chars = 66 total
-        // Pad to 64 hex characters if needed
-        computeJobIdBytes32 = computeJobIdBytes32 + '0'.repeat(66 - computeJobIdBytes32.length);
+      // Ensure analysisJobId is bytes32
+      let analysisJobIdBytes32 = result.analysisJobId || '0x' + '0'.repeat(64);
+      if (analysisJobIdBytes32.length < 66) {
+        analysisJobIdBytes32 = analysisJobIdBytes32 + '0'.repeat(66 - analysisJobIdBytes32.length);
       }
 
       // Prepare summary preview (max 100 chars)
       const summaryPreview = result.summary.substring(0, 100);
 
-      // Call registerAudit with all required parameters
+      // Call registerAudit with IPFS CID
       const tx = await contract.registerAudit(
         contractHash,
         result.stars,
         result.criticalCount || 0,
         result.highCount || 0,
         result.mediumCount || 0,
-        reportHashBytes32,
+        reportCID,
         summaryPreview,
-        computeJobIdBytes32,
+        analysisJobIdBytes32,
         { maxPriorityFeePerGas, maxFeePerGas }
       );
 
       const receipt = await tx.wait();
-      setTxState({ isProcessing: false, hash: receipt.transactionHash, error: null });
-      setIsReviewBlurred(false); // Unblur the review after successful registration
+      setTxState({ isProcessing: false, hash: receipt.hash, error: null });
+      setIsReviewBlurred(false);
+      // Successfully registered — clear the pending CID from sessionStorage
+      sessionStorage.removeItem('blockpilot_pending_cid');
     } catch (err: any) {
       console.error('Registration failed:', err);
       const errorMessage = err.reason || err.message || 'An unknown error occurred.';
       setTxState({ isProcessing: false, hash: null, error: errorMessage });
+
+      // On-chain registration failed — clean up the IPFS file
+      // so we don't leave orphaned reports that were never anchored
+      if (result?.reportCID) {
+        console.log('Cleaning up orphaned IPFS report:', result.reportCID);
+        unpinIPFSReport(result.reportCID);
+        // Clear the CID from result state so user can re-run
+        setResult(prev => prev ? { ...prev, reportCID: '' } : prev);
+      }
     }
   }, [chainId, code, provider, result, signer]);
 
@@ -224,10 +275,10 @@ export default function AuditPage() {
       const highCount = validatedResponse.vulnerabilities.high.length;
       const mediumCount = validatedResponse.vulnerabilities.medium.length;
 
-      // Use job ID from backend or generate placeholder
+      // Use job ID from backend or generate one for analysis tracking
       const computeJobId = result.jobId || generatePlaceholderJobId();
 
-      // Prepare report JSON for 0G Storage
+      // Prepare report JSON for IPFS
       const reportJson = JSON.stringify({
         analysis: validatedResponse,
         contractCode: code,
@@ -237,24 +288,23 @@ export default function AuditPage() {
         model: result.model || 'mistral-large-latest',
       });
 
-      // Upload to 0G Storage and get hash
-      let reportHash = '0x0'; // Fallback
+      // Upload to IPFS and get CID
+      let reportCID = '';
       try {
-        reportHash = await uploadAuditReportTo0GStorage(reportJson);
+        reportCID = await uploadAuditReportToIPFS(reportJson);
       } catch (storageError) {
-        console.warn('0G Storage upload failed, using placeholder:', storageError);
-        // Use placeholder hash if upload fails
-        reportHash = ethers.keccak256(ethers.toUtf8Bytes(reportJson));
+        console.warn('IPFS upload failed, using placeholder:', storageError);
+        reportCID = '';
       }
 
-      // Add 0G metadata to result
+      // Add metadata to result
       const enrichedResult: AuditResult = {
         ...validatedResponse,
         criticalCount: criticalCount,
         highCount: highCount,
         mediumCount: mediumCount,
-        reportHash: reportHash,
-        computeJobId: computeJobId
+        reportCID: reportCID,
+        analysisJobId: computeJobId
       };
 
       setResult(enrichedResult);

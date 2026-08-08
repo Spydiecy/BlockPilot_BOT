@@ -77,7 +77,7 @@ export async function generateAuditPDF(
     doc.setFontSize(7);
     doc.setTextColor(90, 110, 150);
     doc.text(
-      'BlockPilot  ·  0G Network  ·  AI-Powered Smart Contract Security',
+      'BlockPilot  ·  QIE Testnet  ·  AI-Powered Smart Contract Security',
       ML, PH - 7
     );
     doc.text(`Page ${pg}`, PW - MR, PH - 7, { align: 'right' });
@@ -182,7 +182,7 @@ export async function generateAuditPDF(
   doc.setFontSize(8);
   doc.setTextColor(120, 140, 175);
   doc.text(dateStr, PW - MR, 36, { align: 'right' });
-  doc.text('0G Galileo Testnet', PW - MR, 50, { align: 'right' });
+  doc.text('QIE Testnet', PW - MR, 50, { align: 'right' });
 
   // bottom separator
   doc.setDrawColor(99, 102, 241);
@@ -398,7 +398,7 @@ export async function generateAuditPDF(
     doc.setFont('courier', 'normal');
     doc.setFontSize(7.5);
     const txLines = doc.splitTextToSize(txHash, CW - 24) as string[];
-    const urlStr = `https://chainscan-galileo.0g.ai/tx/${txHash}`;
+    const urlStr = `https://testnet.qie.digital/tx/${txHash}`;
     const urlLines = doc.splitTextToSize(urlStr, CW - 24) as string[];
 
     const boxH = lh(9) + lh(8) + txLines.length * lh(7.5) + urlLines.length * lh(7.5) + 30;

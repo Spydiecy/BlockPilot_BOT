@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ethers } from 'ethers';
 import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI } from '@/utils/contracts';
-import { CHAIN_CONFIG } from '@/utils/web3';
 
-const ZERO_G_RPC_URL = 'https://evmrpc-testnet.0g.ai';
-const provider = new ethers.JsonRpcProvider(ZERO_G_RPC_URL);
-const contractAddress = CONTRACT_ADDRESSES.zeroGTestnet;
+const QIE_RPC_URL = 'https://rpc1testnet.qie.digital';
+const provider = new ethers.JsonRpcProvider(QIE_RPC_URL);
+const contractAddress = CONTRACT_ADDRESSES.qieTestnet;
 
-// Initialize contract
 const contract = new ethers.Contract(
   contractAddress,
   AUDIT_REGISTRY_ABI,
@@ -19,82 +17,129 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { method, params = [] } = body;
 
-    // Rate limiting functionality could be added here
     let result;
 
     switch (method) {
       case 'getTotalContracts':
         result = await contract.getTotalContracts();
-        return NextResponse.json({ 
-          result: Number(result) 
-        });
+        return NextResponse.json({ result: Number(result) });
 
-      case 'getAllAudits':
+      case 'getAllAudits': {
         const { startIndex, limit } = params[0];
         const auditsData = await contract.getAllAudits(startIndex, limit);
-        
-        // Transform the data to a more usable format
-        // getAllAudits returns: (bytes32[] contractHashes, uint8[] stars, bytes32[] reportHashes, 
-        //                        address[] auditors, uint256[] timestamps, bytes32[] computeJobIds)
+
+        // QIE Testnet limits eth_getLogs to 10,000 blocks per query.
+        // Fetch tx hash per audit using a sliding recent-blocks window.
+        const currentBlock = await provider.getBlockNumber();
+        const MAX_RANGE = 9000; // stay safely under the 10k limit
+        const fromBlock = Math.max(0, currentBlock - MAX_RANGE);
+
         const audits = [];
         for (let i = 0; i < auditsData.contractHashes.length; i++) {
           const contractHash = auditsData.contractHashes[i];
-          
-          // Query the AuditRegistered event to get the transaction hash
+
           let transactionHash = null;
           try {
-            // Get events for this specific contract hash
             const filter = contract.filters.AuditRegistered(contractHash);
-            const events = await contract.queryFilter(filter);
-            
-            // Find the event that matches this audit (by auditor and timestamp)
-            const matchingEvent = events.find((event: any) => 
+            // Only query the recent window — avoids the 10k block limit error
+            const events = await contract.queryFilter(filter, fromBlock, 'latest');
+            const matchingEvent = events.find((event: any) =>
               event.args?.auditor?.toLowerCase() === auditsData.auditors[i].toLowerCase() &&
               Number(event.args?.timestamp) === Number(auditsData.timestamps[i])
             );
-            
             if (matchingEvent) {
               transactionHash = matchingEvent.transactionHash;
             }
           } catch (error) {
-            console.error('Error fetching transaction hash for audit:', error);
+            // Non-fatal — tx hash is cosmetic, audit data is already stored
+            console.warn('Could not fetch tx hash for audit (non-fatal):', contractHash);
           }
-          
+
           audits.push({
-            contractHash: contractHash,
+            contractHash,
             stars: Number(auditsData.stars[i]),
-            reportHash: auditsData.reportHashes[i],
+            reportCID: auditsData.reportCIDs[i],
             auditor: auditsData.auditors[i],
             timestamp: Number(auditsData.timestamps[i]),
-            computeJobId: auditsData.computeJobIds[i],
-            transactionHash: transactionHash || '0x', // Fallback if event not found
+            analysisJobId: auditsData.analysisJobIds[i],
+            transactionHash: transactionHash || '0x',
           });
         }
-        
-        return NextResponse.json({ result: audits });
 
-      case 'getAuditorHistory':
+        return NextResponse.json({ result: audits });
+      }
+
+      case 'getAuditorHistory': {
         const address = params[0];
         const contractHashes = await contract.getAuditorHistory(address);
-        return NextResponse.json({ 
-          result: contractHashes.map((hash: string) => hash)
+        return NextResponse.json({
+          result: contractHashes.map((hash: string) => hash),
         });
+      }
 
-      case 'getContractAudits':
+      case 'getAuditorAudits': {
+        // Returns full audit data + tx hashes for a specific auditor
+        // Uses a recent block window to avoid QIE's 10k block limit on eth_getLogs
+        const auditorAddress = params[0];
+        const contractHashes = await contract.getAuditorHistory(auditorAddress);
+
+        const currentBlock = await provider.getBlockNumber();
+        const MAX_RANGE = 9000;
+        const fromBlock = Math.max(0, currentBlock - MAX_RANGE);
+
+        const audits = [];
+        for (const hash of contractHashes) {
+          const contractAudits = await contract.getContractAudits(hash);
+          const userAudits = contractAudits.filter(
+            (a: any) => a.auditor?.toLowerCase() === auditorAddress.toLowerCase()
+          );
+
+          for (const audit of userAudits) {
+            // Fetch tx hash from event log (recent blocks only)
+            let transactionHash = '0x';
+            try {
+              const filter = contract.filters.AuditRegistered(hash);
+              const events = await contract.queryFilter(filter, fromBlock, 'latest');
+              const match = events.find((e: any) =>
+                e.args?.auditor?.toLowerCase() === auditorAddress.toLowerCase() &&
+                Number(e.args?.timestamp) === Number(audit.timestamp)
+              );
+              if (match) transactionHash = match.transactionHash;
+            } catch {
+              // Non-fatal
+            }
+
+            audits.push({
+              contractHash: hash,
+              transactionHash,
+              stars: Number(audit.stars),
+              summaryPreview: audit.summaryPreview,
+              reportCID: audit.reportCID,
+              auditor: audit.auditor,
+              timestamp: Number(audit.timestamp),
+              criticalIssues: Number(audit.criticalIssues || 0),
+              highIssues: Number(audit.highIssues || 0),
+              mediumIssues: Number(audit.mediumIssues || 0),
+              analysisJobId: audit.analysisJobId,
+            });
+          }
+        }
+
+        return NextResponse.json({ result: audits });
+      }
+
+      case 'getContractAudits': {
         const contractHash = params[0];
         const contractAudits = await contract.getContractAudits(contractHash);
-        
-        // Transform the data
-        const formattedAudits = contractAudits.map((audit: any) => {
-          return {
-            stars: Number(audit.stars),
-            summary: audit.summary,
-            auditor: audit.auditor,
-            timestamp: Number(audit.timestamp),
-          };
-        });
-        
+        const formattedAudits = contractAudits.map((audit: any) => ({
+          stars: Number(audit.stars),
+          summaryPreview: audit.summaryPreview,
+          reportCID: audit.reportCID,
+          auditor: audit.auditor,
+          timestamp: Number(audit.timestamp),
+        }));
         return NextResponse.json({ result: formattedAudits });
+      }
 
       default:
         return NextResponse.json(

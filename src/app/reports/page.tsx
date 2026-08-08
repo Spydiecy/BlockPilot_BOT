@@ -31,8 +31,8 @@ interface AuditReport {
   criticalIssues?: number;
   highIssues?: number;
   mediumIssues?: number;
-  reportHash?: string; // 0G Storage hash
-  computeJobId?: string; // 0G Compute job ID
+  reportCID?: string;  // IPFS CID
+  analysisJobId?: string;
 }
 
 interface FilterState {
@@ -60,7 +60,7 @@ export default function ReportsPage() {
       const allAudits: AuditReport[] = [];
       
       try {
-        console.log('Fetching audit reports from 0G Galileo Testnet...');
+        console.log('Fetching audit reports from QIE Testnet...');
         
         // First get the total number of contracts
         const totalResponse = await fetch('/api/blockchain', {
@@ -80,7 +80,7 @@ export default function ReportsPage() {
         
         const totalData = await totalResponse.json();
         const totalContracts = totalData.result;
-        console.log(`Found ${totalContracts} contracts on 0G Galileo Testnet`);
+        console.log(`Found ${totalContracts} contracts on QIE Testnet`);
         
         // Fetch in batches to respect rate limits
         const BATCH_SIZE = 10; 
@@ -117,13 +117,12 @@ export default function ReportsPage() {
               summary: audit.summary || audit.summaryPreview || "",
               auditor: audit.auditor || audit.auditors?.[0],
               timestamp: Number(audit.timestamp || audit.timestamps?.[0]),
-              chain: 'zeroGTestnet' as ChainKey,
-              // New fields from updated contract
+              chain: 'qieTestnet' as ChainKey,
               criticalIssues: Number(audit.criticalIssues || 0),
               highIssues: Number(audit.highIssues || 0),
               mediumIssues: Number(audit.mediumIssues || 0),
-              reportHash: audit.reportHash || audit.reportHashes?.[0],
-              computeJobId: audit.computeJobId || audit.computeJobIds?.[0]
+              reportCID: audit.reportCID || audit.reportCIDs?.[0],
+              analysisJobId: audit.analysisJobId || audit.analysisJobIds?.[0]
             }));
             
             allAudits.push(...batchAudits);
@@ -141,7 +140,7 @@ export default function ReportsPage() {
         
         console.log(`Total audits fetched: ${allAudits.length}`);
       } catch (error) {
-        console.error('Error fetching 0G Galileo Testnet audits:', error);
+        console.error('Error fetching QIE Testnet audits:', error);
       }
       
       setReports(allAudits);
@@ -202,13 +201,13 @@ export default function ReportsPage() {
   };
 
   const exportReport = async (report: AuditReport) => {
-    // Fetch full report from 0G Storage if available
-    if (report.reportHash && report.reportHash !== '0x' + '0'.repeat(64)) {
+    // Fetch full report from IPFS if available
+    if (report.reportCID) {
       try {
-        const response = await fetch('/api/0g-storage/download', {
+        const response = await fetch('/api/ipfs/download', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reportHash: report.reportHash }),
+          body: JSON.stringify({ cid: report.reportCID }),
         });
 
         if (response.ok) {
@@ -443,9 +442,9 @@ export default function ReportsPage() {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex justify-end gap-2">
-                        {report.reportHash && report.reportHash !== '0x' + '0'.repeat(64) ? (
+                        {report.reportCID ? (
                           <button
-                            onClick={() => window.location.href = `/report/${report.reportHash}`}
+                            onClick={() => window.location.href = `/report/${report.reportCID}`}
                             className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-lg transition-colors duration-200 text-blue-400 text-xs font-medium flex items-center gap-1.5"
                             title="View Full Report"
                           >
