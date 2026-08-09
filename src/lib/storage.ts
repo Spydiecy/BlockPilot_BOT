@@ -6,7 +6,7 @@
  *
  * .env.local setup:
  *   PINATA_JWT=your_jwt_here
- *   NEXT_PUBLIC_GATEWAY_URL=your-subdomain.mypinata.cloud
+ *   PINATA_GATEWAY=your-subdomain.mypinata.cloud
  *
  * Get your keys at: https://app.pinata.cloud/developers/keys
  * Get your gateway at: https://app.pinata.cloud/gateway
@@ -42,7 +42,7 @@ export async function saveReport(content: string): Promise<string> {
  */
 export async function getReport(cid: string): Promise<string | null> {
   try {
-    if (process.env.NEXT_PUBLIC_GATEWAY_URL) {
+    if (process.env.PINATA_GATEWAY) {
       // Use dedicated gateway — fastest, no rate limits
       const { data } = await pinata.gateways.public.get(cid)
       return JSON.stringify(data)
@@ -91,7 +91,7 @@ export function getStorageStats() {
   return {
     network: 'IPFS via Pinata',
     sdk: 'pinata@2.5.6',
-    gateway: process.env.NEXT_PUBLIC_GATEWAY_URL || 'ipfs.io (public fallback)',
+    gateway: process.env.PINATA_GATEWAY || 'ipfs.io (public fallback)',
     status: process.env.PINATA_JWT ? 'Connected' : 'Not configured',
   }
 }
