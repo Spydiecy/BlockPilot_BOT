@@ -77,7 +77,7 @@ ${frameworkPrompt}`;
         model: 'open-mistral-7b',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.1,
-        max_tokens: 4096,
+        max_tokens: 2048,
       }),
     });
 
