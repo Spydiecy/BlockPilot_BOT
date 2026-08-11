@@ -2,7 +2,7 @@
 
 **AI-Powered Smart Contract Security on QIE Testnet**
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now-blue?style=for-the-badge)](https://blockpilot-0g.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now-blue?style=for-the-badge)](https://blockpilot-qie.netlify.app/)
 [![QIE Testnet](https://img.shields.io/badge/⛓️_Built_on-QIE_Testnet-brightgreen?style=for-the-badge)](https://qie.digital/)
 [![MIT License](https://img.shields.io/badge/📄_License-MIT-yellow?style=for-the-badge)](LICENSE)
 
@@ -134,7 +134,7 @@ Network details:
 
 ## Live Demo
 
-Try BlockPilot now: **[blockpilot-0g.vercel.app](https://blockpilot-0g.vercel.app/)**
+Try BlockPilot now: **[blockpilot-qie.netlify.app](https://blockpilot-qie.netlify.app/)**
 
 Connect your wallet to QIE Testnet and start auditing contracts instantly.
 
