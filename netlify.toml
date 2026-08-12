@@ -6,9 +6,6 @@
   NODE_VERSION = "20"
 
 [functions]
-  # Increase timeout for AI routes — Mistral calls can take 20-30s for large contracts
-  included_files = ["**"]
-
   [functions."___netlify-server-handler"]
     timeout = 60
 
