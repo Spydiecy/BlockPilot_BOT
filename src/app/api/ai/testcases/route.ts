@@ -11,9 +11,9 @@ Additional Requirements:
 - Use Hardhat and Chai with latest practices
 - Include complete test setup with TypeScript
 - Add proper describe/it blocks
-- Include deployment scripts
 - Add comprehensive assertions
-- Include gas usage reporting
+- CRITICAL: Always close every function with } before stopping
+- CRITICAL: The file must end with the closing } of the main describe block
 Return ONLY the complete test file code without any extra text.`,
 
   foundry: `
@@ -22,8 +22,8 @@ Additional Requirements:
 - Include setUp() function
 - Use forge std assertions
 - Add fuzzing where appropriate
-- Include proper test annotations
-- Add gas optimization tests
+- CRITICAL: Always close every function with } before stopping
+- CRITICAL: The file must end with the closing } of the contract
 Return ONLY the complete test file code without any extra text.`,
 
   remix: `
@@ -32,8 +32,7 @@ Additional Requirements:
 - Include specific input values to test
 - Add expected outcomes for each step
 - Include verification steps
-- Add troubleshooting notes
-- Include deployment instructions
+- CRITICAL: Always complete every step fully before stopping
 Return a structured list of testing steps without any extra text.`,
 };
 
@@ -53,18 +52,23 @@ export async function POST(request: NextRequest) {
 
     const frameworkPrompt = FRAMEWORK_PROMPTS[framework] || FRAMEWORK_PROMPTS.hardhat;
 
-    const prompt = `You are an expert in smart contract testing. Generate comprehensive test cases for the following smart contract:
+    // Keep contract code concise to leave room for test output
+    const truncatedCode = contractCode.length > 3000
+      ? contractCode.substring(0, 3000) + '\n// ... (truncated for brevity)'
+      : contractCode;
+
+    const prompt = `You are an expert in smart contract testing. Generate concise but complete test cases for the following smart contract.
+
+IMPORTANT: Write fewer, higher-quality tests rather than many incomplete ones. Every function you start MUST be fully closed with proper closing braces.
 
 Contract code:
-${contractCode}
+${truncatedCode}
 
 Requirements:
-- Test all main contract functions
-- Include edge cases and error conditions
+- Test the 5-8 most important functions only
+- Include happy path + one error case per function
 - Test access control
-- Verify state changes
-- Check event emissions
-- Add gas optimization checks where relevant
+- Verify key state changes
 ${frameworkPrompt}`;
 
     const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
@@ -77,7 +81,7 @@ ${frameworkPrompt}`;
         model: 'open-mistral-7b',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.1,
-        max_tokens: 2048,
+        max_tokens: 3500,
       }),
     });
 
@@ -87,13 +91,25 @@ ${frameworkPrompt}`;
     }
 
     const result = await response.json();
-    const generatedText = result.choices?.[0]?.message?.content || '';
+    let generatedText: string = result.choices?.[0]?.message?.content || '';
 
-    const cleanCode = generatedText
-      .replace(/```[a-z]*\n/g, '')
+    // Clean markdown artifacts
+    let cleanCode = generatedText
+      .replace(/```[a-z]*\n?/g, '')
       .replace(/```/g, '')
       .replace(/\*/g, '')
       .trim();
+
+    // Auto-close uncompleted code if truncated mid-function
+    // Count opening vs closing braces; if off, append missing closers
+    if (framework !== 'remix') {
+      const opens = (cleanCode.match(/\{/g) || []).length;
+      const closes = (cleanCode.match(/\}/g) || []).length;
+      const missing = opens - closes;
+      if (missing > 0 && missing <= 5) {
+        cleanCode += '\n' + '}'.repeat(missing);
+      }
+    }
 
     return NextResponse.json({ success: true, testCode: cleanCode });
   } catch (error: any) {
