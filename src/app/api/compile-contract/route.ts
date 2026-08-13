@@ -38,31 +38,34 @@ function findImports(importPath: string) {
 
 export async function POST(request: Request) {
     try {
-        // Safely parse the request body
         let sourceCode;
         try {
             const body = await request.json();
             sourceCode = body.sourceCode;
-            
             if (!sourceCode) {
-                return NextResponse.json({
-                    error: 'No source code provided'
-                }, { status: 400 });
+                return NextResponse.json({ error: 'No source code provided' }, { status: 400 });
             }
         } catch (error) {
-            return NextResponse.json({
-                error: 'Invalid request body',
-                details: (error as Error).message
-            }, { status: 400 });
+            return NextResponse.json({ error: 'Invalid request body', details: (error as Error).message }, { status: 400 });
         }
 
-        // Detect solidity version from source code
-        let solidityVersion = '0.8.19';
-        const versionRegex = /pragma\s+solidity\s+([\^~]?\d+\.\d+\.\d+)/;
-        const match = sourceCode.match(versionRegex);
-        if (match && match[1]) {
-            solidityVersion = match[1].replace(/[\^~]/, ''); // Remove ^ or ~ if present
-        }
+        // Get the installed solc version — use (solc as any).version() for type compat
+        const installedVersion: string = (solc as any).version?.() || '0.8.0';
+        const installedSemver = installedVersion.split('+')[0]; // "0.8.35"
+
+        // Rewrite pragma to use ^ so any compatible version is accepted
+        // This handles cases where AI generates "pragma solidity 0.8.19" but we have 0.8.35
+        sourceCode = sourceCode.replace(
+            /pragma\s+solidity\s+[\^~]?[\d]+\.[\d]+\.[\d]+\s*;/g,
+            `pragma solidity ^${installedSemver};`
+        );
+
+        // Remove import statements — they won't resolve in serverless environment
+        // The AI should generate self-contained contracts, but as a safety net strip them
+        sourceCode = sourceCode.replace(/import\s+[^;]+;/g, '');
+
+        // Remove inheritance that depends on stripped imports (e.g., "is Ownable" without the import)
+        // We can't safely strip this without breaking the contract logic, so just let it fail with a clear message
 
         // Prepare compiler input with detected version
         const input = {
@@ -123,9 +126,14 @@ export async function POST(request: Request) {
             
             // Return if there are actual errors
             if (errors.length > 0) {
+                const errorMessages = errors.map((e: { formattedMessage: string }) => e.formattedMessage).join('\n');
+                // Detect if it's an import/inheritance issue and give a helpful message
+                const isImportError = errorMessages.includes('not found') || errorMessages.includes('Identifier not found') || errorMessages.includes('is Ownable') || errorMessages.includes('undeclared identifier');
                 return NextResponse.json({
-                    error: 'Compilation errors found',
-                    details: errors.map((e: { formattedMessage: string }) => e.formattedMessage)
+                    error: isImportError
+                        ? 'Compilation failed: Contract uses external imports (e.g. OpenZeppelin) which are not supported. Please regenerate with "self-contained" contracts only.'
+                        : 'Compilation errors found',
+                    details: errorMessages
                 }, { status: 400 });
             }
         }
@@ -165,7 +173,7 @@ export async function POST(request: Request) {
             abi: contract.abi,
             bytecode: '0x' + contract.evm.bytecode.object,
             metadata: contract.metadata,
-            solidity_version: solidityVersion
+            solidity_version: installedSemver
         });
 
     } catch (error) {

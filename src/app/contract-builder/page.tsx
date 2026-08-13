@@ -175,11 +175,11 @@ export default function ContractBuilder() {
 
 CRITICAL QUALITY REQUIREMENTS:
 - Generate contracts that would score 4-5 stars in security audits
-- MUST compile without ANY errors in Solidity 0.8.19
+- MUST compile without ANY errors in Solidity 0.8.x
 - Use ONLY valid Solidity syntax and features
 - NO experimental or unsupported features
 - Include comprehensive security measures and best practices
-- DO NOT use ANY external imports or libraries - write everything inline
+- ABSOLUTELY NO import statements — no @openzeppelin, no external libs. NO inheritance like "is Ownable". Everything inline, zero dependencies
 - NO placeholders like "...", "{ ... }", or incomplete code
 - Every function MUST have a complete implementation`;
 
@@ -191,7 +191,7 @@ Parameters: ${JSON.stringify(contractParams)}
 
 Return ONLY this exact JSON format with valid, compilable Solidity code:
 {
-  "code": "// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.19;\\n\\ncontract YourContract {\\n  // Complete implementation\\n}",
+  "code": "// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\ncontract YourContract {\\n  // Complete implementation\\n}",
   "features": ["list of implemented features"],
   "securityNotes": ["list of security measures implemented"]
 }`;
