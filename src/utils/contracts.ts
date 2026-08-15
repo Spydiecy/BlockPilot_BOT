@@ -1,6 +1,6 @@
 // constants/contracts.ts
 export const CONTRACT_ADDRESSES = {
-  qieTestnet: '0xc60E29FDdf01b9E15CDa524B48991B33bFa0E0FD',
+  botTestnet: '0xCa36dD890F987EDcE1D6D7C74Fb9df627c216BF6',
 } as const;
 
 // Updated ABI matching the new IPFS-based AuditRegistry contract

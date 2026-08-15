@@ -324,12 +324,12 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
           .trim();
       }
       
-      // Validate we're on QIE Testnet
+      // Validate we're on BOT Chain Testnet
       const network = await provider.getNetwork();
       const currentChainId = '0x' + network.chainId.toString(16).toUpperCase();
 
-      if (currentChainId.toLowerCase() !== CHAIN_CONFIG.qieTestnet.chainId.toLowerCase()) {
-        throw new Error(`Please switch to QIE Testnet to deploy contracts. Current chain: ${currentChainId}, Expected: ${CHAIN_CONFIG.qieTestnet.chainId}`);
+      if (currentChainId.toLowerCase() !== CHAIN_CONFIG.botTestnet.chainId.toLowerCase()) {
+        throw new Error(`Please switch to BOT Chain Testnet to deploy contracts. Current chain: ${currentChainId}, Expected: ${CHAIN_CONFIG.botTestnet.chainId}`);
       }
 
       // Compile contract with cleaned code
@@ -380,7 +380,7 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
         }
       });
 
-      // Deploy contract with proper gas settings for QIE Testnet
+      // Deploy contract with proper gas settings for BOT Chain Testnet
       const contract = await contractFactory.deploy(...constructorArgs, {
         maxPriorityFeePerGas: ethers.parseUnits('30', 'gwei'), // 30 Gwei tip (above minimum of 25 Gwei)
         maxFeePerGas: ethers.parseUnits('50', 'gwei'), // 50 Gwei max fee
@@ -408,7 +408,7 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
         setError('You cancelled the deployment transaction');
       } else if (error.code === 'INSUFFICIENT_FUNDS') {
         setDeploymentError('Insufficient funds for gas');
-        setError('You don\'t have enough QIE tokens to pay for gas. Get testnet tokens from the faucet.');
+        setError('You don\'t have enough tBOT tokens to pay for gas. Get testnet tokens from the faucet.');
       } else if (error.code === 'NETWORK_ERROR') {
         setDeploymentError('Network connection error');
         setError('Network error. Please check your connection and try again.');
@@ -420,7 +420,7 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
         setError('You cancelled the deployment transaction');
       } else if (error.message?.includes('insufficient funds')) {
         setDeploymentError('Insufficient funds');
-        setError('You don\'t have enough QIE tokens to pay for gas. Get testnet tokens from the faucet.');
+        setError('You don\'t have enough tBOT tokens to pay for gas. Get testnet tokens from the faucet.');
       } else {
         // Generic error
         setDeploymentError(error.message || 'Deployment failed');
@@ -484,12 +484,12 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
       // Register on blockchain
       const { provider, signer } = await connectWallet();
       
-      const CONTRACT_ADDRESSES = { qieTestnet: '0xc60E29FDdf01b9E15CDa524B48991B33bFa0E0FD' };
+      const CONTRACT_ADDRESSES = { botTestnet: '0xCa36dD890F987EDcE1D6D7C74Fb9df627c216BF6' };
       const AUDIT_REGISTRY_ABI = [
         'function registerAudit(bytes32 contractHash, uint8 stars, uint8 criticalCount, uint8 highCount, uint8 mediumCount, string calldata reportCID, string calldata summaryPreview, bytes32 analysisJobId) external'
       ];
       
-      const auditContract = new ethers.Contract(CONTRACT_ADDRESSES.qieTestnet, AUDIT_REGISTRY_ABI, signer);
+      const auditContract = new ethers.Contract(CONTRACT_ADDRESSES.botTestnet, AUDIT_REGISTRY_ABI, signer);
 
       const contractHash = ethers.keccak256(ethers.toUtf8Bytes(contractCode));
       const analysisJobIdBytes32 = generatePlaceholderJobId();
@@ -570,8 +570,8 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
         setError('You cancelled the wallet connection request');
       } else if (error.message?.includes('No Ethereum provider')) {
         setError('No wallet detected. Please install MetaMask or another Web3 wallet.');
-      } else if (error.message?.includes('Please switch to QIE Testnet')) {
-        setError('Please switch to QIE Testnet in your wallet');
+      } else if (error.message?.includes('Please switch to BOT Chain Testnet')) {
+        setError('Please switch to BOT Chain Testnet in your wallet');
       } else {
         setError(error.message || 'Failed to connect wallet. Please try again.');
       }
@@ -928,7 +928,7 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
                     ) : (
                       <>
                         <Rocket size={20} weight="fill" />
-                        Deploy to QIE Testnet
+                        Deploy to BOT Chain Testnet
                       </>
                     )}
                   </button>

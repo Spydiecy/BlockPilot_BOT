@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ethers } from 'ethers';
 import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI } from '@/utils/contracts';
 
-const QIE_RPC_URL = 'https://rpc1testnet.qie.digital';
-const provider = new ethers.JsonRpcProvider(QIE_RPC_URL);
-const contractAddress = CONTRACT_ADDRESSES.qieTestnet;
+const BOT_RPC_URL = 'https://rpc.bohr.life';
+const provider = new ethers.JsonRpcProvider(BOT_RPC_URL);
+const contractAddress = CONTRACT_ADDRESSES.botTestnet;
 
 const contract = new ethers.Contract(
   contractAddress,
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
         const { startIndex, limit } = params[0];
         const auditsData = await contract.getAllAudits(startIndex, limit);
 
-        // QIE Testnet limits eth_getLogs to 10,000 blocks per query.
+        // BOT Chain Testnet limits eth_getLogs to 10,000 blocks per query.
         // Fetch tx hash per audit using a sliding recent-blocks window.
         const currentBlock = await provider.getBlockNumber();
         const MAX_RANGE = 9000; // stay safely under the 10k limit
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
       case 'getAuditorAudits': {
         // Returns full audit data + tx hashes for a specific auditor
-        // Uses a recent block window to avoid QIE's 10k block limit on eth_getLogs
+        // Uses a recent block window to avoid BOT Chain's 10k block limit on eth_getLogs
         const auditorAddress = params[0];
         const contractHashes = await contract.getAuditorHistory(auditorAddress);
 

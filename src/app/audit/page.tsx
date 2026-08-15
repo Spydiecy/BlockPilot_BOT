@@ -61,7 +61,7 @@ interface TransactionState {
 const COOLDOWN_TIME = 30;
 
 const CHAIN_ID_TO_KEY: { [key: number]: ChainKey } = {
-  [getDefaultChain().id]: 'qieTestnet',
+  [getDefaultChain().id]: 'botTestnet',
 };
 
 export default function AuditPage() {
@@ -165,7 +165,7 @@ export default function AuditPage() {
         signer
       );
 
-      // QIE network fee data
+      // BOT Chain network fee data
       const feeData = await provider.getFeeData();
       const minPriorityFee = ethers.parseUnits('25', 'gwei');
       const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas && feeData.maxPriorityFeePerGas > minPriorityFee

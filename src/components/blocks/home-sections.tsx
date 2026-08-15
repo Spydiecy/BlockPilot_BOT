@@ -83,7 +83,7 @@ const workflowSteps: Step[] = [
 ];
 
 const supportedChains: Chain[] = [
-  { id: 1, name: "QIE Testnet", icon: "/chains/QIE.png" },
+  { id: 968, name: "BOT Chain Testnet", icon: "/chains/bot.png" },
 ];
 
 const latestAudits: Audit[] = [
@@ -173,7 +173,7 @@ const ChainsSupported = () => {
           <span className="text-blue-400">NETWORKS</span>
         </h2>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-          Currently supporting QIE Testnet for development and testing
+          Currently supporting BOT Chain Testnet for development and testing
         </p>
         <div className="mt-4 inline-flex items-center px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm">
           🚀 Mainnet coming soon!
@@ -195,7 +195,7 @@ const ChainsSupported = () => {
 
             {/* Content Container */}
             <div className="relative h-full flex flex-col items-center justify-center text-center">
-              {/* QIE Logo */}
+              {/* BOT Chain Logo */}
               <div className="w-20 h-20 bg-neutral-800 rounded-xl mb-6 flex items-center justify-center overflow-hidden">
                 {chain.icon ? (
                   <Image
@@ -224,7 +224,7 @@ const ChainsSupported = () => {
               
               {/* Description */}
               <p className="text-gray-400 text-sm leading-relaxed">
-                Secure smart contract auditing and deployment on QIE's high-performance and developer-friendly network
+                Secure smart contract auditing and deployment on BOT Chain's high-performance and developer-friendly network
               </p>
             </div>
 
@@ -515,9 +515,9 @@ export function HomeSections() {
       icon: <IconShieldLock className="w-6 h-6" />,
     },
     {
-      title: "QIE Network Optimized",
+      title: "BOT Chain Optimized",
       description: 
-        "Specialized security coverage and optimization specifically designed for QIE Network architecture.",
+        "Specialized security coverage and optimization specifically designed for BOT Chain architecture.",
       icon: <IconBolt className="w-6 h-6" />,
     },
     {
@@ -562,8 +562,8 @@ export function HomeSections() {
           ))}
         </div>
 
-        {/* QIE Ecosystem Section */}
-        <div id="qie-ecosystem" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        {/* BOT Chain Ecosystem Section */}
+        <div id="bot-ecosystem" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           {/* Background Elements */}
           <div className="absolute inset-0">
             <div className="absolute inset-0 theme-section-spotlight" />
@@ -574,14 +574,14 @@ export function HomeSections() {
           <div className="relative text-center mb-20">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold mb-4 leading-tight text-white">
               BUILT FOR<br />
-              <span className="text-blue-400">QIE ECOSYSTEM</span>
+              <span className="text-blue-400">BOT CHAIN ECOSYSTEM</span>
             </h2>
             <div className="text-xs text-gray-400 tracking-wider mb-6">
               DECENTRALIZED · SCALABLE · SECURE · REVOLUTIONARY
             </div>
           </div>
 
-          {/* QIE Features Grid */}
+          {/* BOT Chain Features Grid */}
           <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-neutral-800/30">
             {/* IPFS Storage Card */}
             <div className="relative group bg-black">
@@ -681,7 +681,7 @@ export function HomeSections() {
               </div>
             </div>
 
-            {/* QIE Network Card */}
+            {/* BOT Chain Network Card */}
             <div className="relative group bg-black">
               {/* Hover Gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-neutral-800/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -693,8 +693,8 @@ export function HomeSections() {
                   <div className="absolute -inset-1 bg-blue-500/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="relative h-12 w-12 flex items-center justify-center bg-neutral-900 rounded-lg overflow-hidden">
                     <Image
-                      src="/chains/QIE.png"
-                      alt="QIE Network"
+                      src="/chains/bot.png"
+                      alt="BOT Chain Network"
                       width={32}
                       height={32}
                       className="w-8 h-8 object-contain group-hover:scale-110 transition-transform duration-300"
@@ -706,14 +706,14 @@ export function HomeSections() {
                 <div className="mt-6">
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors duration-300">
-                      QIE Testnet
+                      BOT Chain Testnet
                     </h3>
                     <div className="inline-flex items-center px-2 py-0.5 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-xs">
                       ✓ Active
                     </div>
                   </div>
                   <p className="text-neutral-400 group-hover:text-neutral-300 transition-colors duration-300 mb-4">
-                    Secure smart contract auditing on QIE's scalable and developer-friendly testnet infrastructure.
+                    Secure smart contract auditing on BOT Chain's scalable and developer-friendly testnet infrastructure.
                   </p>
                   <ul className="space-y-2 text-sm text-neutral-500">
                     <li className="flex items-start">
@@ -726,7 +726,7 @@ export function HomeSections() {
                     </li>
                     <li className="flex items-start">
                       <span className="text-blue-400 mr-2">•</span>
-                      <span>Mainnet coming Q2 2026</span>
+                      <span>Mainnet will be added very soon</span>
                     </li>
                   </ul>
                 </div>

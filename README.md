@@ -1,16 +1,16 @@
 # 🛡️ BlockPilot
 
-**AI-Powered Smart Contract Security on QIE Testnet**
+**AI-Powered Smart Contract Security on BOT Chain Testnet**
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now-blue?style=for-the-badge)](https://blockpilot-qie.netlify.app/)
-[![QIE Testnet](https://img.shields.io/badge/⛓️_Built_on-QIE_Testnet-brightgreen?style=for-the-badge)](https://qie.digital/)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now-blue?style=for-the-badge)](https://blockpilot-bot.netlify.app/)
+[![BOT Chain Testnet](https://img.shields.io/badge/⛓️_Built_on-BOT_Chain_Testnet-brightgreen?style=for-the-badge)](https://scan.bohr.life/)
 [![MIT License](https://img.shields.io/badge/📄_License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 ---
 
 ## What is BlockPilot?
 
-BlockPilot transforms smart contract security from a weeks-long, expensive process into instant AI-powered analysis. Built for QIE Testnet, it combines Mistral AI's language models with IPFS storage and on-chain verification to create a complete security workflow: audit, store, verify, and document your contracts all in one place.
+BlockPilot transforms smart contract security from a weeks-long, expensive process into instant AI-powered analysis. Built for BOT Chain Testnet, it combines Mistral AI's language models with IPFS storage and on-chain verification to create a complete security workflow: audit, store, verify, and document your contracts all in one place.
 
 **The Problem:** Developers deploy vulnerable contracts because traditional audits are slow and costly.
 
@@ -42,9 +42,9 @@ Each template is self-contained (no external dependencies) and designed to score
 
 ### 📊 Decentralized Reports
 
-Every audit report is stored on IPFS via Pinata with content-addressed verification. Reports are permanent, tamper-proof, and retrievable by CID. The on-chain registry at `0xc60E29FDdf01b9E15CDa524B48991B33bFa0E0FD` maintains an immutable record of all audits.
+Every audit report is stored on IPFS via Pinata with content-addressed verification. Reports are permanent, tamper-proof, and retrievable by CID. The on-chain registry at `0xCa36dD890F987EDcE1D6D7C74Fb9df627c216BF6` maintains an immutable record of all audits.
 
-View your complete audit history in the Reports dashboard, with direct links to QIE Testnet explorer for verification.
+View your complete audit history in the Reports dashboard, with direct links to the BOT Chain explorer for verification.
 
 ### 📝 Documentation Generator
 
@@ -77,7 +77,7 @@ Clean, intuitive design with light and dark themes. Responsive and accessible on
 
 **AI:** Mistral AI (mistral-large-latest model)
 
-**Blockchain:** ethers.js v6, QIE Testnet (Chain ID: 1983)
+**Blockchain:** ethers.js v6, BOT Chain Testnet (Chain ID: 968)
 
 **Storage:** IPFS via Pinata SDK v2.5.6
 
@@ -85,22 +85,26 @@ Clean, intuitive design with light and dark themes. Responsive and accessible on
 
 ---
 
-## QIE Testnet Integration
+## BOT Chain Testnet Integration
 
-BlockPilot is built for QIE Testnet:
+BlockPilot is built for BOT Chain Testnet:
 
-**QIE Testnet** - All contracts deploy with optimized gas patterns
+**BOT Chain Testnet** - All contracts deploy with optimized gas patterns
 
 **IPFS via Pinata** - Audit reports stored decentralized, retrievable by CID
 
-**On-Chain Registry** - Immutable audit records at `0xc60E29FDdf01b9E15CDa524B48991B33bFa0E0FD`
+**On-Chain Registry** - Immutable audit records at `0xCa36dD890F987EDcE1D6D7C74Fb9df627c216BF6`
 
-**Explorer Integration** - Direct links to QIE explorer for transparent verification
+**Explorer Integration** - Direct links to the BOT Chain explorer for transparent verification
 
 Network details:
-- RPC: `https://rpc1testnet.qie.digital`
-- Explorer: `https://testnet.qie.digital`
-- Chain ID: 1983 (0x7bf)
+- Network name: BOT Chain Testnet
+- RPC: `https://rpc.bohr.life`
+- Explorer: `https://scan.bohr.life`
+- Chain ID: 968
+- Currency symbol: tBOT
+
+Mainnet support will be added very soon.
 
 ---
 
@@ -134,9 +138,9 @@ Network details:
 
 ## Live Demo
 
-Try BlockPilot now: **[blockpilot-qie.netlify.app](https://blockpilot-qie.netlify.app/)**
+Try BlockPilot now: **[blockpilot-bot.netlify.app](https://blockpilot-bot.netlify.app/)**
 
-Connect your wallet to QIE Testnet and start auditing contracts instantly.
+Connect your wallet to BOT Chain Testnet and start auditing contracts instantly.
 
 ---
 
@@ -146,4 +150,4 @@ MIT License - See [LICENSE](LICENSE) for details
 
 ---
 
-*Built with ❤️ for the QIE community*
+*Built with ❤️ for the BOT Chain community*

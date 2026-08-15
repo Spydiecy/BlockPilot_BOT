@@ -96,7 +96,7 @@ function WalletPageContent() {
   // Check if current network is testnet
   useEffect(() => {
     if (!chainId) return;
-    // QIE Testnet chain ID is 1983
+    // BOT Chain Testnet chain ID is 968
     const isTestnetChain = currentChain?.testnet === true;
     setIsTestnet(isTestnetChain);
     setShowTestnetWarning(isTestnetChain);

@@ -39,17 +39,17 @@ interface ChainConfig {
 // Note: Window.ethereum is declared in WalletContext.tsx
 
 export const CHAIN_CONFIG: Record<string, ChainConfig> = {
-  qieTestnet: {
-    chainId: '0x7bf', // 1983 in hex
-    chainName: 'QIE Testnet',
+  botTestnet: {
+    chainId: '0x3c8', // 968 in hex
+    chainName: 'BOT Chain Testnet',
     nativeCurrency: {
-      name: 'QIE',
-      symbol: 'QIE',
+      name: 'tBOT',
+      symbol: 'tBOT',
       decimals: 18
     },
-    rpcUrls: ['https://rpc1testnet.qie.digital'],
-    blockExplorerUrls: ['https://testnet.qie.digital'],
-    iconPath: '/chains/QIE.png'
+    rpcUrls: ['https://rpc.bohr.life'],
+    blockExplorerUrls: ['https://scan.bohr.life'],
+    iconPath: '/chains/bot.png'
   }
 } as const;
 
@@ -126,13 +126,13 @@ export const isSupportedNetwork = (chainId: string): boolean => {
 };
 
 // Get explorer URL for a transaction
-export const getExplorerUrl = (txHash: string, chainKey: ChainKey = 'qieTestnet'): string => {
+export const getExplorerUrl = (txHash: string, chainKey: ChainKey = 'botTestnet'): string => {
   const chain = CHAIN_CONFIG[chainKey];
   return `${chain.blockExplorerUrls[0]}/tx/${txHash}`;
 };
 
 // Get explorer URL for an address
-export const getAddressExplorerUrl = (address: string, chainKey: ChainKey = 'qieTestnet'): string => {
+export const getAddressExplorerUrl = (address: string, chainKey: ChainKey = 'botTestnet'): string => {
   const chain = CHAIN_CONFIG[chainKey];
   return `${chain.blockExplorerUrls[0]}/address/${address}`;
 };

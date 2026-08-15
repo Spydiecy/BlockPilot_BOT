@@ -302,7 +302,7 @@ export default function ReportDetailPage() {
                         )}
                       </button>
                       <a
-                        href={`https://testnet.qie.digital/tx/${auditInfo.transactionHash}`}
+                        href={`https://scan.bohr.life/tx/${auditInfo.transactionHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-2 hover:bg-blue-500/20 rounded-lg transition-colors"
@@ -321,7 +321,7 @@ export default function ReportDetailPage() {
                       {auditInfo.auditor}
                     </code>
                     <a
-                      href={`https://testnet.qie.digital/address/${auditInfo.auditor}`}
+                      href={`https://scan.bohr.life/address/${auditInfo.auditor}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-2 hover:bg-blue-500/20 rounded-lg transition-colors"

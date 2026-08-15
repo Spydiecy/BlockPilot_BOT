@@ -14,14 +14,14 @@ export interface Chain {
 
 // Supported chains configuration
 export const SUPPORTED_CHAINS = {
-  qieTestnet: {
-    id: 1983,
-    key: 'qieTestnet',
-    name: 'QIE Testnet',
-    rpcUrl: 'https://rpc1testnet.qie.digital',
-    explorerUrl: 'https://testnet.qie.digital',
-    currency: 'QIE',
-    iconPath: '/chains/QIE.png',
+  botTestnet: {
+    id: 968,
+    key: 'botTestnet',
+    name: 'BOT Chain Testnet',
+    rpcUrl: 'https://rpc.bohr.life',
+    explorerUrl: 'https://scan.bohr.life',
+    currency: 'tBOT',
+    iconPath: '/chains/bot.png',
     testnet: true,
   },
 } as const;
@@ -30,7 +30,7 @@ export type ChainId = keyof typeof SUPPORTED_CHAINS;
 export type SupportedChain = typeof SUPPORTED_CHAINS[ChainId];
 
 // Default chain to use
-const DEFAULT_CHAIN: ChainId = 'qieTestnet';
+const DEFAULT_CHAIN: ChainId = 'botTestnet';
 
 // Helper to get chain by ID
 export const getChainById = (chainId: number): SupportedChain | undefined => {

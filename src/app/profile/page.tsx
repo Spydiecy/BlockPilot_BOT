@@ -82,7 +82,7 @@ export default function ProfilePage() {
       const chainCounts: Record<string, number> = {};
       let totalStars = 0;
 
-      const chainKey: ChainKey = 'qieTestnet';
+      const chainKey: ChainKey = 'botTestnet';
 
       // Use the blockchain API which handles the 10k block limit
       // and fetches real tx hashes from events
@@ -169,7 +169,7 @@ export default function ProfilePage() {
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tighter">Connect Your Wallet</h1>
             <p className="text-gray-400 mb-8 max-w-sm mx-auto">
-              Connect your wallet to view your personalized audit history and statistics on QIE Testnet.
+              Connect your wallet to view your personalized audit history and statistics on BOT Chain Testnet.
             </p>
             <button 
               onClick={connectWallet}
@@ -347,7 +347,7 @@ export default function ProfilePage() {
                   <div className="text-center py-16 text-gray-500 border-2 border-dashed border-gray-800 rounded-xl">
                     <FileSearch size={48} className="mx-auto mb-4 text-gray-600" weight="duotone" />
                     <p className="font-bold text-lg text-gray-400">No Audits Found</p>
-                    <p className="text-sm">You haven't performed any audits on QIE Testnet yet.</p>
+                    <p className="text-sm">You haven't performed any audits on BOT Chain Testnet yet.</p>
                   </div>
                 )}
               </div>

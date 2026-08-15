@@ -60,7 +60,7 @@ export default function ReportsPage() {
       const allAudits: AuditReport[] = [];
       
       try {
-        console.log('Fetching audit reports from QIE Testnet...');
+        console.log('Fetching audit reports from BOT Chain Testnet...');
         
         // First get the total number of contracts
         const totalResponse = await fetch('/api/blockchain', {
@@ -80,7 +80,7 @@ export default function ReportsPage() {
         
         const totalData = await totalResponse.json();
         const totalContracts = totalData.result;
-        console.log(`Found ${totalContracts} contracts on QIE Testnet`);
+        console.log(`Found ${totalContracts} contracts on BOT Chain Testnet`);
         
         // Fetch in batches to respect rate limits
         const BATCH_SIZE = 10; 
@@ -117,7 +117,7 @@ export default function ReportsPage() {
               summary: audit.summary || audit.summaryPreview || "",
               auditor: audit.auditor || audit.auditors?.[0],
               timestamp: Number(audit.timestamp || audit.timestamps?.[0]),
-              chain: 'qieTestnet' as ChainKey,
+              chain: 'botTestnet' as ChainKey,
               criticalIssues: Number(audit.criticalIssues || 0),
               highIssues: Number(audit.highIssues || 0),
               mediumIssues: Number(audit.mediumIssues || 0),
@@ -140,7 +140,7 @@ export default function ReportsPage() {
         
         console.log(`Total audits fetched: ${allAudits.length}`);
       } catch (error) {
-        console.error('Error fetching QIE Testnet audits:', error);
+        console.error('Error fetching BOT Chain Testnet audits:', error);
       }
       
       setReports(allAudits);
