@@ -651,19 +651,19 @@ export function HomeSections() {
                 <div className="mt-6">
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors duration-300">
-                      AI Compute
+                      Custom AI Model
                     </h3>
-                    <div className="inline-flex items-center px-2 py-0.5 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-400 text-xs">
-                      Soon
+                    <div className="inline-flex items-center px-2 py-0.5 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-xs">
+                      ✓ Live
                     </div>
                   </div>
                   <p className="text-neutral-400 group-hover:text-neutral-300 transition-colors duration-300 mb-4">
-                    Next-gen AI analysis powered by AI Compute. Demo ready, final testing in progress for unprecedented speed and accuracy.
+                    Our in-house AI model, trained on industry-leading security audit reports, is fully integrated to deliver the most accurate vulnerability analysis.
                   </p>
                   <ul className="space-y-2 text-sm text-neutral-500">
                     <li className="flex items-start">
                       <span className="text-purple-400 mr-2">•</span>
-                      <span>Distributed AI processing</span>
+                      <span>Trained on top industry audit reports</span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-purple-400 mr-2">•</span>
@@ -671,7 +671,7 @@ export function HomeSections() {
                     </li>
                     <li className="flex items-start">
                       <span className="text-purple-400 mr-2">•</span>
-                      <span>Demo ready & testing</span>
+                      <span>Fully integrated & production ready</span>
                     </li>
                   </ul>
                 </div>
