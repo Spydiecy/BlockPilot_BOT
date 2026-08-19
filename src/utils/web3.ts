@@ -39,6 +39,18 @@ interface ChainConfig {
 // Note: Window.ethereum is declared in WalletContext.tsx
 
 export const CHAIN_CONFIG: Record<string, ChainConfig> = {
+  botMainnet: {
+    chainId: '0x2a5', // 677 in hex
+    chainName: 'BOT Chain Mainnet',
+    nativeCurrency: {
+      name: 'BOT',
+      symbol: 'BOT',
+      decimals: 18
+    },
+    rpcUrls: ['https://rpc.botchain.ai'],
+    blockExplorerUrls: ['https://scan.botchain.ai'],
+    iconPath: '/chains/bot.png'
+  },
   botTestnet: {
     chainId: '0x3c8', // 968 in hex
     chainName: 'BOT Chain Testnet',

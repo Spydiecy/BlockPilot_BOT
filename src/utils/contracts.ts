@@ -1,5 +1,6 @@
 // constants/contracts.ts
 export const CONTRACT_ADDRESSES = {
+  botMainnet: '0xCa36dD890F987EDcE1D6D7C74Fb9df627c216BF6',
   botTestnet: '0xCa36dD890F987EDcE1D6D7C74Fb9df627c216BF6',
 } as const;
 

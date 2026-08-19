@@ -1,16 +1,16 @@
-# 🛡️ BlockPilot
+# BlockPilot
 
-**AI-Powered Smart Contract Security on BOT Chain Testnet**
+**AI-Powered Smart Contract Security on BOT Chain**
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now-blue?style=for-the-badge)](https://blockpilot-bot.netlify.app/)
-[![BOT Chain Testnet](https://img.shields.io/badge/⛓️_Built_on-BOT_Chain_Testnet-brightgreen?style=for-the-badge)](https://scan.bohr.life/)
-[![MIT License](https://img.shields.io/badge/📄_License-MIT-yellow?style=for-the-badge)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Try_Now-blue?style=for-the-badge)](https://blockpilot-bot.netlify.app/)
+[![BOT Chain](https://img.shields.io/badge/Built_on-BOT_Chain-brightgreen?style=for-the-badge)](https://scan.botchain.ai/)
+[![MIT License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 ---
 
 ## What is BlockPilot?
 
-BlockPilot transforms smart contract security from a weeks-long, expensive process into instant AI-powered analysis. Built for BOT Chain Testnet, it combines Mistral AI's language models with IPFS storage and on-chain verification to create a complete security workflow: audit, store, verify, and document your contracts all in one place.
+BlockPilot transforms smart contract security from a weeks-long, expensive process into instant AI-powered analysis. Built for BOT Chain, it combines Mistral AI's language models with IPFS storage and on-chain verification to create a complete security workflow: audit, store, verify, and document your contracts all in one place.
 
 **The Problem:** Developers deploy vulnerable contracts because traditional audits are slow and costly.
 
@@ -20,7 +20,7 @@ BlockPilot transforms smart contract security from a weeks-long, expensive proce
 
 ## Features
 
-### 🔍 AI Security Auditor
+### AI Security Auditor
 
 Paste your contract code and get instant security analysis. The AI scans for vulnerabilities, classifies them by severity (Critical, High, Medium, Low), and provides actionable recommendations. Each audit includes:
 
@@ -31,7 +31,11 @@ Paste your contract code and get instant security analysis. The AI scans for vul
 
 All audit reports are automatically stored on IPFS via Pinata and registered on-chain for permanent verification.
 
-### 🏗️ Smart Contract Builder
+### Mainnet & Testnet Support
+
+BlockPilot now runs on both **BOT Chain Mainnet** and **BOT Chain Testnet**. Switch networks right from the in-app network switcher — your audits, deployments, and reports are automatically tagged and tracked per network.
+
+### Smart Contract Builder
 
 Deploy production-ready contracts without writing code. Choose from battle-tested templates:
 
@@ -40,13 +44,13 @@ Deploy production-ready contracts without writing code. Choose from battle-teste
 
 Each template is self-contained (no external dependencies) and designed to score 4-5 stars on security audits. Enable "Auto-Audit" to get your contract analyzed immediately after deployment.
 
-### 📊 Decentralized Reports
+### Decentralized Reports
 
-Every audit report is stored on IPFS via Pinata with content-addressed verification. Reports are permanent, tamper-proof, and retrievable by CID. The on-chain registry at `0xCa36dD890F987EDcE1D6D7C74Fb9df627c216BF6` maintains an immutable record of all audits.
+Every audit report is stored on IPFS via Pinata with content-addressed verification. Reports are permanent, tamper-proof, and retrievable by CID. The on-chain registry at `0xCa36dD890F987EDcE1D6D7C74Fb9df627c216BF6` maintains an immutable record of all audits on both Mainnet and Testnet.
 
 View your complete audit history in the Reports dashboard, with direct links to the BOT Chain explorer for verification.
 
-### 📝 Documentation Generator
+### Documentation Generator
 
 Generate professional documentation for any smart contract. The AI analyzes your code and creates comprehensive docs including:
 
@@ -57,7 +61,7 @@ Generate professional documentation for any smart contract. The AI analyzes your
 
 Export as professional PDF with BlockPilot branding or Markdown for version control.
 
-### 🧪 Test Case Generator
+### Test Case Generator
 
 Get complete test suites for your contracts in seconds. Choose your framework:
 
@@ -65,7 +69,7 @@ Get complete test suites for your contracts in seconds. Choose your framework:
 - **Foundry** - Solidity-native tests with fuzzing support
 - **Remix** - Step-by-step manual testing instructions
 
-### 🎨 Modern Interface
+### Modern Interface
 
 Clean, intuitive design with light and dark themes. Responsive and accessible on any device.
 
@@ -77,7 +81,7 @@ Clean, intuitive design with light and dark themes. Responsive and accessible on
 
 **AI:** Mistral AI (mistral-large-latest model)
 
-**Blockchain:** ethers.js v6, BOT Chain Testnet (Chain ID: 968)
+**Blockchain:** ethers.js v6, BOT Chain Mainnet (Chain ID: 677) and BOT Chain Testnet (Chain ID: 968)
 
 **Storage:** IPFS via Pinata SDK v2.5.6
 
@@ -85,11 +89,11 @@ Clean, intuitive design with light and dark themes. Responsive and accessible on
 
 ---
 
-## BOT Chain Testnet Integration
+## BOT Chain Integration
 
-BlockPilot is built for BOT Chain Testnet:
+BlockPilot is built for BOT Chain and supports both networks:
 
-**BOT Chain Testnet** - All contracts deploy with optimized gas patterns
+**Mainnet & Testnet** - All contracts deploy with optimized gas patterns on either network
 
 **IPFS via Pinata** - Audit reports stored decentralized, retrievable by CID
 
@@ -97,14 +101,16 @@ BlockPilot is built for BOT Chain Testnet:
 
 **Explorer Integration** - Direct links to the BOT Chain explorer for transparent verification
 
-Network details:
-- Network name: BOT Chain Testnet
-- RPC: `https://rpc.bohr.life`
-- Explorer: `https://scan.bohr.life`
-- Chain ID: 968
-- Currency symbol: tBOT
+**Network Switcher** - Swap between Mainnet and Testnet directly from the navbar
 
-Mainnet support will be added very soon.
+Network details:
+
+| | BOT Chain Mainnet | BOT Chain Testnet |
+|---|---|---|
+| RPC | `https://rpc.botchain.ai` | `https://rpc.bohr.life` |
+| Explorer | `https://scan.botchain.ai` | `https://scan.bohr.life` |
+| Chain ID | 677 | 968 |
+| Currency symbol | BOT | tBOT |
 
 ---
 
@@ -112,11 +118,11 @@ Mainnet support will be added very soon.
 
 | Stars | What It Means |
 |:---:|:---|
-| ⭐⭐⭐⭐⭐ | Perfect - Zero vulnerabilities, ready to deploy |
-| ⭐⭐⭐⭐ | Excellent - Minor optimizations suggested, safe to deploy |
-| ⭐⭐⭐ | Good - Some issues found, fix before deploying |
-| ⭐⭐ | Risky - Critical vulnerabilities detected, do not deploy |
-| ⭐ | Dangerous - Major security flaws, needs complete rewrite |
+| 5 | Perfect - Zero vulnerabilities, ready to deploy |
+| 4 | Excellent - Minor optimizations suggested, safe to deploy |
+| 3 | Good - Some issues found, fix before deploying |
+| 2 | Risky - Critical vulnerabilities detected, do not deploy |
+| 1 | Dangerous - Major security flaws, needs complete rewrite |
 
 ---
 
@@ -132,6 +138,8 @@ Mainnet support will be added very soon.
 
 **Complete** - Security, documentation, and testing in one platform
 
+**Multi-Network** - Full support for both BOT Chain Mainnet and Testnet
+
 **Clean Storage** - Orphaned IPFS reports auto-deleted if on-chain registration fails
 
 ---
@@ -140,7 +148,7 @@ Mainnet support will be added very soon.
 
 Try BlockPilot now: **[blockpilot-bot.netlify.app](https://blockpilot-bot.netlify.app/)**
 
-Connect your wallet to BOT Chain Testnet and start auditing contracts instantly.
+Connect your wallet, pick Mainnet or Testnet from the network switcher, and start auditing contracts instantly.
 
 ---
 
@@ -150,4 +158,4 @@ MIT License - See [LICENSE](LICENSE) for details
 
 ---
 
-*Built with ❤️ for the BOT Chain community*
+*Built with care for the BOT Chain community*

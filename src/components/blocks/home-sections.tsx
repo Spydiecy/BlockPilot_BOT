@@ -3,6 +3,7 @@
 import React from 'react';
 import { cn } from "@/lib/utils";
 import Image from 'next/image';
+import { getSupportedChains } from '@/config/wallet';
 import {
   IconShieldLock,
   IconBrain,
@@ -82,9 +83,13 @@ const workflowSteps: Step[] = [
   },
 ];
 
-const supportedChains: Chain[] = [
-  { id: 968, name: "BOT Chain Testnet", icon: "/chains/bot.png" },
-];
+// Sourced from the single source of truth (config/wallet.ts) so this list
+// never drifts out of sync with the chains actually supported by the app.
+const supportedChains: Chain[] = getSupportedChains().map((chain) => ({
+  id: chain.id,
+  name: chain.name,
+  icon: chain.iconPath,
+}));
 
 const latestAudits: Audit[] = [
   { id: 1 },
@@ -173,19 +178,19 @@ const ChainsSupported = () => {
           <span className="text-blue-400">NETWORKS</span>
         </h2>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-          Currently supporting BOT Chain Testnet for development and testing
+          Live on BOT Chain Mainnet and Testnet
         </p>
-        <div className="mt-4 inline-flex items-center px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm">
-          🚀 Mainnet coming soon!
+        <div className="mt-4 inline-flex items-center px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-sm">
+          ✓ Mainnet is live
         </div>
       </div>
 
       {/* Chains Grid */}
-      <div className="relative flex justify-center">
+      <div className="relative flex flex-wrap justify-center gap-6">
         {supportedChains.map((chain) => (
           <div
             key={chain.id}
-            className="relative group bg-black/50 backdrop-blur-sm rounded-2xl p-8 hover:bg-black/70 transition-all duration-300 border border-neutral-800/50 hover:border-blue-500/50 max-w-sm"
+            className="relative group bg-black/50 backdrop-blur-sm rounded-2xl p-8 hover:bg-black/70 transition-all duration-300 border border-neutral-800/50 hover:border-blue-500/50 max-w-sm w-full sm:w-80"
           >
             {/* Card Background with Gradient */}
             <div className="absolute inset-0 bg-neutral-900/50 backdrop-blur-sm rounded-2xl border border-neutral-800/50 transition-all duration-300 group-hover:border-blue-500/50">
@@ -706,14 +711,14 @@ export function HomeSections() {
                 <div className="mt-6">
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors duration-300">
-                      BOT Chain Testnet
+                      BOT Chain
                     </h3>
                     <div className="inline-flex items-center px-2 py-0.5 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-xs">
-                      ✓ Active
+                      ✓ Mainnet Live
                     </div>
                   </div>
                   <p className="text-neutral-400 group-hover:text-neutral-300 transition-colors duration-300 mb-4">
-                    Secure smart contract auditing on BOT Chain's scalable and developer-friendly testnet infrastructure.
+                    Secure smart contract auditing on BOT Chain's scalable and developer-friendly network, with support for both Mainnet and Testnet.
                   </p>
                   <ul className="space-y-2 text-sm text-neutral-500">
                     <li className="flex items-start">
@@ -726,7 +731,7 @@ export function HomeSections() {
                     </li>
                     <li className="flex items-start">
                       <span className="text-blue-400 mr-2">•</span>
-                      <span>Mainnet will be added very soon</span>
+                      <span>Mainnet and Testnet supported</span>
                     </li>
                   </ul>
                 </div>

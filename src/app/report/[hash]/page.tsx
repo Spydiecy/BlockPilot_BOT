@@ -16,7 +16,14 @@ import {
   Info,
 } from 'phosphor-react';
 import { generateAuditPDF } from '@/utils/generatePDF';
-import { SUPPORTED_CHAINS } from '@/config/wallet';
+import { SUPPORTED_CHAINS, getDefaultChain } from '@/config/wallet';
+
+const getAuditExplorerUrl = (chainKey?: string): string => {
+  const chain = chainKey && chainKey in SUPPORTED_CHAINS
+    ? SUPPORTED_CHAINS[chainKey as keyof typeof SUPPORTED_CHAINS]
+    : getDefaultChain();
+  return chain.explorerUrl;
+};
 
 interface ReportData {
   analysis: {
@@ -47,6 +54,9 @@ interface AuditInfo {
   chain: string;
   transactionHash?: string;
 }
+
+// Query every supported chain until we find the one the report's audit was registered on
+const ALL_CHAIN_KEYS = Object.keys(SUPPORTED_CHAINS) as (keyof typeof SUPPORTED_CHAINS)[];
 
 export default function ReportDetailPage() {
   const params = useParams();
@@ -81,27 +91,32 @@ export default function ReportDetailPage() {
       const data = await response.json();
       setReportData(data.report);
 
-      // Try to fetch audit info from blockchain
+      // Try to fetch audit info from blockchain — check every supported chain
+      // since we don't know upfront which chain (mainnet or testnet) this report was registered on.
       // This is optional - report can be viewed without it
-      try {
-        const auditResponse = await fetch('/api/blockchain', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            method: 'getAllAudits',
-            params: [{ startIndex: 0, limit: 100 }],
-          }),
-        });
+      for (const chainKey of ALL_CHAIN_KEYS) {
+        try {
+          const auditResponse = await fetch('/api/blockchain', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              method: 'getAllAudits',
+              params: [{ startIndex: 0, limit: 100 }],
+              chain: chainKey,
+            }),
+          });
 
-        if (auditResponse.ok) {
-          const auditData = await auditResponse.json();
-          const audit = auditData.result.find((a: any) => a.reportHash === reportHash);
-          if (audit) {
-            setAuditInfo(audit);
+          if (auditResponse.ok) {
+            const auditData = await auditResponse.json();
+            const audit = auditData.result.find((a: any) => a.reportHash === reportHash);
+            if (audit) {
+              setAuditInfo({ ...audit, chain: chainKey });
+              break;
+            }
           }
+        } catch (err) {
+          console.warn(`Could not fetch audit info from ${chainKey}:`, err);
         }
-      } catch (err) {
-        console.warn('Could not fetch audit info:', err);
       }
 
       setIsLoading(false);
@@ -302,7 +317,7 @@ export default function ReportDetailPage() {
                         )}
                       </button>
                       <a
-                        href={`https://scan.bohr.life/tx/${auditInfo.transactionHash}`}
+                        href={`${getAuditExplorerUrl(auditInfo.chain)}/tx/${auditInfo.transactionHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-2 hover:bg-blue-500/20 rounded-lg transition-colors"
@@ -321,7 +336,7 @@ export default function ReportDetailPage() {
                       {auditInfo.auditor}
                     </code>
                     <a
-                      href={`https://scan.bohr.life/address/${auditInfo.auditor}`}
+                      href={`${getAuditExplorerUrl(auditInfo.chain)}/address/${auditInfo.auditor}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-2 hover:bg-blue-500/20 rounded-lg transition-colors"

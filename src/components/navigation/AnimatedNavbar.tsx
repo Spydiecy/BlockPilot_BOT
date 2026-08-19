@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FiHome, FiFileText, FiShield, FiUser, FiZap, FiCreditCard, FiBookOpen, FiCode } from 'react-icons/fi';
 import { useTheme } from '@/contexts/ThemeContext';
+import { NetworkSwitcher } from './NetworkSwitcher';
 
 interface NavItem {
   name: string;
@@ -69,8 +70,8 @@ export function AnimatedNavbar() {
       className="fixed left-1/2 transform -translate-x-1/2 z-50 transition-all duration-500 ease-out"
       style={{
         bottom: '40px',
-        width: '65%',
-        maxWidth: '650px',
+        width: '78%',
+        maxWidth: '660px',
         transform: `translate(-50%, ${isVisible ? '0' : '100%'})`,
       }}
       onMouseEnter={() => setIsHovered(true)}
@@ -104,12 +105,12 @@ export function AnimatedNavbar() {
             isHovered ? 'opacity-100 h-16 -translate-y-0' : 'opacity-0 h-0 -translate-y-2 overflow-hidden border-t-0 border-l-0 border-r-0'
           }`}
         >
-          <div className="flex items-center justify-center h-full px-4 pb-1">
+          <div className="flex items-center justify-center h-full px-6 pb-1">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 href={item.path}
-                className={`flex flex-col items-center justify-center px-4 py-3 transition-all duration-300 ${
+                className={`flex flex-col items-center justify-center px-3 py-3 transition-all duration-300 ${
                   pathname === item.path 
                     ? 'text-blue-400' 
                     : isLightTheme
@@ -129,6 +130,10 @@ export function AnimatedNavbar() {
                 </span>
               </Link>
             ))}
+            <div className={`w-px h-8 mx-1 flex-shrink-0 ${isLightTheme ? 'bg-blue-200/60' : 'bg-gray-700/60'}`} />
+            <div className="pr-1">
+              <NetworkSwitcher isLightTheme={isLightTheme} showLabel={isHovered} />
+            </div>
           </div>
         </div>
       </div>

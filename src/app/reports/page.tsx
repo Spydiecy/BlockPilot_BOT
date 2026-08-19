@@ -19,6 +19,8 @@ import { SUPPORTED_CHAINS, ChainId } from '@/config/wallet';
 import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI, ChainKey } from '@/utils/contracts';
 import { generateAuditPDF } from '@/utils/generatePDF';
 
+const ALL_CHAIN_KEYS = Object.keys(CONTRACT_ADDRESSES) as ChainKey[];
+
 interface AuditReport {
   contractHash: string;
   transactionHash: string; // Transaction hash from blockchain event
@@ -53,97 +55,92 @@ export default function ReportsPage() {
     minStars: 0
   });
 
+  // Fetch audits from every supported chain (mainnet + testnet) and tag each with its chain
+  const fetchChainAudits = async (chainKey: ChainKey): Promise<AuditReport[]> => {
+    const chainName = SUPPORTED_CHAINS[chainKey]?.name || chainKey;
+    const chainAudits: AuditReport[] = [];
+
+    try {
+      console.log(`Fetching audit reports from ${chainName}...`);
+
+      const totalResponse = await fetch('/api/blockchain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method: 'getTotalContracts', params: [], chain: chainKey }),
+      });
+
+      if (!totalResponse.ok) {
+        throw new Error('Failed to get total contracts');
+      }
+
+      const totalData = await totalResponse.json();
+      const totalContracts = totalData.result;
+      console.log(`Found ${totalContracts} contracts on ${chainName}`);
+
+      const BATCH_SIZE = 10;
+      let processed = 0;
+
+      while (processed < totalContracts) {
+        try {
+          const response = await fetch('/api/blockchain', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              method: 'getAllAudits',
+              params: [{ startIndex: processed, limit: BATCH_SIZE }],
+              chain: chainKey,
+            }),
+          });
+
+          if (!response.ok) {
+            console.warn(`Failed to fetch batch ${processed}-${processed + BATCH_SIZE} on ${chainName}: ${response.statusText}`);
+            break;
+          }
+
+          const data = await response.json();
+          console.log(`Fetched batch ${processed}-${processed + BATCH_SIZE} on ${chainName}, found ${data.result.length} audits`);
+
+          const batchAudits: AuditReport[] = data.result.map((audit: any) => ({
+            contractHash: audit.contractHash || audit.contractHashes?.[0],
+            transactionHash: audit.transactionHash || '0x',
+            stars: Number(audit.stars),
+            summary: audit.summary || audit.summaryPreview || "",
+            auditor: audit.auditor || audit.auditors?.[0],
+            timestamp: Number(audit.timestamp || audit.timestamps?.[0]),
+            chain: chainKey,
+            criticalIssues: Number(audit.criticalIssues || 0),
+            highIssues: Number(audit.highIssues || 0),
+            mediumIssues: Number(audit.mediumIssues || 0),
+            reportCID: audit.reportCID || audit.reportCIDs?.[0],
+            analysisJobId: audit.analysisJobId || audit.analysisJobIds?.[0]
+          }));
+
+          chainAudits.push(...batchAudits);
+          processed += BATCH_SIZE;
+
+          if (processed < totalContracts) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        } catch (error) {
+          console.error(`Error fetching batch ${processed} on ${chainName}:`, error);
+          break;
+        }
+      }
+
+      console.log(`Total audits fetched on ${chainName}: ${chainAudits.length}`);
+    } catch (error) {
+      console.error(`Error fetching ${chainName} audits:`, error);
+    }
+
+    return chainAudits;
+  };
+
   // Fetch audits from all supported chains
   const fetchAllChainAudits = async () => {
     setIsLoading(true);
     try {
-      const allAudits: AuditReport[] = [];
-      
-      try {
-        console.log('Fetching audit reports from BOT Chain Testnet...');
-        
-        // First get the total number of contracts
-        const totalResponse = await fetch('/api/blockchain', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            method: 'getTotalContracts',
-            params: []
-          })
-        });
-        
-        if (!totalResponse.ok) {
-          throw new Error('Failed to get total contracts');
-        }
-        
-        const totalData = await totalResponse.json();
-        const totalContracts = totalData.result;
-        console.log(`Found ${totalContracts} contracts on BOT Chain Testnet`);
-        
-        // Fetch in batches to respect rate limits
-        const BATCH_SIZE = 10; 
-        let processed = 0;
-        
-        while (processed < totalContracts) {
-          try {
-            const response = await fetch('/api/blockchain', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                method: 'getAllAudits',
-                params: [{
-                  startIndex: processed,
-                  limit: BATCH_SIZE
-                }]
-              })
-            });
-            
-            if (!response.ok) {
-              console.warn(`Failed to fetch batch ${processed}-${processed + BATCH_SIZE}: ${response.statusText}`);
-              break;
-            }
-            
-            const data = await response.json();
-            console.log(`Fetched batch ${processed}-${processed + BATCH_SIZE}, found ${data.result.length} audits`);
-            
-            const batchAudits = data.result.map((audit: any) => ({
-              contractHash: audit.contractHash || audit.contractHashes?.[0],
-              transactionHash: audit.transactionHash || '0x',
-              stars: Number(audit.stars),
-              summary: audit.summary || audit.summaryPreview || "",
-              auditor: audit.auditor || audit.auditors?.[0],
-              timestamp: Number(audit.timestamp || audit.timestamps?.[0]),
-              chain: 'botTestnet' as ChainKey,
-              criticalIssues: Number(audit.criticalIssues || 0),
-              highIssues: Number(audit.highIssues || 0),
-              mediumIssues: Number(audit.mediumIssues || 0),
-              reportCID: audit.reportCID || audit.reportCIDs?.[0],
-              analysisJobId: audit.analysisJobId || audit.analysisJobIds?.[0]
-            }));
-            
-            allAudits.push(...batchAudits);
-            processed += BATCH_SIZE;
-            
-            // Small delay to avoid overwhelming the RPC
-            if (processed < totalContracts) {
-              await new Promise(resolve => setTimeout(resolve, 100));
-            }
-          } catch (error) {
-            console.error(`Error fetching batch ${processed}:`, error);
-            break;
-          }
-        }
-        
-        console.log(`Total audits fetched: ${allAudits.length}`);
-      } catch (error) {
-        console.error('Error fetching BOT Chain Testnet audits:', error);
-      }
-      
-      setReports(allAudits);
+      const results = await Promise.all(ALL_CHAIN_KEYS.map(fetchChainAudits));
+      setReports(results.flat());
     } catch (error) {
       console.error('Error fetching all chain audits:', error);
     } finally {

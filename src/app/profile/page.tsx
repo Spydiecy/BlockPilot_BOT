@@ -16,7 +16,9 @@ import {
 import Image from 'next/image';
 import { useWallet } from '@/contexts/WalletContext';
 import { getSupportedChains, getDefaultChain, ChainId } from '@/config/wallet';
-import { ChainKey } from '@/utils/contracts';
+import { CONTRACT_ADDRESSES, ChainKey } from '@/utils/contracts';
+
+const ALL_CHAIN_KEYS = Object.keys(CONTRACT_ADDRESSES) as ChainKey[];
 
 interface AuditStats {
   totalAudits: number;
@@ -82,36 +84,46 @@ export default function ProfilePage() {
       const chainCounts: Record<string, number> = {};
       let totalStars = 0;
 
-      const chainKey: ChainKey = 'botTestnet';
+      // Query every supported chain (mainnet + testnet) and tag audits with
+      // the chain they actually came from.
+      const perChainResults = await Promise.all(
+        ALL_CHAIN_KEYS.map(async (chainKey) => {
+          try {
+            const response = await fetch('/api/blockchain', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                method: 'getAuditorAudits',
+                params: [userAddress],
+                chain: chainKey,
+              }),
+            });
 
-      // Use the blockchain API which handles the 10k block limit
-      // and fetches real tx hashes from events
-      const response = await fetch('/api/blockchain', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          method: 'getAuditorAudits',
-          params: [userAddress],
-        }),
-      });
+            const data = await response.json();
+            return (data.result || []).map((audit: any): UserAudit => ({
+              contractHash: audit.contractHash,
+              transactionHash: audit.transactionHash || '0x',
+              stars: Number(audit.stars),
+              summary: audit.summaryPreview || '',
+              timestamp: Number(audit.timestamp),
+              chain: chainKey,
+              criticalIssues: Number(audit.criticalIssues || 0),
+              highIssues: Number(audit.highIssues || 0),
+              mediumIssues: Number(audit.mediumIssues || 0),
+              reportCID: audit.reportCID,
+              analysisJobId: audit.analysisJobId,
+            }));
+          } catch (err) {
+            console.error(`Error fetching audits on ${chainKey}:`, err);
+            return [];
+          }
+        })
+      );
 
-      const data = await response.json();
-      const allAudits: UserAudit[] = (data.result || []).map((audit: any) => {
-        chainCounts[chainKey] = (chainCounts[chainKey] || 0) + 1;
-        totalStars += Number(audit.stars);
-        return {
-          contractHash: audit.contractHash,
-          transactionHash: audit.transactionHash || '0x',
-          stars: Number(audit.stars),
-          summary: audit.summaryPreview || '',
-          timestamp: Number(audit.timestamp),
-          chain: chainKey,
-          criticalIssues: Number(audit.criticalIssues || 0),
-          highIssues: Number(audit.highIssues || 0),
-          mediumIssues: Number(audit.mediumIssues || 0),
-          reportCID: audit.reportCID,
-          analysisJobId: audit.analysisJobId,
-        };
+      const allAudits: UserAudit[] = perChainResults.flat();
+      allAudits.forEach((audit) => {
+        chainCounts[audit.chain] = (chainCounts[audit.chain] || 0) + 1;
+        totalStars += audit.stars;
       });
 
       const totalAudits = allAudits.length;
@@ -169,7 +181,7 @@ export default function ProfilePage() {
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tighter">Connect Your Wallet</h1>
             <p className="text-gray-400 mb-8 max-w-sm mx-auto">
-              Connect your wallet to view your personalized audit history and statistics on BOT Chain Testnet.
+              Connect your wallet to view your personalized audit history and statistics on BOT Chain.
             </p>
             <button 
               onClick={connectWallet}
@@ -297,7 +309,7 @@ export default function ProfilePage() {
                           </div>
                           {audit.transactionHash && audit.transactionHash !== '0x' && (
                             <a 
-                              href={`${defaultChain.explorerUrl}/tx/${audit.transactionHash}`}
+                              href={`${getSupportedChains().find(c => c.key === audit.chain)?.explorerUrl || defaultChain.explorerUrl}/tx/${audit.transactionHash}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center gap-2 font-mono text-sm text-blue-400 hover:text-blue-300 transition-colors"
@@ -347,7 +359,7 @@ export default function ProfilePage() {
                   <div className="text-center py-16 text-gray-500 border-2 border-dashed border-gray-800 rounded-xl">
                     <FileSearch size={48} className="mx-auto mb-4 text-gray-600" weight="duotone" />
                     <p className="font-bold text-lg text-gray-400">No Audits Found</p>
-                    <p className="text-sm">You haven't performed any audits on BOT Chain Testnet yet.</p>
+                    <p className="text-sm">You haven't performed any audits on BOT Chain yet.</p>
                   </div>
                 )}
               </div>

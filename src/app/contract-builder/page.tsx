@@ -20,6 +20,7 @@ import {
 } from 'phosphor-react';
 import { CONTRACT_TEMPLATES, ContractTemplate } from './templates';
 import { connectWallet, CHAIN_CONFIG } from '@/utils/web3';
+import { CONTRACT_ADDRESSES, type ChainKey as ContractChainKey } from '@/utils/contracts';
 import { generatePlaceholderJobId, unpinIPFSReport } from '@/utils/ipfsStorage';
 import React from 'react';
 
@@ -324,13 +325,19 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
           .trim();
       }
       
-      // Validate we're on BOT Chain Testnet
+      // Validate we're on a supported BOT Chain network (mainnet or testnet)
       const network = await provider.getNetwork();
       const currentChainId = '0x' + network.chainId.toString(16).toUpperCase();
+      const deployTargetChain = Object.entries(CHAIN_CONFIG).find(
+        ([, config]) => currentChainId.toLowerCase() === config.chainId.toLowerCase()
+      );
 
-      if (currentChainId.toLowerCase() !== CHAIN_CONFIG.botTestnet.chainId.toLowerCase()) {
-        throw new Error(`Please switch to BOT Chain Testnet to deploy contracts. Current chain: ${currentChainId}, Expected: ${CHAIN_CONFIG.botTestnet.chainId}`);
+      if (!deployTargetChain) {
+        const supportedNames = Object.values(CHAIN_CONFIG).map(c => c.chainName).join(' or ');
+        throw new Error(`Please switch to ${supportedNames} to deploy contracts. Current chain: ${currentChainId}`);
       }
+
+      const [deployTargetChainKey] = deployTargetChain;
 
       // Compile contract with cleaned code
       const response = await fetch('/api/compile-contract', {
@@ -380,7 +387,7 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
         }
       });
 
-      // Deploy contract with proper gas settings for BOT Chain Testnet
+      // Deploy contract with proper gas settings for BOT Chain
       const contract = await contractFactory.deploy(...constructorArgs, {
         maxPriorityFeePerGas: ethers.parseUnits('30', 'gwei'), // 30 Gwei tip (above minimum of 25 Gwei)
         maxFeePerGas: ethers.parseUnits('50', 'gwei'), // 50 Gwei max fee
@@ -395,7 +402,7 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
 
       // If audit toggle is enabled, automatically audit the contract
       if (auditOnDeploy) {
-        await auditDeployedContract(cleanCode, receipt.contractAddress, receipt.hash);
+        await auditDeployedContract(cleanCode, receipt.contractAddress, receipt.hash, deployTargetChainKey as keyof typeof CHAIN_CONFIG);
       }
 
     } catch (error: any) {
@@ -431,7 +438,7 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
     }
   };
 
-  const auditDeployedContract = async (contractCode: string, contractAddress: string, txHash: string) => {
+  const auditDeployedContract = async (contractCode: string, contractAddress: string, txHash: string, deployChainKey: keyof typeof CHAIN_CONFIG) => {
     setIsAuditing(true);
     let uploadedCid = ''; // track CID so we can unpin on failure
     try {
@@ -481,15 +488,15 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
       const { cid } = await uploadResponse.json();
       uploadedCid = cid; // save so we can unpin if chain registration fails
 
-      // Register on blockchain
+      // Register on blockchain — use the contract address for whichever chain the deploy happened on
       const { provider, signer } = await connectWallet();
-      
-      const CONTRACT_ADDRESSES = { botTestnet: '0xCa36dD890F987EDcE1D6D7C74Fb9df627c216BF6' };
-      const AUDIT_REGISTRY_ABI = [
+
+      const registryAddress = CONTRACT_ADDRESSES[deployChainKey as unknown as ContractChainKey];
+      const AUDIT_REGISTRY_ABI_LOCAL = [
         'function registerAudit(bytes32 contractHash, uint8 stars, uint8 criticalCount, uint8 highCount, uint8 mediumCount, string calldata reportCID, string calldata summaryPreview, bytes32 analysisJobId) external'
       ];
-      
-      const auditContract = new ethers.Contract(CONTRACT_ADDRESSES.botTestnet, AUDIT_REGISTRY_ABI, signer);
+
+      const auditContract = new ethers.Contract(registryAddress, AUDIT_REGISTRY_ABI_LOCAL, signer);
 
       const contractHash = ethers.keccak256(ethers.toUtf8Bytes(contractCode));
       const analysisJobIdBytes32 = generatePlaceholderJobId();
@@ -570,8 +577,8 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
         setError('You cancelled the wallet connection request');
       } else if (error.message?.includes('No Ethereum provider')) {
         setError('No wallet detected. Please install MetaMask or another Web3 wallet.');
-      } else if (error.message?.includes('Please switch to BOT Chain Testnet')) {
-        setError('Please switch to BOT Chain Testnet in your wallet');
+      } else if (error.message?.includes('Please switch to')) {
+        setError('Please switch to a supported BOT Chain network in your wallet');
       } else {
         setError(error.message || 'Failed to connect wallet. Please try again.');
       }
@@ -928,7 +935,7 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
                     ) : (
                       <>
                         <Rocket size={20} weight="fill" />
-                        Deploy to BOT Chain Testnet
+                        Deploy to {currentChain ? CHAIN_CONFIG[currentChain].chainName : 'BOT Chain'}
                       </>
                     )}
                   </button>

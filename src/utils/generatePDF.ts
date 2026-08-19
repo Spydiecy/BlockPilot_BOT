@@ -77,7 +77,7 @@ export async function generateAuditPDF(
     doc.setFontSize(7);
     doc.setTextColor(90, 110, 150);
     doc.text(
-      'BlockPilot  ·  BOT Chain Testnet  ·  AI-Powered Smart Contract Security',
+      'BlockPilot  ·  BOT Chain  ·  AI-Powered Smart Contract Security',
       ML, PH - 7
     );
     doc.text(`Page ${pg}`, PW - MR, PH - 7, { align: 'right' });
@@ -182,7 +182,7 @@ export async function generateAuditPDF(
   doc.setFontSize(8);
   doc.setTextColor(120, 140, 175);
   doc.text(dateStr, PW - MR, 36, { align: 'right' });
-  doc.text('BOT Chain Testnet', PW - MR, 50, { align: 'right' });
+  doc.text('BOT Chain', PW - MR, 50, { align: 'right' });
 
   // bottom separator
   doc.setDrawColor(99, 102, 241);

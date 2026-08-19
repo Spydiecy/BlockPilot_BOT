@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, ReactNode, useCallback, useState } from 'react';
 import { ethers } from 'ethers';
 import { useRouter } from 'next/navigation';
-import { formatBalance, getChain, getDefaultChain, getSupportedChains, type SupportedChain } from '@/config/wallet';
+import { formatBalance, getChain, getChainById, getDefaultChain, getSupportedChains, PREFERRED_CHAIN_STORAGE_KEY, type SupportedChain } from '@/config/wallet';
 import type { EthereumProvider } from '@/types/ethereum';
 
 const setWalletConnected = (connected: boolean) => {
@@ -30,6 +30,31 @@ const getEthereum = (): EthereumProvider | undefined => {
   if (typeof window === 'undefined') return undefined;
   const provider = window.ethereum;
   return isEthereumProvider(provider) ? provider : undefined;
+};
+
+// Reads the user's last-selected network (if any) from localStorage,
+// falling back to the app default (BOT Chain Testnet) if none is set.
+const getPreferredChain = (): SupportedChain => {
+  if (typeof window === 'undefined') return getDefaultChain();
+  try {
+    const savedId = window.localStorage.getItem(PREFERRED_CHAIN_STORAGE_KEY);
+    if (savedId) {
+      const chain = getChainById(Number(savedId));
+      if (chain) return chain;
+    }
+  } catch {
+    // localStorage unavailable — fall back silently
+  }
+  return getDefaultChain();
+};
+
+const savePreferredChain = (id: number) => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(PREFERRED_CHAIN_STORAGE_KEY, String(id));
+  } catch {
+    // no-op
+  }
 };
 
 interface WalletContextType {
@@ -156,13 +181,17 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
       const chainHex = await ethereum.request({ method: 'eth_chainId' }) as string;
       const currentId = parseInt(chainHex, 16);
-      const defaultChain = getDefaultChain();
 
       applyChainId(chainHex);
       await applyAccounts(accounts);
 
-      if (currentId !== defaultChain.id) {
-        await switchChain(defaultChain.id);
+      // Only auto-switch if the wallet isn't already on ANY supported chain.
+      // If the user is already on e.g. BOT Chain Mainnet, respect that instead
+      // of forcing them back to the default (testnet).
+      const isOnSupportedChain = !!getChainById(currentId);
+      if (!isOnSupportedChain) {
+        const preferred = getPreferredChain();
+        await switchChain(preferred.id);
       }
     } catch (err) {
       console.error('Error connecting wallet:', err);
@@ -193,6 +222,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: `0x${targetChainId.toString(16)}` }],
       });
+      savePreferredChain(targetChainId);
     } catch (switchError: any) {
       if (switchError.code === 4902) {
         const chain = getChain(targetChainId);
@@ -207,6 +237,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             blockExplorerUrls: [chain.explorerUrl],
           }],
         });
+        savePreferredChain(targetChainId);
       } else {
         throw switchError;
       }

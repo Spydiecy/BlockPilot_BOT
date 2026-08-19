@@ -9,7 +9,7 @@ import {
 } from 'phosphor-react';
 import { useWallet } from '@/contexts/WalletContext';
 import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI, ChainKey, Audit } from '@/utils/contracts';
-import { getDefaultChain } from '@/config/wallet';
+import { getDefaultChain, getChainById } from '@/config/wallet';
 import { AuditPageContainer } from '@/components/audit/AuditPageContainer';
 import { CodeInputPanel } from '@/components/audit/CodeInputPanel';
 import { ResultsPanel } from '@/components/audit/ResultsPanel';
@@ -60,10 +60,6 @@ interface TransactionState {
 // Constants
 const COOLDOWN_TIME = 30;
 
-const CHAIN_ID_TO_KEY: { [key: number]: ChainKey } = {
-  [getDefaultChain().id]: 'botTestnet',
-};
-
 export default function AuditPage() {
   const { chainId, isConnected, provider, signer, currentChain } = useWallet();
   const [code, setCode] = useState('');
@@ -75,13 +71,11 @@ export default function AuditPage() {
   const [txState, setTxState] = useState<TransactionState>({ isProcessing: false, hash: null, error: null });
 
   const defaultChain = getDefaultChain();
-  // Consider correct network if:
-  // 1. chainId from context matches, OR
-  // 2. currentChain is set and matches (context populated via different path), OR
-  // 3. chainId is null (context not yet hydrated) AND we're connected — give benefit of the doubt
+  // Any chain in SUPPORTED_CHAINS (mainnet or testnet) is valid for registration —
+  // we just need to know which one so we call the right contract address.
   const isCorrectNetwork = 
-    chainId === defaultChain.id || 
-    currentChain?.id === defaultChain.id;
+    (chainId !== null && !!getChainById(chainId)) ||
+    !!currentChain;
 
   const PENDING_CID_KEY = 'blockpilot_pending_cid';
 
@@ -154,9 +148,10 @@ export default function AuditPage() {
         ethers.toUtf8Bytes(code)
       );
 
-      const contractAddressKey = CHAIN_ID_TO_KEY[chainId];
-      if (!contractAddressKey) {
-        throw new Error('Unsupported network');
+      const connectedChain = getChainById(chainId);
+      const contractAddressKey = connectedChain?.key as ChainKey | undefined;
+      if (!contractAddressKey || !(contractAddressKey in CONTRACT_ADDRESSES)) {
+        throw new Error('Unsupported network. Please switch to BOT Chain Mainnet or Testnet.');
       }
 
       const contract = new ethers.Contract(
@@ -360,7 +355,7 @@ export default function AuditPage() {
           registerAuditOnChain={registerAuditOnChain}
           isCorrectNetwork={isCorrectNetwork}
           isConnected={isConnected}
-          defaultChain={defaultChain}
+          defaultChain={currentChain ?? defaultChain}
         />
       </div>
     </AuditPageContainer>

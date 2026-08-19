@@ -14,6 +14,16 @@ export interface Chain {
 
 // Supported chains configuration
 export const SUPPORTED_CHAINS = {
+  botMainnet: {
+    id: 677,
+    key: 'botMainnet',
+    name: 'BOT Chain Mainnet',
+    rpcUrl: 'https://rpc.botchain.ai',
+    explorerUrl: 'https://scan.botchain.ai',
+    currency: 'BOT',
+    iconPath: '/chains/bot.png',
+    testnet: false,
+  },
   botTestnet: {
     id: 968,
     key: 'botTestnet',
@@ -31,6 +41,9 @@ export type SupportedChain = typeof SUPPORTED_CHAINS[ChainId];
 
 // Default chain to use
 const DEFAULT_CHAIN: ChainId = 'botTestnet';
+
+// Local storage key used to remember the user's preferred network across sessions
+export const PREFERRED_CHAIN_STORAGE_KEY = 'blockpilot_preferred_chain';
 
 // Helper to get chain by ID
 export const getChainById = (chainId: number): SupportedChain | undefined => {

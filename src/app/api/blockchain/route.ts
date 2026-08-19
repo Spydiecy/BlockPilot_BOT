@@ -1,21 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ethers } from 'ethers';
-import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI } from '@/utils/contracts';
+import { CONTRACT_ADDRESSES, AUDIT_REGISTRY_ABI, type ChainKey } from '@/utils/contracts';
+import { CHAIN_CONFIG } from '@/utils/web3';
 
-const BOT_RPC_URL = 'https://rpc.bohr.life';
-const provider = new ethers.JsonRpcProvider(BOT_RPC_URL);
-const contractAddress = CONTRACT_ADDRESSES.botTestnet;
+const DEFAULT_CHAIN_KEY: ChainKey = 'botTestnet';
 
-const contract = new ethers.Contract(
-  contractAddress,
-  AUDIT_REGISTRY_ABI,
-  provider
-);
+// Cache one provider/contract pair per chain so we don't reconnect on every request
+const clientsByChain = new Map<ChainKey, { provider: ethers.JsonRpcProvider; contract: ethers.Contract }>();
+
+function getClient(chainKey: ChainKey) {
+  const cached = clientsByChain.get(chainKey);
+  if (cached) return cached;
+
+  const rpcUrl = CHAIN_CONFIG[chainKey]?.rpcUrls[0];
+  const contractAddress = CONTRACT_ADDRESSES[chainKey];
+
+  if (!rpcUrl || !contractAddress) {
+    throw new Error(`Unsupported chain: ${chainKey}`);
+  }
+
+  const provider = new ethers.JsonRpcProvider(rpcUrl);
+  const contract = new ethers.Contract(contractAddress, AUDIT_REGISTRY_ABI, provider);
+
+  const client = { provider, contract };
+  clientsByChain.set(chainKey, client);
+  return client;
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { method, params = [] } = body;
+    const { method, params = [], chain } = body;
+
+    const chainKey: ChainKey = (chain && chain in CONTRACT_ADDRESSES) ? chain : DEFAULT_CHAIN_KEY;
+    const { provider, contract } = getClient(chainKey);
 
     let result;
 
@@ -28,7 +46,7 @@ export async function POST(request: NextRequest) {
         const { startIndex, limit } = params[0];
         const auditsData = await contract.getAllAudits(startIndex, limit);
 
-        // BOT Chain Testnet limits eth_getLogs to 10,000 blocks per query.
+        // BOT Chain limits eth_getLogs to 10,000 blocks per query.
         // Fetch tx hash per audit using a sliding recent-blocks window.
         const currentBlock = await provider.getBlockNumber();
         const MAX_RANGE = 9000; // stay safely under the 10k limit

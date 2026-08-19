@@ -96,7 +96,7 @@ function WalletPageContent() {
   // Check if current network is testnet
   useEffect(() => {
     if (!chainId) return;
-    // BOT Chain Testnet chain ID is 968
+    // Testnet flag is set per-chain in SUPPORTED_CHAINS (config/wallet.ts)
     const isTestnetChain = currentChain?.testnet === true;
     setIsTestnet(isTestnetChain);
     setShowTestnetWarning(isTestnetChain);
