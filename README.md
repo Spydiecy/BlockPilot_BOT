@@ -2,7 +2,7 @@
 
 **AI-Powered Smart Contract Security on BOT Chain**
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Try_Now-blue?style=for-the-badge)](https://blockpilot-bot.netlify.app/)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Try_Now-blue?style=for-the-badge)](https://blockpilot-bot-opal.vercel.app/)
 [![BOT Chain](https://img.shields.io/badge/Built_on-BOT_Chain-brightgreen?style=for-the-badge)](https://scan.botchain.ai/)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
@@ -146,7 +146,7 @@ Network details:
 
 ## Live Demo
 
-Try BlockPilot now: **[blockpilot-bot.netlify.app](https://blockpilot-bot.netlify.app/)**
+Try BlockPilot now: **[blockpilot-bot-opal.vercel.app](https://blockpilot-bot-opal.vercel.app/)**
 
 Connect your wallet, pick Mainnet or Testnet from the network switcher, and start auditing contracts instantly.
 
