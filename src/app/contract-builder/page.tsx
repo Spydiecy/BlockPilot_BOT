@@ -401,8 +401,11 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
       setDeployedAddress(receipt.contractAddress);
 
       // If audit toggle is enabled, automatically audit the contract
+      // Reuse the already-connected signer/provider from deployment instead of
+      // reconnecting — calling connectWallet() again right after a deploy tx
+      // can cause the wallet to silently drop the next signing prompt.
       if (auditOnDeploy) {
-        await auditDeployedContract(cleanCode, receipt.contractAddress, receipt.hash, deployTargetChainKey as keyof typeof CHAIN_CONFIG);
+        await auditDeployedContract(cleanCode, receipt.contractAddress, receipt.hash, deployTargetChainKey as keyof typeof CHAIN_CONFIG, signer, provider);
       }
 
     } catch (error: any) {
@@ -438,7 +441,14 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
     }
   };
 
-  const auditDeployedContract = async (contractCode: string, contractAddress: string, txHash: string, deployChainKey: keyof typeof CHAIN_CONFIG) => {
+  const auditDeployedContract = async (
+    contractCode: string,
+    contractAddress: string,
+    txHash: string,
+    deployChainKey: keyof typeof CHAIN_CONFIG,
+    signer: ethers.Signer,
+    provider: ethers.Provider
+  ) => {
     setIsAuditing(true);
     let uploadedCid = ''; // track CID so we can unpin on failure
     try {
@@ -489,8 +499,7 @@ Return ONLY this exact JSON format with valid, compilable Solidity code:
       uploadedCid = cid; // save so we can unpin if chain registration fails
 
       // Register on blockchain — use the contract address for whichever chain the deploy happened on
-      const { provider, signer } = await connectWallet();
-
+      // (signer/provider are reused from the deployment step, see comment at call site)
       const registryAddress = CONTRACT_ADDRESSES[deployChainKey as unknown as ContractChainKey];
       const AUDIT_REGISTRY_ABI_LOCAL = [
         'function registerAudit(bytes32 contractHash, uint8 stars, uint8 criticalCount, uint8 highCount, uint8 mediumCount, string calldata reportCID, string calldata summaryPreview, bytes32 analysisJobId) external'
